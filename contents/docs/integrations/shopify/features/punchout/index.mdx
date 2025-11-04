@@ -53,8 +53,7 @@ PunchOut allows enterprise customers to:
 │ 2. Redirects to Shopify Store   │
 │    with fromIdentity parameter  │
 │                                 │
-│ ?fromIdentity=SAP_Ariba_        │
-│ Buyer:ACME_CORP_12345           │
+│ ?fromIdentity=AN01234567890     │
 └────────────┬────────────────────┘
              │
              ▼
@@ -138,11 +137,11 @@ The widget recognizes these formats (case-insensitive):
 ### Example URLs
 
 ```
-https://your-store.com/products/laptop?fromIdentity=SAP_Ariba_Buyer:ACME_CORP
+https://your-store.com/products/laptop?fromIdentity=AN01234567890
 
-https://your-store.com/collections/all?fromIdentity=PunchOut_Buyer:ENTERPRISE_123
+https://your-store.com/collections/all?fromIdentity=AN01234567890
 
-https://your-store.com?fromIdentity=Ariba_Buyer:CUSTOMER_XYZ
+https://your-store.com?fromIdentity=AN01234567890
 ```
 
 ### Character Restrictions
@@ -367,14 +366,11 @@ See the [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting) for 
 Create test URLs to verify setup:
 
 ```
-# Test SAP Ariba format
-https://your-store.com?fromIdentity=SAP_Ariba_Buyer:TEST_CUSTOMER
-
 # Test PunchOut format
-https://your-store.com?fromIdentity=PunchOut_Buyer:TEST_123
+https://your-store.com?fromIdentity=AN01234567890
 
 # Test on specific product
-https://your-store.com/products/laptop?fromIdentity=Ariba_Buyer:TEST_ORG
+https://your-store.com/products/laptop?fromIdentity=AN01234567890
 ```
 
 ### Verification Steps
@@ -383,10 +379,10 @@ https://your-store.com/products/laptop?fromIdentity=Ariba_Buyer:TEST_ORG
 2. **Check console:**
 ```javascript
 console.log(sessionStorage.getItem('weevio_fromIdentity'));
-// Should show: "SAP_Ariba_Buyer:TEST_CUSTOMER"
+// Should show: "AN01234567890"
 
 console.log(sessionStorage.getItem('weevio_fromIdentity_customerId'));
-// Should show: "gid://shopify/Customer/123456"
+// Should show: "123456"
 ```
 3. **Verify pricing changes** - Should see "Your Price"
 4. **Navigate to other pages** - FromIdentity should persist
