@@ -1,0 +1,184 @@
+---
+title: PunchOut Integration
+description: Enable SAP Ariba buyers to see customer-specific pricing automatically without Shopify login.
+keywords: ["punchout", "SAP Ariba", "customer pricing", "B2B", "fromIdentity", "procurement"]
+---
+
+PunchOut integration enables your SAP Ariba buyers to see their negotiated, customer-specific pricing automatically when browsing your Shopify store—without requiring them to log in.
+
+## Overview
+
+The PunchOut fromIdentity customer pricing feature creates a seamless experience for B2B procurement buyers. When a buyer accesses your store through their SAP Ariba PunchOut catalog, the system automatically identifies them and displays their contracted pricing on all products.
+
+### How It Works
+
+The integration uses a three-part system:
+
+1. **URL Parameter Capture**: When a buyer clicks through from SAP Ariba, a `fromIdentity` parameter (their SAP Ariba buyer ID) is included in the URL
+2. **Customer Mapping**: The system maps this buyer ID to a Shopify customer record using special tags
+3. **Automatic Pricing**: The Product Page Widget automatically displays the customer's negotiated pricing
+
+**Example Flow**:
+```
+Buyer clicks product in SAP Ariba
+  ↓
+Opens: yourstore.com?fromIdentity=AN01631249352
+  ↓
+System looks up Shopify customer tagged: "Ariba Buyer: AN01631249352"
+  ↓
+Displays customer-specific pricing automatically
+```
+
+### Key Benefits
+
+<CardGrid>
+  <Card
+    title="No Login Required"
+    description="Buyers see their custom pricing without creating or logging into a Shopify account."
+  />
+  <Card
+    title="Seamless Experience"
+    description="Pricing is applied automatically and persists as buyers browse your catalog."
+  />
+  <Card
+    title="Multi-Tab Support"
+    description="Each browser tab maintains its own buyer context, supporting multiple buyers on one device."
+  />
+  <Card
+    title="Privacy-Friendly"
+    description="Uses sessionStorage (no cookies), with automatic 12-hour session expiration."
+  />
+</CardGrid>
+
+## Core Components
+
+### Backend API
+- **Endpoint**: `/api/v1/shopify/b2b/resolve-from-identity`
+- **Purpose**: Maps SAP Ariba buyer IDs to Shopify customer IDs
+- **Caching**: 15-minute HTTP cache for performance
+- **Security**: Input sanitization and validation at all layers
+
+### Tracker Script
+- **Size**: 1.47 KB (0.66 KB gzipped)
+- **Function**: Captures fromIdentity parameter from any page URL
+- **Storage**: Stores in sessionStorage with 12-hour expiration
+- **Installation**: Added once to theme.liquid
+
+### Widget Integration
+- **Component**: Product Page Widget (PriceDisplay)
+- **Function**: Automatically queries and displays customer pricing
+- **Fallback**: Shows public pricing if resolution fails
+
+## Who This Is For
+
+<Step>
+  <StepItem title="End Users & Buyers">
+    If you're a procurement professional using SAP Ariba, the [Buyer Guide](/docs/punchout/buyer-guide) explains what to expect when browsing and purchasing.
+  </StepItem>
+  <StepItem title="Store Administrators">
+    If you manage Shopify customers and need to configure PunchOut access, the [Admin Setup Guide](/docs/punchout/admin-setup) walks you through customer tagging requirements.
+  </StepItem>
+  <StepItem title="Developers & Technical Staff">
+    If you're deploying the feature or troubleshooting integration issues, see the [Deployment Guide](/docs/punchout/deployment) for tracker script installation.
+  </StepItem>
+</Step>
+
+## Technical Highlights
+
+### Session Management
+- **Storage**: Browser sessionStorage (per-tab isolation)
+- **Duration**: 12-hour automatic expiration
+- **Privacy**: No cookies, no cross-site tracking
+- **Multi-buyer**: Different tabs can have different buyer contexts
+
+### Performance
+- **Two-level caching**: Backend (15 min) + Frontend (session-based)
+- **Graceful degradation**: Falls back to public pricing on any error
+- **Minimal overhead**: ~4.5 KB total bundle impact
+- **Real-time pricing**: Updates immediately when products are viewed
+
+### Customer Tagging
+Shopify customers must be tagged with their SAP Ariba buyer ID using one of these formats:
+
+```
+Ariba Buyer: AN01631249352
+SAP Ariba Buyer: AN01631249352
+PunchOut Buyer: AN01631249352
+```
+
+Optional price code tag for tiered pricing:
+```
+PRICE CODE: IPG_TIER_1
+```
+
+## Getting Started
+
+Ready to implement PunchOut pricing? Follow this sequence:
+
+<Step>
+  <StepItem title="Configure Customer Tags">
+    Start with the [Admin Setup Guide](/docs/punchout/admin-setup) to tag your Shopify customers with their SAP Ariba buyer IDs.
+  </StepItem>
+  <StepItem title="Deploy Tracker Script">
+    Follow the [Deployment Guide](/docs/punchout/deployment) to install the fromIdentity tracker script in your Shopify theme.
+  </StepItem>
+  <StepItem title="Test the Integration">
+    Use the PunchOut simulator or test with real buyer IDs to verify pricing displays correctly.
+  </StepItem>
+  <StepItem title="Train Your Team">
+    Share the [Buyer Guide](/docs/punchout/buyer-guide) with procurement teams and the [Troubleshooting Guide](/docs/punchout/troubleshooting) with support staff.
+  </StepItem>
+</Step>
+
+## Feature Compatibility
+
+### Requirements
+- Weevio Product Page Widget (with PunchOut support)
+- Shopify store with customer accounts
+- Customer tagging capability in Shopify
+- Modern web browser with sessionStorage support
+
+### Browser Support
+- Chrome 4+
+- Firefox 3.5+
+- Safari 4+
+- Edge (all versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+<Note type="info">
+The tracker script uses standard Web Storage APIs supported by all modern browsers. Legacy browser fallback gracefully shows public pricing.
+</Note>
+
+## Documentation Structure
+
+<CardGrid>
+  <Card
+    title="Overview"
+    href="/docs/punchout/overview"
+    description="High-level feature explanation and architecture (this page)."
+  />
+  <Card
+    title="Buyer Guide"
+    href="/docs/punchout/buyer-guide"
+    description="For end users: What PunchOut buyers can expect."
+  />
+  <Card
+    title="Admin Setup"
+    href="/docs/punchout/admin-setup"
+    description="For administrators: Customer tagging and configuration."
+  />
+  <Card
+    title="Deployment"
+    href="/docs/punchout/deployment"
+    description="For developers: Tracker script installation and testing."
+  />
+  <Card
+    title="Troubleshooting"
+    href="/docs/punchout/troubleshooting"
+    description="Common issues and debugging procedures."
+  />
+</CardGrid>
+
+## Support & Questions
+
+For technical implementation questions or issues with the PunchOut integration, consult the [Troubleshooting Guide](/docs/punchout/troubleshooting) or contact the Weevio Cloud development team.
