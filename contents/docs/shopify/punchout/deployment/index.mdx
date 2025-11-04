@@ -1,0 +1,759 @@
+---
+title: PunchOut Deployment Guide
+description: Install the fromIdentity tracker script and deploy the Product Page Widget to enable PunchOut custom pricing.
+keywords: ["punchout", "deployment", "installation", "tracker script", "widget", "technical"]
+---
+
+This guide explains how to deploy the PunchOut fromIdentity customer pricing feature, including tracker script installation and widget deployment. This is intended for developers, technical administrators, and implementation teams.
+
+## Overview
+
+Deploying PunchOut custom pricing requires two main components:
+
+1. **Tracker Script**: Captures the `fromIdentity` parameter from URLs and stores it in sessionStorage
+2. **Product Page Widget**: Reads fromIdentity and displays customer-specific pricing
+
+Both components must be deployed for the feature to work correctly.
+
+## Prerequisites
+
+Before you begin:
+
+- [ ] Access to Shopify theme editor
+- [ ] Weevio Product Page Widget source code
+- [ ] Node.js 22.x installed (for building widget)
+- [ ] Understanding of Shopify Liquid templates
+- [ ] Customer tagging configured (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
+
+<Note type="warning">
+**Important**: The tracker script must be deployed to your Shopify theme before the widget deployment. The widget relies on data captured by the tracker script.
+</Note>
+
+## Deployment Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│          Shopify Theme (theme.liquid)       │
+│  ┌───────────────────────────────────────┐  │
+│  │   <head>                              │  │
+│  │     <script src="fromIdentity-       │  │
+│  │              tracker.js">             │  │
+│  │   </head>                             │  │
+│  └───────────────────────────────────────┘  │
+│                                              │
+│  ┌───────────────────────────────────────┐  │
+│  │   Product Page                        │  │
+│  │     <div id="weevio-widget"></div>    │  │
+│  │     <script src="product-widget.js">  │  │
+│  └───────────────────────────────────────┘  │
+└─────────────────────────────────────────────┘
+
+  Tracker captures fromIdentity → sessionStorage
+                 ↓
+  Widget reads sessionStorage → Displays custom pricing
+```
+
+## Part 1: Tracker Script Installation
+
+### Step 1: Build the Tracker Script
+
+The tracker script is part of the ecommerce-widget package.
+
+<Step>
+  <StepItem title="Navigate to Widget Directory">
+    ```bash
+    cd apps/ecommerce-widget
+    ```
+  </StepItem>
+  <StepItem title="Install Dependencies">
+    ```bash
+    npm install
+    ```
+  </StepItem>
+  <StepItem title="Build Production Assets">
+    ```bash
+    npm run build-prod
+    ```
+    
+    This generates optimized production files including `fromIdentity-tracker.js` in the `dist/` directory.
+  </StepItem>
+  <StepItem title="Locate Tracker Script">
+    The built tracker script is at:
+    ```
+    apps/ecommerce-widget/dist/fromIdentity-tracker.js
+    ```
+    
+    **File size**: ~1.47 KB (0.66 KB gzipped)
+  </StepItem>
+</Step>
+
+### Step 2: Upload to Shopify Theme
+
+<Step>
+  <StepItem title="Access Theme Editor">
+    Log into Shopify Admin and navigate to:
+    **Online Store → Themes → Actions → Edit code**
+  </StepItem>
+  <StepItem title="Upload Tracker Script">
+    In the left sidebar, find the **Assets** folder.
+    
+    Click **Add a new asset**, then **Upload file**.
+    
+    Upload `fromIdentity-tracker.js` from your local build.
+  </StepItem>
+  <StepItem title="Verify Upload">
+    Confirm the file appears in the Assets folder:
+    ```
+    assets/fromIdentity-tracker.js
+    ```
+  </StepItem>
+</Step>
+
+### Step 3: Add Script to Theme
+
+<Step>
+  <StepItem title="Open theme.liquid">
+    In the theme editor, navigate to:
+    **Layout → theme.liquid**
+  </StepItem>
+  <StepItem title="Locate <head> Section">
+    Find the `<head>` section in the file (usually near the top).
+  </StepItem>
+  <StepItem title="Add Script Tag">
+    Add the following line within the `<head>` section, preferably near the end:
+    
+    ```liquid
+    <script src="{{ 'fromIdentity-tracker.js' | asset_url }}" defer></script>
+    ```
+    
+    **Important**: Use the `defer` attribute to ensure the script doesn't block page rendering.
+  </StepItem>
+  <StepItem title="Save Changes">
+    Click **Save** in the top right corner.
+  </StepItem>
+</Step>
+
+**Example placement**:
+```liquid
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page_title }}</title>
+    
+    {# Other head content #}
+    
+    {# Add tracker script before closing </head> #}
+    <script src="{{ 'fromIdentity-tracker.js' | asset_url }}" defer></script>
+  </head>
+  <body>
+    ...
+  </body>
+</html>
+```
+
+### Step 4: Verify Tracker Installation
+
+<Step>
+  <StepItem title="Open Store in Browser">
+    Visit your store's homepage in a new incognito/private browser window.
+  </StepItem>
+  <StepItem title="Add Test Parameter">
+    Add `?fromIdentity=TEST123` to the URL:
+    ```
+    https://yourstore.com/?fromIdentity=TEST123
+    ```
+  </StepItem>
+  <StepItem title="Check Browser Console">
+    Open browser developer tools (F12) and check the Console tab.
+    
+    You should see:
+    ```
+    [Weevio] Captured fromIdentity: TEST123
+    ```
+  </StepItem>
+  <StepItem title="Check sessionStorage">
+    In the Console, run:
+    ```javascript
+    sessionStorage.getItem('weevio_fromIdentity');
+    ```
+    
+    Expected output:
+    ```json
+    {"value":"TEST123","timestamp":1699118400000}
+    ```
+  </StepItem>
+</Step>
+
+<Note type="success">
+If you see the console log and sessionStorage contains the data, the tracker script is installed correctly!
+</Note>
+
+### Step 5: Test Cross-Page Persistence
+
+<Step>
+  <StepItem title="Start with Test URL">
+    Open a page with the test parameter:
+    ```
+    https://yourstore.com/?fromIdentity=TEST123
+    ```
+  </StepItem>
+  <StepItem title="Navigate to Another Page">
+    Click any link to navigate to another page (e.g., a product or collection).
+  </StepItem>
+  <StepItem title="Verify Persistence">
+    On the new page, check sessionStorage again:
+    ```javascript
+    sessionStorage.getItem('weevio_fromIdentity');
+    ```
+    
+    It should still contain `TEST123`.
+  </StepItem>
+</Step>
+
+The fromIdentity value should persist across all pages in the same browser tab until the tab is closed or 12 hours have passed.
+
+## Part 2: Product Page Widget Deployment
+
+### Step 1: Build Updated Widget
+
+<Step>
+  <StepItem title="Navigate to Widget Directory">
+    ```bash
+    cd apps/ecommerce-widget
+    ```
+  </StepItem>
+  <StepItem title="Ensure Latest Code">
+    Pull the latest code from your repository that includes the fromIdentity integration.
+  </StepItem>
+  <StepItem title="Install Dependencies">
+    ```bash
+    npm install
+    ```
+  </StepItem>
+  <StepItem title="Build Production Widget">
+    ```bash
+    npm run build-prod
+    ```
+    
+    This generates the updated widget with PunchOut support.
+  </StepItem>
+</Step>
+
+### Step 2: Deploy Widget to Hosting
+
+The widget deployment process depends on your hosting setup:
+
+**Option A: Shopify Theme Assets**
+
+<Step>
+  <StepItem title="Upload Widget Bundle">
+    Upload the built widget JavaScript file to Shopify Assets (same as tracker script).
+  </StepItem>
+  <StepItem title="Update Product Template">
+    In your product template (e.g., `sections/product-template.liquid`), add:
+    ```liquid
+    <div id="weevio-widget"></div>
+    <script src="{{ 'product-widget.js' | asset_url }}"></script>
+    ```
+  </StepItem>
+</Step>
+
+**Option B: CDN Hosting**
+
+<Step>
+  <StepItem title="Upload to CDN">
+    Upload widget files to your CDN (e.g., AWS S3 + CloudFront, Cloudflare).
+  </StepItem>
+  <StepItem title="Update Product Template">
+    In your product template, reference the CDN URL:
+    ```liquid
+    <div id="weevio-widget"></div>
+    <script src="https://cdn.yourstore.com/widgets/product-widget.js"></script>
+    ```
+  </StepItem>
+</Step>
+
+<Note type="info">
+**Standard Deployment**: Follow your existing widget deployment process. The fromIdentity feature is automatically included if you're using the latest widget version—no special configuration needed.
+</Note>
+
+### Step 3: Widget Configuration
+
+Ensure your widget initialization includes the required configuration:
+
+```javascript
+// Widget initialization (usually in product template)
+window.WeevioWidget.init({
+  targetElement: '#weevio-widget',
+  shopifyDomain: 'yourstore.myshopify.com',
+  apiEndpoint: 'https://api.weevio.com',
+  // fromIdentity support is automatic
+  // No additional config needed
+});
+```
+
+The widget automatically:
+1. Checks sessionStorage for `weevio_fromIdentity`
+2. Calls `/api/v1/shopify/b2b/resolve-from-identity` if found
+3. Fetches customer-specific pricing
+4. Falls back to public pricing if resolution fails
+
+## Testing the Complete Integration
+
+### Test 1: End-to-End Pricing Resolution
+
+<Step>
+  <StepItem title="Set Up Test Customer">
+    In Shopify Admin, tag a test customer with a buyer ID (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup)):
+    ```
+    Ariba Buyer: TEST_BUYER_123
+    ```
+  </StepItem>
+  <StepItem title="Open Product with fromIdentity">
+    Open a product page with the test buyer ID:
+    ```
+    https://yourstore.com/products/test-product?fromIdentity=TEST_BUYER_123
+    ```
+  </StepItem>
+  <StepItem title="Verify Console Logs">
+    Check browser console for:
+    ```
+    [Weevio] Captured fromIdentity: TEST_BUYER_123
+    [Weevio Widget] Resolving fromIdentity...
+    [Weevio Widget] Customer resolved: gid://shopify/Customer/123...
+    [Weevio Widget] Displaying customer pricing
+    ```
+  </StepItem>
+  <StepItem title="Verify Pricing Display">
+    Confirm the product shows customer-specific pricing (not public pricing).
+  </StepItem>
+</Step>
+
+### Test 2: Fallback Behavior
+
+<Step>
+  <StepItem title="Use Invalid Buyer ID">
+    Open a product with a non-existent buyer ID:
+    ```
+    https://yourstore.com/products/test-product?fromIdentity=INVALID_ID
+    ```
+  </StepItem>
+  <StepItem title="Verify Fallback">
+    The widget should:
+    - Show public pricing (not an error)
+    - Log a resolution failure in console
+    - Continue functioning normally
+  </StepItem>
+</Step>
+
+### Test 3: Session Expiration
+
+<Step>
+  <StepItem title="Manually Expire Session">
+    In browser console, modify the timestamp to simulate expiration:
+    ```javascript
+    const data = JSON.parse(sessionStorage.getItem('weevio_fromIdentity'));
+    data.timestamp = Date.now() - (13 * 60 * 60 * 1000); // 13 hours ago
+    sessionStorage.setItem('weevio_fromIdentity', JSON.stringify(data));
+    ```
+  </StepItem>
+  <StepItem title="Reload Page">
+    Refresh the product page.
+  </StepItem>
+  <StepItem title="Verify Expiration Handling">
+    The widget should:
+    - Detect expired session
+    - Show public pricing
+    - Log expiration in console
+  </StepItem>
+</Step>
+
+### Test 4: Multi-Tab Isolation
+
+<Step>
+  <StepItem title="Open Tab 1 with Buyer A">
+    ```
+    https://yourstore.com/products/test-product?fromIdentity=BUYER_A
+    ```
+    Verify pricing for Buyer A appears.
+  </StepItem>
+  <StepItem title="Open Tab 2 with Buyer B">
+    In a new tab (same browser), open:
+    ```
+    https://yourstore.com/products/test-product?fromIdentity=BUYER_B
+    ```
+    Verify pricing for Buyer B appears.
+  </StepItem>
+  <StepItem title="Switch Between Tabs">
+    Switch back to Tab 1 and refresh. Verify Buyer A's pricing is still shown.
+    
+    Each tab maintains its own sessionStorage and buyer context.
+  </StepItem>
+</Step>
+
+## Troubleshooting Deployment Issues
+
+### Issue: Tracker Script Not Loading
+
+**Symptoms**:
+- No console log when visiting page with `?fromIdentity` parameter
+- sessionStorage doesn't contain `weevio_fromIdentity`
+
+**Debug steps**:
+
+<Step>
+  <StepItem title="Check Network Tab">
+    In browser DevTools → Network tab, filter for "fromIdentity-tracker.js".
+    
+    Verify the script loads (status 200).
+  </StepItem>
+  <StepItem title="Check for JavaScript Errors">
+    Look in Console tab for any errors related to the tracker script.
+  </StepItem>
+  <StepItem title="Verify File Path">
+    Check that the script tag uses the correct asset URL:
+    ```liquid
+    {{ 'fromIdentity-tracker.js' | asset_url }}
+    ```
+  </StepItem>
+  <StepItem title="Check Script Execution">
+    In Console, run:
+    ```javascript
+    typeof window.WeevioFromIdentityTracker !== 'undefined'
+    ```
+    Should return `true` if script loaded.
+  </StepItem>
+</Step>
+
+**Solutions**:
+- Re-upload the tracker script to Shopify Assets
+- Clear Shopify theme cache (Edit code → Actions → Clear cache)
+- Verify theme.liquid was saved correctly
+- Check for JavaScript errors blocking script execution
+
+### Issue: Widget Not Resolving fromIdentity
+
+**Symptoms**:
+- Tracker script works (console logs appear)
+- sessionStorage contains fromIdentity
+- Widget shows public pricing instead of customer pricing
+
+**Debug steps**:
+
+<Step>
+  <StepItem title="Check Widget Logs">
+    In Console, filter for "Weevio Widget" logs.
+    
+    Look for resolution attempt and any error messages.
+  </StepItem>
+  <StepItem title="Check API Response">
+    In DevTools → Network tab, find the request to:
+    ```
+    /api/v1/shopify/b2b/resolve-from-identity
+    ```
+    
+    Check the response:
+    - Status 200 = successful
+    - Response contains `customerId` and optionally `priceCode`
+  </StepItem>
+  <StepItem title="Verify Customer Tagging">
+    Ensure the Shopify customer has correct buyer ID tag (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup)).
+  </StepItem>
+</Step>
+
+**Solutions**:
+- Verify customer is tagged correctly in Shopify
+- Check API endpoint configuration in widget init
+- Ensure backend API is deployed and accessible
+- Check for CORS issues in Network tab
+
+### Issue: Session Not Persisting Across Pages
+
+**Symptoms**:
+- fromIdentity captured on first page
+- Lost when navigating to another page
+
+**Possible causes**:
+- Browser doesn't support sessionStorage (very old browsers)
+- sessionStorage disabled by browser privacy settings
+- Script error clearing sessionStorage
+
+**Debug steps**:
+
+<Step>
+  <StepItem title="Test sessionStorage Support">
+    In Console, run:
+    ```javascript
+    typeof(Storage) !== "undefined"
+    ```
+    Should return `true`.
+  </StepItem>
+  <StepItem title="Manually Test Persistence">
+    In Console, set test data:
+    ```javascript
+    sessionStorage.setItem('test', 'value');
+    ```
+    Navigate to another page and check:
+    ```javascript
+    sessionStorage.getItem('test');
+    ```
+    Should return `'value'`.
+  </StepItem>
+</Step>
+
+**Solutions**:
+- Use a modern browser (Chrome 4+, Firefox 3.5+, Safari 4+)
+- Check browser privacy settings (sessionStorage should be enabled)
+- Verify no other scripts are clearing sessionStorage
+
+### Issue: Pricing Updates Delayed
+
+**Symptoms**:
+- Customer tag changed in Shopify
+- Widget still shows old pricing after 1-2 minutes
+
+**Cause**: Backend caching (15-minute TTL)
+
+**Solution**: Wait 15 minutes for backend cache to expire, or manually clear backend cache if available.
+
+### Issue: CORS Errors in Console
+
+**Symptoms**:
+- Browser console shows CORS error when calling resolution API
+- Network request to `/resolve-from-identity` is blocked
+
+**Cause**: API endpoint not configured to accept requests from your Shopify domain
+
+**Solution**:
+- Verify backend API CORS configuration includes your Shopify store domain
+- Check that API requests use correct domain and protocol (HTTPS)
+- Contact Weevio backend team if CORS configuration needs updating
+
+## Performance Optimization
+
+### Caching Strategy
+
+The fromIdentity feature uses two levels of caching:
+
+**Backend Cache (15 minutes)**:
+- Resolution API results cached for 15 minutes
+- Reduces Shopify API calls
+- Automatic cache expiration
+
+**Frontend Cache (12 hours)**:
+- sessionStorage persists fromIdentity for 12 hours
+- Eliminates repeated parameter parsing
+- Automatic expiration on tab close
+
+### Bundle Size Impact
+
+| Component | Size | Gzipped | Impact |
+|-----------|------|---------|--------|
+| Tracker Script | 1.47 KB | 0.66 KB | Minimal |
+| Session Manager | ~2 KB | ~1 KB | Included in widget |
+| Widget Integration | ~1 KB | ~0.5 KB | Included in widget |
+| **Total** | **~4.5 KB** | **~2 KB** | **Negligible** |
+
+The feature adds less than 5 KB to total bundle size—negligible impact on page load performance.
+
+### Runtime Performance
+
+- **Tracker execution**: < 1ms per page load
+- **Session check**: < 0.1ms (synchronous read from sessionStorage)
+- **API call**: Cached on backend, typically < 50ms
+- **No impact** on page render or First Contentful Paint
+
+## Monitoring and Maintenance
+
+### Browser Console Logging
+
+The feature provides detailed console logs for debugging:
+
+**Tracker logs**:
+```
+[Weevio] Captured fromIdentity: AN01631249352
+[Weevio] Session stored with 12-hour expiration
+```
+
+**Widget logs**:
+```
+[Weevio Widget] Checking for fromIdentity in sessionStorage
+[Weevio Widget] Found fromIdentity: AN01631249352
+[Weevio Widget] Resolving fromIdentity to customer...
+[Weevio Widget] Resolution successful: gid://shopify/Customer/123
+[Weevio Widget] Fetching customer pricing...
+[Weevio Widget] Displaying customer pricing
+```
+
+**Error logs**:
+```
+[Weevio Widget] Resolution failed: Customer not found
+[Weevio Widget] Falling back to public pricing
+```
+
+### Production Logging
+
+In production, consider:
+
+**Logging successful resolutions**:
+- Track how many buyers use fromIdentity feature
+- Monitor resolution success rate
+- Identify most active buyer IDs
+
+**Logging errors**:
+- Log resolution failures (customer not found)
+- Track expired sessions
+- Monitor API errors
+
+**Analytics integration**:
+- Send events to Google Analytics or similar
+- Track "fromIdentity_captured" event
+- Track "pricing_resolved" or "pricing_fallback" events
+
+### Maintenance Checklist
+
+Perform these tasks regularly:
+
+**Weekly**:
+- [ ] Check error logs for resolution failures
+- [ ] Verify tracker script still loading correctly
+- [ ] Test with a few real buyer IDs
+
+**Monthly**:
+- [ ] Review customer tag audit (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
+- [ ] Check for duplicate buyer ID tags
+- [ ] Verify pricing data is accurate
+
+**Quarterly**:
+- [ ] Review bundle size and performance metrics
+- [ ] Test on new browser versions
+- [ ] Update documentation for any changes
+
+## Rollback Procedure
+
+If you need to roll back the deployment:
+
+### Rollback Tracker Script
+
+<Step>
+  <StepItem title="Remove Script from theme.liquid">
+    Edit `theme.liquid` and remove the tracker script line:
+    ```liquid
+    <script src="{{ 'fromIdentity-tracker.js' | asset_url }}" defer></script>
+    ```
+  </StepItem>
+  <StepItem title="Save Theme">
+    Save the theme file.
+  </StepItem>
+  <StepItem title="Optional: Delete Asset">
+    Optionally delete `fromIdentity-tracker.js` from Shopify Assets to fully remove.
+  </StepItem>
+</Step>
+
+### Rollback Widget
+
+Deploy the previous widget version that doesn't include fromIdentity support:
+
+<Step>
+  <StepItem title="Build Previous Widget Version">
+    Check out the previous git commit or tag:
+    ```bash
+    git checkout <previous-version-tag>
+    cd apps/ecommerce-widget
+    npm install
+    npm run build-prod
+    ```
+  </StepItem>
+  <StepItem title="Deploy Previous Widget">
+    Follow your standard widget deployment process to deploy the rolled-back version.
+  </StepItem>
+</Step>
+
+**Impact of rollback**:
+- PunchOut buyers will see public pricing instead of custom pricing
+- Cart transfer functionality remains unaffected
+- No errors or broken functionality
+
+## Security Checklist
+
+Before deploying to production, verify:
+
+- [ ] **Input sanitization**: fromIdentity parameter is sanitized in tracker script
+- [ ] **HTTPS only**: All API calls use HTTPS
+- [ ] **CORS configured**: API accepts requests only from your Shopify domain
+- [ ] **Rate limiting**: API endpoint has rate limiting enabled
+- [ ] **No PII logged**: No personally identifiable information in logs
+- [ ] **sessionStorage only**: No cookies or localStorage used for tracking
+- [ ] **Error handling**: All errors fail gracefully (show public pricing)
+- [ ] **Cache headers**: Backend API returns appropriate Cache-Control headers
+
+## Deployment Checklist
+
+Complete this checklist before deploying to production:
+
+**Pre-Deployment**:
+- [ ] Customer tagging completed (at least test customers)
+- [ ] Tracker script built and tested locally
+- [ ] Widget built with fromIdentity support
+- [ ] Tested in staging environment
+- [ ] Browser console logs verified in staging
+- [ ] Multi-tab behavior tested
+
+**Tracker Script Deployment**:
+- [ ] Uploaded `fromIdentity-tracker.js` to Shopify Assets
+- [ ] Added script tag to `theme.liquid` in `<head>` section
+- [ ] Verified script loads without errors (check Network tab)
+- [ ] Verified console log appears with test parameter
+- [ ] Verified sessionStorage persistence across pages
+
+**Widget Deployment**:
+- [ ] Deployed updated widget bundle
+- [ ] Verified widget initialization includes correct config
+- [ ] Tested resolution API with real buyer ID
+- [ ] Tested fallback behavior with invalid buyer ID
+- [ ] Tested session expiration handling
+
+**Post-Deployment**:
+- [ ] Smoke test with real buyer ID
+- [ ] Monitor error logs for first 24 hours
+- [ ] Coordinate with admin team to verify customer tagging
+- [ ] Share [Buyer Guide](/docs/shopify/punchout/buyer-guide) with procurement teams
+- [ ] Share [Troubleshooting Guide](/docs/shopify/punchout/troubleshooting) with support team
+
+## Next Steps
+
+<CardGrid>
+  <Card
+    title="Admin Setup"
+    href="/docs/shopify/punchout/admin-setup"
+    description="Configure customer tagging for your B2B buyers."
+  />
+  <Card
+    title="Troubleshooting"
+    href="/docs/shopify/punchout/troubleshooting"
+    description="Debug and resolve common integration issues."
+  />
+  <Card
+    title="Buyer Guide"
+    href="/docs/shopify/punchout/buyer-guide"
+    description="Share with procurement teams to explain the buyer experience."
+  />
+</CardGrid>
+
+## Support
+
+For deployment assistance or technical issues:
+
+**Contact Weevio Development Team** with:
+- Shopify store domain
+- Widget version number
+- Browser console logs (screenshots or copy/paste)
+- Network tab screenshot showing API requests
+- Description of issue and steps to reproduce
+
+**Include deployment details**:
+- When you deployed (date/time)
+- Which components were deployed (tracker, widget, both)
+- Testing results from this guide
+- Any error messages or warnings

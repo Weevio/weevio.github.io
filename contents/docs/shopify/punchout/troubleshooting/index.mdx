@@ -1,0 +1,936 @@
+---
+title: PunchOut Troubleshooting
+description: Diagnose and resolve common issues with PunchOut fromIdentity customer pricing integration.
+keywords: ["punchout", "troubleshooting", "debugging", "issues", "support"]
+---
+
+This guide helps you diagnose and resolve common issues with the PunchOut fromIdentity customer pricing feature.
+
+## Quick Diagnostics
+
+Before diving into specific issues, run these quick checks:
+
+<Step>
+  <StepItem title="Verify Tracker Script">
+    Open any page with `?fromIdentity=TEST123` parameter.
+    
+    Check browser console for:
+    ```
+    [Weevio] Captured fromIdentity: TEST123
+    ```
+    
+    If missing → [Tracker script not working](#tracker-script-issues)
+  </StepItem>
+  <StepItem title="Check sessionStorage">
+    In browser console, run:
+    ```javascript
+    sessionStorage.getItem('weevio_fromIdentity');
+    ```
+    
+    Should return: `{"value":"TEST123","timestamp":...}`
+    
+    If null → [Session storage issues](#session-storage-issues)
+  </StepItem>
+  <StepItem title="Verify Customer Tagging">
+    In Shopify Admin → Customers, search for buyer ID in tags.
+    
+    Verify customer has tag like: `Ariba Buyer: AN01631249352`
+    
+    If missing → [Customer tagging issues](#customer-tagging-issues)
+  </StepItem>
+  <StepItem title="Test API Endpoint">
+    Open DevTools → Network tab, reload product page.
+    
+    Look for request to `/api/v1/shopify/b2b/resolve-from-identity`
+    
+    If missing or erroring → [API resolution issues](#api-resolution-issues)
+  </StepItem>
+</Step>
+
+## Common Issues & Solutions
+
+### Buyer Sees Public Pricing Instead of Custom Pricing
+
+**Symptoms**:
+- Buyer clicked through from SAP Ariba
+- Product pages show public pricing
+- Buyer expects to see custom pricing
+
+**Diagnostic Steps**:
+
+<Tabs defaultValue="check1">
+  <TabsList>
+    <TabsTrigger value="check1">Check 1: URL</TabsTrigger>
+    <TabsTrigger value="check2">Check 2: Console</TabsTrigger>
+    <TabsTrigger value="check3">Check 3: Tags</TabsTrigger>
+    <TabsTrigger value="check4">Check 4: API</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="check1">
+    **Verify fromIdentity in URL**
+    
+    Ask buyer to check the URL when they first clicked from SAP Ariba:
+    ```
+    https://yourstore.com/products/item?fromIdentity=AN01631249352
+    ```
+    
+    **If parameter is missing**:
+    - Issue is with SAP Ariba configuration (not Weevio)
+    - Contact SAP Ariba administrator
+    - Verify PunchOut catalog setup includes fromIdentity parameter
+    
+    **If parameter is present**: Continue to Check 2
+  </TabsContent>
+  
+  <TabsContent value="check2">
+    **Check Browser Console**
+    
+    Ask buyer to open browser console (F12) and reload the page.
+    
+    **Expected output**:
+    ```
+    [Weevio] Captured fromIdentity: AN01631249352
+    ```
+    
+    **If console log is missing**:
+    - Tracker script not installed or not loading
+    - See [Tracker Script Issues](#tracker-script-issues)
+    
+    **If console log is present**: Continue to Check 3
+  </TabsContent>
+  
+  <TabsContent value="check3">
+    **Verify Customer Tagging**
+    
+    In Shopify Admin → Customers:
+    1. Search for the buyer ID (e.g., "AN01631249352")
+    2. Verify a customer appears with this tag
+    3. Check tag format: `Ariba Buyer: AN01631249352`
+    
+    **If no customer found**:
+    - Customer not tagged correctly
+    - See [Admin Setup Guide](/docs/shopify/punchout/admin-setup)
+    
+    **If customer exists**: Continue to Check 4
+  </TabsContent>
+  
+  <TabsContent value="check4">
+    **Check API Resolution**
+    
+    In browser DevTools → Network tab:
+    1. Filter for "resolve-from-identity"
+    2. Reload product page
+    3. Check the API request and response
+    
+    **Expected request**:
+    ```
+    GET /api/v1/shopify/b2b/resolve-from-identity
+      ?fromIdentity=AN01631249352
+      &domain=yourstore.myshopify.com
+    ```
+    
+    **Expected response (success)**:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "customerId": "gid://shopify/Customer/123...",
+        "priceCode": "TIER_1"
+      }
+    }
+    ```
+    
+    **If request is missing**: Widget not calling API (see [Widget Issues](#widget-issues))
+    
+    **If response is 404/500**: See [API Resolution Issues](#api-resolution-issues)
+    
+    **If response has `success: false`**: See [Resolution Failures](#resolution-failures)
+  </TabsContent>
+</Tabs>
+
+### Pricing Works Initially Then Stops Working
+
+**Symptoms**:
+- Custom pricing worked when buyer first visited
+- After browsing for a while, pricing changed to public
+- Buyer didn't close the tab
+
+**Most Likely Cause**: Session expired (> 12 hours)
+
+**Solution**:
+
+<Step>
+  <StepItem title="Confirm Session Duration">
+    Ask buyer how long they've had the tab open. If > 12 hours, session expired naturally.
+  </StepItem>
+  <StepItem title="Check Timestamp">
+    In browser console:
+    ```javascript
+    const data = JSON.parse(sessionStorage.getItem('weevio_fromIdentity'));
+    const hoursAgo = (Date.now() - data.timestamp) / (1000 * 60 * 60);
+    console.log('Session age (hours):', hoursAgo);
+    ```
+    
+    If > 12: Session expired
+  </StepItem>
+  <StepItem title="Refresh Session">
+    Ask buyer to:
+    1. Close the browser tab
+    2. Return to SAP Ariba
+    3. Click through to the store again
+    
+    This creates a fresh 12-hour session.
+  </StepItem>
+</Step>
+
+**Other Possible Causes**:
+- Browser tab was refreshed by clicking browser refresh (doesn't preserve fromIdentity parameter)
+- Buyer navigated to a bookmarked page (bookmarks don't include fromIdentity)
+- sessionStorage was manually cleared (unlikely)
+
+### Different Pricing in Different Browser Tabs
+
+**Symptoms**:
+- Tab 1 shows one set of prices
+- Tab 2 (opened later) shows different prices
+- Buyer is confused about which pricing is correct
+
+**This is Expected Behavior**
+
+sessionStorage is **per-tab isolated** by design. Each tab maintains its own buyer context.
+
+**Common Scenarios**:
+
+**Scenario A: Two Different Buyers**
+- Tab 1: Buyer A clicked from SAP Ariba → Shows Buyer A pricing
+- Tab 2: Buyer B clicked from SAP Ariba → Shows Buyer B pricing
+- **Result**: Different pricing is correct
+
+**Scenario B: Same Buyer, Different Entry Points**
+- Tab 1: Buyer clicked from SAP Ariba → Shows custom pricing
+- Tab 2: Buyer opened bookmark or typed URL → Shows public pricing
+- **Result**: Tab 2 doesn't have fromIdentity, shows public pricing
+
+**Solution**:
+- Educate buyers to always click through from SAP Ariba
+- Open new products by clicking links within the store (maintains session)
+- Don't bookmark product pages
+- Close old tabs when finished browsing
+
+### Tracker Script Issues
+
+**Symptoms**:
+- No console log when visiting page with fromIdentity parameter
+- sessionStorage doesn't contain weevio_fromIdentity
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check Script Load">
+    DevTools → Network tab → Filter for "fromIdentity-tracker.js"
+    
+    **If 404**: Script not uploaded to Shopify Assets
+    - Re-upload the tracker script
+    - See [Deployment Guide](/docs/shopify/punchout/deployment)
+    
+    **If 200 but no console log**: Script loaded but not executing
+    - Check Console tab for JavaScript errors
+    - Verify script tag has correct syntax in theme.liquid
+  </StepItem>
+  <StepItem title="Verify Script Tag">
+    In Shopify theme editor, check theme.liquid contains:
+    ```liquid
+    <script src="{{ 'fromIdentity-tracker.js' | asset_url }}" defer></script>
+    ```
+    
+    **Common mistakes**:
+    - Missing `defer` attribute
+    - Typo in filename
+    - Script tag outside `<head>` section
+  </StepItem>
+  <StepItem title="Check for Conflicts">
+    Other scripts may interfere. In Console, check:
+    ```javascript
+    typeof window.WeevioFromIdentityTracker !== 'undefined'
+    ```
+    
+    Should return `true` if script loaded.
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Re-upload tracker script** to Shopify Assets
+2. **Clear Shopify theme cache**: Theme editor → Actions → Clear cache
+3. **Verify theme.liquid saved correctly**
+4. **Test in incognito window** to rule out browser cache issues
+
+### Session Storage Issues
+
+**Symptoms**:
+- Tracker script works (console logs appear)
+- But sessionStorage doesn't contain fromIdentity
+- Or sessionStorage data is corrupt
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check Browser Support">
+    In Console:
+    ```javascript
+    typeof(Storage) !== "undefined"
+    ```
+    
+    Should return `true`. If `false`, browser doesn't support sessionStorage (very old browser).
+  </StepItem>
+  <StepItem title="Check Privacy Settings">
+    Some browsers block sessionStorage in private browsing or with strict privacy settings.
+    
+    Test in normal (non-incognito) mode with default privacy settings.
+  </StepItem>
+  <StepItem title="Check for Conflicts">
+    Other scripts may clear sessionStorage. In Console:
+    ```javascript
+    sessionStorage.setItem('test', 'value');
+    setTimeout(() => {
+      console.log(sessionStorage.getItem('test'));
+    }, 1000);
+    ```
+    
+    Should output `value` after 1 second. If null, another script is clearing sessionStorage.
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Use modern browser**: Chrome 4+, Firefox 3.5+, Safari 4+, Edge
+2. **Check privacy settings**: Allow sessionStorage (usually enabled by default)
+3. **Identify conflicting scripts**: Disable other scripts temporarily to isolate issue
+
+### Customer Tagging Issues
+
+**Symptoms**:
+- Tracker captures fromIdentity correctly
+- Customer exists in Shopify
+- But resolution API returns "Customer not found"
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Search by Buyer ID">
+    Shopify Admin → Customers → Search for buyer ID
+    
+    Example: Search for "AN01631249352"
+    
+    **If no results**: Customer not tagged
+    - Tag the customer (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
+    
+    **If multiple results**: Duplicate buyer IDs
+    - See [Handling Duplicates](#handling-duplicate-buyer-ids)
+  </StepItem>
+  <StepItem title="Verify Tag Format">
+    Open the customer profile and check tags:
+    
+    **Correct formats**:
+    ```
+    Ariba Buyer: AN01631249352
+    SAP Ariba Buyer: AN01631249352
+    PunchOut Buyer: AN01631249352
+    ```
+    
+    **Incorrect formats**:
+    ```
+    Ariba AN01631249352           (missing "Buyer:")
+    AribaBuyer: AN01631249352     (missing space)
+    Buyer ID: AN01631249352       (wrong prefix)
+    ```
+    
+    If format is wrong, correct it.
+  </StepItem>
+  <StepItem title="Check for Typos">
+    Verify the buyer ID in the tag exactly matches the fromIdentity parameter:
+    
+    **Tag**: `Ariba Buyer: AN01631249352`  
+    **URL**: `?fromIdentity=AN01631249352`
+    
+    IDs must match character-for-character (case-sensitive).
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Add missing tags**: Tag customer with correct format
+2. **Fix typos**: Correct buyer ID to match exactly
+3. **Standardize format**: Use consistent prefix (e.g., always "Ariba Buyer:")
+4. **Wait 15 minutes**: Backend cache takes up to 15 minutes to update
+
+### API Resolution Issues
+
+**Symptoms**:
+- Tracker and sessionStorage working
+- Customer tagged correctly
+- But API returns errors or doesn't respond
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check API Request">
+    DevTools → Network tab → Find resolve-from-identity request
+    
+    **If request not found**:
+    - Widget not calling API
+    - See [Widget Issues](#widget-issues)
+    
+    **If request present**: Check status code
+  </StepItem>
+  <StepItem title="Analyze Response">
+    Click the API request in Network tab → Response tab
+    
+    **Status 200 with `success: false`**:
+    ```json
+    {
+      "success": false,
+      "message": "No customer found with fromIdentity"
+    }
+    ```
+    → Customer tagging issue (see above)
+    
+    **Status 400**:
+    → Invalid request (malformed fromIdentity or missing domain)
+    
+    **Status 404**:
+    → API endpoint not found (deployment issue)
+    
+    **Status 500**:
+    → Backend error (contact Weevio support)
+    
+    **Status 503**:
+    → Service unavailable (temporary issue, retry later)
+  </StepItem>
+  <StepItem title="Check CORS">
+    If Console shows CORS error:
+    ```
+    Access to fetch at '...' from origin '...' has been blocked by CORS policy
+    ```
+    
+    → Backend CORS configuration needs updating
+    → Contact Weevio backend team
+  </StepItem>
+</Step>
+
+**Solutions Based on Status Code**:
+
+| Status | Issue | Solution |
+|--------|-------|----------|
+| 200 (success: false) | Customer not found | Fix customer tagging |
+| 400 | Invalid request | Check widget configuration |
+| 404 | Endpoint not found | Verify API deployment |
+| 500 | Backend error | Contact Weevio support |
+| 503 | Service unavailable | Wait and retry |
+| CORS error | CORS misconfiguration | Contact Weevio backend team |
+
+### Widget Issues
+
+**Symptoms**:
+- Tracker working correctly
+- Customer tagged correctly
+- But widget doesn't call resolution API
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check Widget Logs">
+    In Console, filter for "Weevio Widget" logs.
+    
+    **Expected logs**:
+    ```
+    [Weevio Widget] Checking for fromIdentity in sessionStorage
+    [Weevio Widget] Found fromIdentity: AN01631249352
+    [Weevio Widget] Resolving fromIdentity to customer...
+    ```
+    
+    **If no logs**: Widget not loaded or not initializing
+  </StepItem>
+  <StepItem title="Verify Widget Load">
+    DevTools → Network tab → Check for widget JavaScript file
+    
+    Should see: `product-widget.js` (or your widget filename) with status 200
+    
+    **If 404**: Widget not deployed
+    - See [Deployment Guide](/docs/shopify/punchout/deployment)
+  </StepItem>
+  <StepItem title="Check Widget Version">
+    Verify you deployed the widget version with fromIdentity support.
+    
+    In Console:
+    ```javascript
+    window.WeevioWidget.version
+    ```
+    
+    Should return version number that includes fromIdentity feature.
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Deploy updated widget** with fromIdentity support
+2. **Clear browser cache** and hard refresh (Ctrl+Shift+R)
+3. **Verify widget initialization** includes correct configuration
+4. **Check for JavaScript errors** blocking widget execution
+
+### Resolution Failures
+
+**Symptoms**:
+- API is called
+- API returns `success: false`
+- Message: "No customer found with fromIdentity"
+
+**This means**:
+- Customer doesn't exist in Shopify with matching buyer ID tag
+- OR customer exists but tag format is incorrect
+- OR multiple customers have same buyer ID (ambiguous match)
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Manual Customer Search">
+    Shopify Admin → Customers → Search for the buyer ID
+    
+    Count results:
+    - **0 results**: Customer not tagged
+    - **1 result**: Check tag format
+    - **2+ results**: Duplicate buyer IDs
+  </StepItem>
+  <StepItem title="Verify Exact Match">
+    If 1 result found, open customer and check tags:
+    
+    **fromIdentity**: `AN01631249352`  
+    **Tag**: `Ariba Buyer: AN01631249352`
+    
+    Must match exactly (case-sensitive for the ID part).
+  </StepItem>
+  <StepItem title="Check Backend Logs">
+    If you have access to backend logs, check for:
+    - GraphQL query to Shopify
+    - Number of customers returned
+    - Any error messages
+    
+    This helps identify if issue is with tagging or API logic.
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Tag the customer** if not tagged (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
+2. **Fix tag format** if incorrect
+3. **Fix typos** in buyer ID
+4. **Remove duplicates** if multiple customers have same buyer ID
+5. **Wait 15 minutes** for backend cache to refresh
+
+### Handling Duplicate Buyer IDs
+
+**Symptoms**:
+- Search for buyer ID returns multiple customers
+- Resolution is inconsistent
+
+**Why This Is a Problem**:
+- System doesn't know which customer to use
+- May return first match (unpredictable)
+- Pricing may be wrong
+
+**Solution**:
+
+<Step>
+  <StepItem title="Identify Correct Customer">
+    Determine which customer should have this buyer ID:
+    - Check with procurement team
+    - Review customer order history
+    - Identify active vs. inactive accounts
+  </StepItem>
+  <StepItem title="Remove Incorrect Tags">
+    For each incorrect customer:
+    1. Open customer profile
+    2. Remove the buyer ID tag
+    3. Save
+    
+    Leave the tag only on the correct customer.
+  </StepItem>
+  <StepItem title="Archive Old Accounts">
+    If incorrect customers are old/inactive:
+    1. Remove all their tags
+    2. Consider archiving the customer account
+    3. Preserves order history but prevents new orders
+  </StepItem>
+  <StepItem title="Document Mapping">
+    Maintain a spreadsheet:
+    | Buyer ID | Shopify Customer Email | Customer Name |
+    |----------|------------------------|---------------|
+    | AN01... | customer@example.com | Acme Corp |
+    
+    Use this to audit and prevent future duplicates.
+  </StepItem>
+</Step>
+
+### Session Expiration Issues
+
+**Symptoms**:
+- Buyer browsing for extended period
+- Pricing suddenly changes to public
+- Console shows: "Session expired"
+
+**This is Expected Behavior**: Sessions expire after 12 hours
+
+**Solution**:
+
+<Step>
+  <StepItem title="Confirm Expiration">
+    Check session age:
+    ```javascript
+    const data = JSON.parse(sessionStorage.getItem('weevio_fromIdentity'));
+    const age = (Date.now() - data.timestamp) / (1000 * 60 * 60);
+    console.log('Session age (hours):', age);
+    ```
+  </StepItem>
+  <StepItem title="Refresh Session">
+    Buyer should:
+    1. Close the browser tab
+    2. Return to SAP Ariba
+    3. Click through to store again
+    
+    Creates a fresh 12-hour session.
+  </StepItem>
+  <StepItem title="Educate Users">
+    Add to buyer training:
+    - Sessions last 12 hours
+    - If browsing for very long, may need to re-enter
+    - Always click through from SAP Ariba for fresh session
+  </StepItem>
+</Step>
+
+**Preventing Confusion**:
+- Document session duration in buyer guide
+- Consider adding session timeout warning in UI (optional enhancement)
+- Train support team on session expiration behavior
+
+## Debugging Tools
+
+### Browser Console Commands
+
+**Check fromIdentity**:
+```javascript
+// Get fromIdentity data
+const data = sessionStorage.getItem('weevio_fromIdentity');
+console.log(JSON.parse(data));
+
+// Check session age
+const parsed = JSON.parse(data);
+const hours = (Date.now() - parsed.timestamp) / (1000 * 60 * 60);
+console.log('Session age:', hours, 'hours');
+
+// Manually clear session (for testing)
+sessionStorage.removeItem('weevio_fromIdentity');
+
+// Manually set test data
+sessionStorage.setItem('weevio_fromIdentity', JSON.stringify({
+  value: 'TEST_BUYER_123',
+  timestamp: Date.now()
+}));
+```
+
+**Check widget state**:
+```javascript
+// Check if widget loaded
+typeof window.WeevioWidget !== 'undefined';
+
+// Check widget version (if available)
+window.WeevioWidget.version;
+
+// Check if tracker loaded
+typeof window.WeevioFromIdentityTracker !== 'undefined';
+```
+
+### Testing Resolution API Manually
+
+**Using Browser Console**:
+```javascript
+// Test resolution API
+fetch('/api/v1/shopify/b2b/resolve-from-identity?fromIdentity=AN01631249352&domain=yourstore.myshopify.com')
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+```
+
+**Using cURL**:
+```bash
+curl "https://api.weevio.com/api/v1/shopify/b2b/resolve-from-identity?fromIdentity=AN01631249352&domain=yourstore.myshopify.com"
+```
+
+**Expected Response (Success)**:
+```json
+{
+  "success": true,
+  "data": {
+    "customerId": "gid://shopify/Customer/7234567890",
+    "priceCode": "IPG_TIER_1"
+  }
+}
+```
+
+**Expected Response (Not Found)**:
+```json
+{
+  "success": false,
+  "message": "No customer found with fromIdentity"
+}
+```
+
+### Network Analysis
+
+**In DevTools → Network tab**:
+
+1. **Filter for API requests**: Type "resolve" in filter box
+2. **Check request details**:
+   - Request URL (verify fromIdentity and domain parameters)
+   - Request headers (verify authorization if applicable)
+   - Status code (200, 400, 404, 500, etc.)
+3. **Check response**:
+   - Response body (JSON with success/data)
+   - Response headers (Cache-Control, CORS headers)
+   - Timing (should be < 100ms with cache)
+
+**Check timing**:
+- **Cached response**: < 50ms (backend cache hit)
+- **Fresh query**: 100-500ms (Shopify API query)
+- **Timeout**: > 5000ms (network or backend issue)
+
+## Performance Issues
+
+### Slow Pricing Resolution
+
+**Symptoms**:
+- Pricing takes several seconds to appear
+- Widget shows loading state for extended time
+
+**Possible Causes**:
+1. **Slow network**: Check network speed
+2. **Backend not caching**: Should see 15-minute cache headers
+3. **Shopify API slow**: Check Shopify status
+4. **Large customer base**: Many customers slows GraphQL query
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check Network Timing">
+    DevTools → Network tab → resolve-from-identity request
+    
+    Click request → Timing tab
+    
+    **Expected**:
+    - Cached: < 50ms total
+    - Uncached: 100-500ms total
+    
+    **If > 1000ms**: Backend or Shopify API is slow
+  </StepItem>
+  <StepItem title="Check Cache Headers">
+    In Response headers, look for:
+    ```
+    Cache-Control: public, max-age=900
+    ```
+    
+    If missing: Backend caching not working
+  </StepItem>
+  <StepItem title="Test Multiple Times">
+    Reload page multiple times. Second+ loads should be much faster (cached).
+    
+    If all requests are slow: Caching not working
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Verify backend caching** is enabled (15-minute TTL)
+2. **Check Shopify API status**: [status.shopify.com](https://www.shopify.com/admin/settings/general)
+3. **Optimize customer query**: Ensure Shopify customer tags are indexed
+4. **Contact Weevio support**: If persistent slow performance
+
+### Widget Not Loading
+
+**Symptoms**:
+- Product page renders but no pricing widget appears
+- No widget logs in console
+
+**Diagnostic Steps**:
+
+<Step>
+  <StepItem title="Check Widget Container">
+    In Console:
+    ```javascript
+    document.querySelector('#weevio-widget');
+    ```
+    
+    Should return the widget container element. If null, container doesn't exist on page.
+  </StepItem>
+  <StepItem title="Check Widget Script">
+    DevTools → Network tab → Check for widget JavaScript file
+    
+    Should see product-widget.js (or similar) with status 200.
+    
+    If 404: Widget not deployed
+  </StepItem>
+  <StepItem title="Check JavaScript Errors">
+    Console tab → Look for errors
+    
+    Common errors:
+    - "Cannot read property 'init' of undefined" → Widget not loaded
+    - "Element not found" → Widget container missing
+    - Other errors → Widget initialization failed
+  </StepItem>
+</Step>
+
+**Solutions**:
+1. **Add widget container** to product template: `<div id="weevio-widget"></div>`
+2. **Deploy widget script** (see [Deployment Guide](/docs/shopify/punchout/deployment))
+3. **Fix JavaScript errors** blocking widget initialization
+4. **Verify widget initialization code** is present and correct
+
+## Error Messages Reference
+
+### Console Error Messages
+
+| Error Message | Meaning | Solution |
+|--------------|---------|----------|
+| `[Weevio] Failed to capture fromIdentity` | Tracker script error | Check tracker script installation |
+| `[Weevio Widget] sessionStorage not available` | Browser doesn't support sessionStorage | Use modern browser |
+| `[Weevio Widget] fromIdentity expired` | Session > 12 hours old | Refresh session by clicking from SAP Ariba |
+| `[Weevio Widget] Resolution API failed` | API error or timeout | Check network, verify API endpoint |
+| `[Weevio Widget] Customer not found` | No matching customer tag | Tag customer correctly |
+| `[Weevio Widget] Multiple customers found` | Duplicate buyer IDs | Remove duplicate tags |
+| `[Weevio Widget] Falling back to public pricing` | Resolution failed, showing default | Check previous errors for root cause |
+
+### API Error Responses
+
+| Response | Meaning | Action |
+|----------|---------|--------|
+| `success: false, message: "No customer found"` | Customer not tagged | Add/fix customer tag |
+| `success: false, message: "Multiple customers found"` | Duplicate buyer IDs | Remove duplicates |
+| `success: false, message: "Invalid fromIdentity"` | Malformed buyer ID | Check parameter format |
+| Status 400 | Bad request | Check API parameters |
+| Status 404 | Endpoint not found | Verify API deployment |
+| Status 500 | Internal server error | Contact Weevio support |
+| Status 503 | Service unavailable | Wait and retry later |
+
+## Support Escalation
+
+### When to Contact Weevio Support
+
+Contact support if:
+- [ ] You've followed all troubleshooting steps
+- [ ] Issue persists across multiple buyers
+- [ ] Backend API is returning errors
+- [ ] Performance is consistently slow (> 1 second)
+- [ ] You suspect a bug in the feature
+
+### Information to Provide
+
+When contacting support, include:
+
+**Environment Details**:
+- Shopify store domain
+- Widget version number
+- Browser and version
+- Operating system
+
+**Issue Details**:
+- Buyer ID (fromIdentity value)
+- Specific product URL
+- Expected behavior vs. actual behavior
+- When issue started (date/time)
+
+**Diagnostic Data**:
+- Browser console logs (screenshot or copy/paste)
+- Network tab screenshot (showing API request/response)
+- sessionStorage value (from console)
+- Customer tags in Shopify (screenshot)
+
+**Steps to Reproduce**:
+1. Detailed steps to trigger the issue
+2. Whether issue is consistent or intermittent
+3. Whether issue affects all buyers or specific buyer(s)
+
+### Before Contacting Support
+
+Complete this checklist:
+
+- [ ] Verified tracker script is installed and loading
+- [ ] Confirmed sessionStorage contains fromIdentity
+- [ ] Checked customer is tagged correctly in Shopify
+- [ ] Tested API resolution manually
+- [ ] Cleared browser cache and retried
+- [ ] Tested in different browser
+- [ ] Waited 15 minutes for backend cache to update (if tag recently added)
+- [ ] Reviewed all sections of this troubleshooting guide
+
+## Prevention & Best Practices
+
+### Regular Maintenance
+
+**Weekly**:
+- Monitor error logs for resolution failures
+- Check for new buyer IDs that need tagging
+
+**Monthly**:
+- Audit customer tags for accuracy
+- Remove old/inactive buyer ID tags
+- Test with sample buyer IDs
+
+**Quarterly**:
+- Review performance metrics
+- Update documentation for any changes
+- Train new support staff on troubleshooting
+
+### Buyer Education
+
+**Share with procurement teams**:
+- [Buyer Guide](/docs/shopify/punchout/buyer-guide) - explains their experience
+- Session duration (12 hours)
+- Importance of clicking through from SAP Ariba
+- What to do if pricing looks wrong
+
+### Support Team Training
+
+**Train support staff on**:
+- How to verify tracker script installation
+- How to check browser console logs
+- How to verify customer tagging
+- When to escalate to technical team
+
+### Documentation
+
+**Maintain**:
+- Spreadsheet of buyer ID → customer mappings
+- Deployment history (when deployed, which version)
+- Known issues and workarounds
+- Support ticket history for patterns
+
+## Related Resources
+
+<CardGrid>
+  <Card
+    title="Admin Setup"
+    href="/docs/shopify/punchout/admin-setup"
+    description="Configure customer tagging correctly to prevent resolution issues."
+  />
+  <Card
+    title="Deployment Guide"
+    href="/docs/shopify/punchout/deployment"
+    description="Verify tracker script and widget are deployed correctly."
+  />
+  <Card
+    title="Buyer Guide"
+    href="/docs/shopify/punchout/buyer-guide"
+    description="Share with buyers to reduce support inquiries."
+  />
+  <Card
+    title="Overview"
+    href="/docs/shopify/punchout/overview"
+    description="Understand the technical architecture and data flow."
+  />
+</CardGrid>
+
+<Note type="info">
+**Can't find your issue?** Contact Weevio Support with detailed diagnostic information from this guide. Include console logs, network traces, and steps to reproduce.
+</Note>

@@ -1,75 +1,80 @@
 import { Paths } from "@/lib/pageroutes"
 
 export const Documents: Paths[] = [
-    {
-        heading: "Getting Started",
-        title: "Introduction",
-        href: "/introduction",
+  {
+    heading: "Getting Started",
+    title: "Introduction",
+    href: "/introduction",
+    items: [
+      {
+        title: "What is Weevio Cloud?",
+        href: "/what-is-weevio",
+        cardMeta: {
+          subtitle: "Platform Overview",
+          description: "Learn about the platform's capabilities and features.",
+        },
+      },
+      {
+        title: "Quick Start Guide",
+        href: "/quick-start",
+        cardMeta: {
+          subtitle: "Quick Setup",
+          description: "Get up and running with Weevio Cloud in minutes.",
+        },
+      },
+    ],
+  },
+  {
+    spacer: true,
+  },
+  {
+    heading: "Core Platform",
+    title: "Weevio Store",
+    href: "/store",
+    items: [
+      {
+        title: "Orders",
+        href: "/orders",
+        cardMeta: {
+          description:
+            "Browse, search, and manage all customer orders with advanced filtering and sorting tools.",
+        },
         items: [
-            {
-                title: "What is Weevio Cloud?",
-                href: "/what-is-weevio",
-                cardMeta: {
-                    subtitle: "Platform Overview",
-                    description: "Learn about the platform's capabilities and features."
-                }
+          {
+            title: "Order Table",
+            href: "/order-table",
+            cardMeta: {
+              description:
+                "Browse, search, and filter all orders with a powerful data table interface. Sort by date, customer, status, total, and more.",
             },
-            {
-                title: "Quick Start Guide",
-                href: "/quick-start",
-                cardMeta: {
-                    subtitle: "Quick Setup",
-                    description: "Get up and running with Weevio Cloud in minutes."
-                }
-            }
+          },
+          {
+            title: "Order View Overview",
+            href: "/order-view-overview",
+            cardMeta: {
+              description:
+                "View comprehensive order details including customer info, line items, totals, payments, and shipping information all in one place.",
+            },
+          },
+          {
+            title: "Line Items",
+            href: "/line-items",
+            cardMeta: {
+              description:
+                "Add, edit, and remove products from orders. Adjust quantities, pricing, and discounts with real-time inventory validation.",
+            },
+          },
+          {
+            title: "Customer Management",
+            href: "/customer-management",
+            cardMeta: {
+              description:
+                "View and update customer information, including contact details, shipping addresses, and order history.",
+            },
+          },
         ],
-    },
-    {
-        spacer: true,
-    },
-    {
-        heading: "Core Platform",
-        title: "Weevio Store",
-        href: "/store",
-        items: [
-            {
-                title: "Orders",
-                href: "/orders",
-                cardMeta: {
-                    description: "Browse, search, and manage all customer orders with advanced filtering and sorting tools."
-                },
-                items: [
-                    {
-                        title: "Order Table",
-                        href: "/order-table",
-                        cardMeta: {
-                            description: "Browse, search, and filter all orders with a powerful data table interface. Sort by date, customer, status, total, and more."
-                        }
-                    },
-                    {
-                        title: "Order View Overview",
-                        href: "/order-view-overview",
-                        cardMeta: {
-                            description: "View comprehensive order details including customer info, line items, totals, payments, and shipping information all in one place."
-                        }
-                    },
-                    {
-                        title: "Line Items",
-                        href: "/line-items",
-                        cardMeta: {
-                            description: "Add, edit, and remove products from orders. Adjust quantities, pricing, and discounts with real-time inventory validation."
-                        }
-                    },
-                    {
-                        title: "Customer Management",
-                        href: "/customer-management",
-                        cardMeta: {
-                            description: "View and update customer information, including contact details, shipping addresses, and order history."
-                        }
-                    },
-                ],
-            },
-            /*
+      },
+      /*
             {
                 title: "Service Repair Orders",
                 href: "/sros",
@@ -83,9 +88,84 @@ export const Documents: Paths[] = [
                 href: "/inventory",
             },
             */
+    ],
+  },
+  {
+    spacer: true,
+  },
+  {
+    heading: "Integrations",
+    title: "Shopify Integration",
+    href: "/shopify",
+    items: [
+      {
+        title: "Overview",
+        href: "/overview",
+        cardMeta: {
+          subtitle: "Shopify B2B Features",
+          description:
+            "Integrate Weevio with Shopify for advanced B2B capabilities and custom pricing.",
+        },
+      },
+      {
+        title: "PunchOut Integration",
+        href: "/punchout",
+        cardMeta: {
+          subtitle: "SAP Ariba Integration",
+          description:
+            "Enable SAP Ariba buyers to see custom pricing automatically without login.",
+        },
+        items: [
+          {
+            title: "Overview",
+            href: "/overview",
+            cardMeta: {
+              subtitle: "Technical Architecture",
+              description:
+                "Learn how PunchOut integration enables SAP Ariba buyers to see custom pricing automatically.",
+            },
+          },
+          {
+            title: "Buyer Guide",
+            href: "/buyer-guide",
+            cardMeta: {
+              subtitle: "For End Users",
+              description:
+                "How PunchOut buyers experience custom pricing without logging in to Shopify.",
+            },
+          },
+          {
+            title: "Admin Setup",
+            href: "/admin-setup",
+            cardMeta: {
+              subtitle: "For Administrators",
+              description:
+                "Configure customer tagging in Shopify to enable PunchOut pricing resolution.",
+            },
+          },
+          {
+            title: "Deployment Guide",
+            href: "/deployment",
+            cardMeta: {
+              subtitle: "For Developers",
+              description:
+                "Install the fromIdentity tracker script and deploy the Product Page Widget.",
+            },
+          },
+          {
+            title: "Troubleshooting",
+            href: "/troubleshooting",
+            cardMeta: {
+              subtitle: "Common Issues",
+              description:
+                "Resolve common PunchOut pricing issues and debug integration problems.",
+            },
+          },
         ],
-    },
-    /*
+      },
+    ],
+  },
+  /*
     {
       title: "Customer Portal",
       href: "/customer-portal",

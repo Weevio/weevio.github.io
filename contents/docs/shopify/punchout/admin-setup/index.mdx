@@ -1,0 +1,580 @@
+---
+title: PunchOut Admin Setup
+description: Configure customer tagging in Shopify to enable PunchOut fromIdentity pricing resolution.
+keywords: ["punchout", "admin", "setup", "customer tagging", "configuration", "Shopify"]
+---
+
+This guide explains how to configure Shopify customer accounts to enable PunchOut fromIdentity pricing. This is required for buyers to see their custom pricing when browsing through SAP Ariba or other procurement systems.
+
+## Overview
+
+For PunchOut custom pricing to work, you must **tag Shopify customers** with their SAP Ariba buyer ID. The system uses these tags to map the `fromIdentity` parameter (sent by SAP Ariba) to the correct Shopify customer account.
+
+**Key Concept**: When a buyer clicks through from SAP Ariba with `?fromIdentity=AN01631249352`, the system searches for a Shopify customer tagged with `Ariba Buyer: AN01631249352` and displays that customer's pricing.
+
+## Prerequisites
+
+Before you begin:
+
+- [ ] Access to Shopify Admin dashboard
+- [ ] Customer account management permissions
+- [ ] List of SAP Ariba buyer IDs from your procurement team
+- [ ] Understanding of your customer pricing structure
+
+<Note type="warning">
+**Important**: You must have permission to edit customer tags in Shopify. If you don't have access, contact your Shopify store administrator.
+</Note>
+
+## Customer Tagging Requirements
+
+### Required Tag: Buyer ID
+
+Every PunchOut customer **must** have a tag that identifies their SAP Ariba buyer ID.
+
+**Supported Tag Formats**:
+
+The system recognizes any of these tag prefixes (case-insensitive):
+
+```
+Ariba Buyer: [BUYER_ID]
+SAP Ariba Buyer: [BUYER_ID]
+PunchOut Buyer: [BUYER_ID]
+```
+
+**Examples of valid tags**:
+```
+Ariba Buyer: AN01631249352
+SAP Ariba Buyer: AN01631249352
+PunchOut Buyer: AN01631249352
+ariba_buyer:AN01631249352
+ARIBA BUYER: AN01631249352
+ariba buyer:AN01631249352
+```
+
+**Tag flexibility**:
+- **Case-insensitive**: "Ariba Buyer" = "ariba buyer" = "ARIBA BUYER"
+- **Space/underscore flexible**: "Ariba Buyer:" = "ariba_buyer:" = "ariba buyer:"
+- **Spaces around colon**: "Ariba Buyer: ID" = "Ariba Buyer:ID"
+
+<Note type="success">
+The system is forgiving with formatting. As long as the tag starts with an approved prefix and contains the buyer ID, it will work.
+</Note>
+
+### Optional Tag: Price Code
+
+If you use tiered pricing or price lists, you can add a price code tag:
+
+**Format**:
+```
+PRICE CODE: [PRICE_CODE_NAME]
+Price Code: [PRICE_CODE_NAME]
+price_code:[PRICE_CODE_NAME]
+```
+
+**Examples**:
+```
+PRICE CODE: IPG_TIER_1
+Price Code: CORPORATE_DISCOUNT
+price_code:VIP_PRICING
+```
+
+**Use cases**:
+- Multiple customers sharing the same price tier
+- Different pricing levels (Tier 1, Tier 2, VIP, etc.)
+- Customer group pricing
+- Regional pricing variations
+
+## Step-by-Step Setup
+
+### Step 1: Gather Required Information
+
+Before tagging customers, collect:
+
+1. **Buyer IDs from SAP Ariba**
+   - Contact your procurement team or SAP Ariba administrator
+   - Buyer IDs typically look like: `AN01631249352`
+   - You need one buyer ID per B2B customer
+
+2. **Customer mapping**
+   - Match each SAP Ariba buyer ID to a Shopify customer account
+   - Create a spreadsheet: Customer Name | Shopify Email | SAP Ariba Buyer ID
+
+3. **Price codes** (if applicable)
+   - Determine which price tier each customer belongs to
+   - Use consistent naming (e.g., "TIER_1", "TIER_2", "VIP")
+
+### Step 2: Access Shopify Admin
+
+<Step>
+  <StepItem title="Log into Shopify Admin">
+    Navigate to your Shopify admin dashboard: `https://[your-store].myshopify.com/admin`
+  </StepItem>
+  <StepItem title="Go to Customers">
+    From the left sidebar, click **Customers** to view your customer list.
+  </StepItem>
+  <StepItem title="Find the Customer">
+    Use the search bar to find the customer you want to tag (search by name, email, or company).
+  </StepItem>
+</Step>
+
+### Step 3: Add Tags to Customer
+
+<Step>
+  <StepItem title="Open Customer Profile">
+    Click on the customer's name to open their profile.
+  </StepItem>
+  <StepItem title="Locate Tags Section">
+    Scroll down to the **Tags** section in the customer profile.
+  </StepItem>
+  <StepItem title="Add Buyer ID Tag">
+    In the tags field, type:
+    ```
+    Ariba Buyer: AN01631249352
+    ```
+    (Replace `AN01631249352` with the actual buyer ID)
+    
+    Press Enter to add the tag.
+  </StepItem>
+  <StepItem title="Add Price Code Tag (Optional)">
+    If using tiered pricing, add:
+    ```
+    PRICE CODE: IPG_TIER_1
+    ```
+    (Replace with your actual price code)
+    
+    Press Enter to add the tag.
+  </StepItem>
+  <StepItem title="Save Changes">
+    Click **Save** at the top or bottom of the customer profile.
+  </StepItem>
+</Step>
+
+### Step 4: Verify Tags
+
+After saving, verify the tags appear correctly:
+
+1. **Check tag list**: Tags should appear in the customer's profile
+2. **Check formatting**: Verify the buyer ID is exact (no typos)
+3. **Check uniqueness**: Ensure no other customer has the same buyer ID tag
+
+<Note type="warning">
+**Critical**: The buyer ID in the tag must **exactly match** the buyer ID sent by SAP Ariba. Even a small typo will prevent pricing resolution.
+</Note>
+
+## Tag Management Best Practices
+
+### Buyer ID Uniqueness
+
+**Rule**: Each buyer ID should be unique to one Shopify customer.
+
+**What happens if duplicate**:
+- The system may return the first matching customer
+- Pricing may be inconsistent
+- Error logged in system
+
+**Best practice**:
+- Maintain a master spreadsheet of buyer ID → customer mappings
+- Audit tags periodically to check for duplicates
+- Remove old tags when buyer IDs change
+
+### Price Code Sharing
+
+**Rule**: Multiple customers can share the same price code.
+
+**Example scenario**:
+```
+Customer A: Ariba Buyer: AN01631249352, PRICE CODE: TIER_1
+Customer B: Ariba Buyer: AN01631249353, PRICE CODE: TIER_1
+Customer C: Ariba Buyer: AN01631249354, PRICE CODE: TIER_2
+```
+
+Customers A and B see the same tier pricing, Customer C sees different pricing.
+
+### Tag Naming Conventions
+
+For consistency across your customer base:
+
+**Buyer ID tags** - Use consistent prefix:
+- ✅ Always use "Ariba Buyer:" (recommended)
+- ⚠️ Don't mix prefixes randomly (confusing for audits)
+
+**Price code tags** - Use consistent format:
+- ✅ "PRICE CODE: TIER_1", "PRICE CODE: TIER_2"
+- ✅ Use underscores instead of spaces in code names
+- ❌ Avoid special characters like @, #, $
+
+**Example good naming**:
+```
+Ariba Buyer: AN01631249352
+PRICE CODE: CORPORATE_A
+PRICE CODE: REGION_WEST
+```
+
+**Example poor naming**:
+```
+ariba AN01631249352      (missing prefix)
+Price: Corporate-A%      (inconsistent format, special char)
+```
+
+## Bulk Tagging
+
+### Using Shopify Bulk Editor
+
+For tagging many customers at once:
+
+<Step>
+  <StepItem title="Export Customers">
+    In Shopify Admin → Customers, click **Export** and download your customer list as CSV.
+  </StepItem>
+  <StepItem title="Edit CSV">
+    Open the CSV in Excel or Google Sheets. The **Tags** column contains existing tags (comma-separated).
+    
+    Add new tags to the Tags column:
+    ```
+    existing_tag, Ariba Buyer: AN01631249352, PRICE CODE: TIER_1
+    ```
+  </StepItem>
+  <StepItem title="Import Updated CSV">
+    In Shopify Admin → Customers, click **Import** and upload your modified CSV file.
+    
+    Shopify will update customer tags in bulk.
+  </StepItem>
+  <StepItem title="Verify Import">
+    Check a few customer profiles to confirm tags were added correctly.
+  </StepItem>
+</Step>
+
+<Note type="warning">
+**CSV Formatting**: Be careful with commas in tags. If your buyer ID or price code contains a comma, you'll need to escape it properly or use quotes in the CSV.
+</Note>
+
+### Using Shopify API (Advanced)
+
+For developers or automation:
+
+```javascript
+// Example: Add tags via Shopify Admin API
+const customerId = 'gid://shopify/Customer/7234567890';
+const tags = [
+  'Ariba Buyer: AN01631249352',
+  'PRICE CODE: IPG_TIER_1'
+];
+
+// GraphQL mutation
+mutation {
+  customerUpdate(input: {
+    id: "${customerId}",
+    tags: ${JSON.stringify(tags)}
+  }) {
+    customer {
+      id
+      tags
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+```
+
+See Shopify's [Customer API documentation](https://shopify.dev/api/admin-graphql/latest/mutations/customerUpdate) for details.
+
+## Testing the Configuration
+
+After tagging customers, test that the integration works:
+
+### Method 1: Use PunchOut Simulator
+
+1. **Access simulator**: [PunchOut Cloud Simulator](https://pcsf.cloud.punchoutexpress.com/simulator/cart/cxml.php)
+2. **Enter your store URL** with test buyer ID:
+   ```
+   https://yourstore.com?fromIdentity=AN01631249352
+   ```
+3. **Open in browser** and verify custom pricing appears
+
+### Method 2: Manual URL Testing
+
+<Step>
+  <StepItem title="Get Test Buyer ID">
+    Choose a buyer ID you've tagged (e.g., `AN01631249352`)
+  </StepItem>
+  <StepItem title="Construct Test URL">
+    Add the fromIdentity parameter to any product page:
+    ```
+    https://yourstore.com/products/test-product?fromIdentity=AN01631249352
+    ```
+  </StepItem>
+  <StepItem title="Open in Browser">
+    Open the URL in an incognito/private browser window (to avoid existing sessions).
+  </StepItem>
+  <StepItem title="Check Browser Console">
+    Open browser developer tools (F12) and check console for:
+    ```
+    [Weevio] Captured fromIdentity: AN01631249352
+    ```
+  </StepItem>
+  <StepItem title="Verify Pricing">
+    Check that the product shows customer-specific pricing (not public pricing).
+  </StepItem>
+</Step>
+
+### Method 3: Check sessionStorage
+
+In browser developer tools:
+
+```javascript
+// Check if fromIdentity was captured
+sessionStorage.getItem('weevio_fromIdentity');
+
+// Expected output:
+// {"value":"AN01631249352","timestamp":1699118400000}
+```
+
+## Common Configuration Issues
+
+### Issue: Pricing Not Resolving
+
+**Symptoms**: Buyer sees public pricing instead of custom pricing
+
+**Possible causes**:
+1. **Customer not tagged**: Verify tag exists in Shopify customer profile
+2. **Typo in buyer ID**: Double-check buyer ID matches exactly (case-sensitive for ID part)
+3. **Wrong tag format**: Ensure tag starts with approved prefix
+4. **Duplicate buyer IDs**: Check if multiple customers have same buyer ID tag
+
+**Solution**:
+1. Go to Shopify Admin → Customers
+2. Search for customer by buyer ID (use tag search)
+3. Verify tag format: `Ariba Buyer: [EXACT_ID]`
+4. Correct any typos or formatting issues
+5. Save and test again
+
+### Issue: Multiple Customers Match
+
+**Symptoms**: Error in logs about multiple matching customers
+
+**Cause**: Two or more Shopify customers have the same buyer ID tag
+
+**Solution**:
+1. Search Shopify customers for the duplicate buyer ID
+2. Determine which customer is correct
+3. Remove the buyer ID tag from incorrect customer(s)
+4. Consider archiving old/inactive customer accounts
+
+### Issue: Price Code Not Applied
+
+**Symptoms**: Customer pricing works but price code pricing doesn't
+
+**Possible causes**:
+1. **Price code tag missing**: Customer has buyer ID tag but no price code tag
+2. **Price code not configured**: Price code exists in tag but not in pricing system
+3. **Typo in price code**: Price code tag doesn't match pricing system
+
+**Solution**:
+1. Verify customer has both tags: buyer ID AND price code
+2. Check price code spelling matches pricing system exactly
+3. Confirm price code is active in your pricing configuration
+
+### Issue: Tags Not Saving
+
+**Symptoms**: Tags disappear after saving customer profile
+
+**Possible causes**:
+1. **Shopify permissions issue**: User account lacks customer edit permissions
+2. **Tag validation error**: Tag contains invalid characters
+3. **Browser issue**: Cache or session problem
+
+**Solution**:
+1. Verify you have "Customers" permission in Shopify Admin
+2. Remove any special characters from tags
+3. Try a different browser or clear browser cache
+4. Contact Shopify support if problem persists
+
+## Updating and Managing Tags
+
+### Changing Buyer IDs
+
+If a customer's SAP Ariba buyer ID changes:
+
+<Step>
+  <StepItem title="Remove Old Tag">
+    Go to customer profile and remove the old buyer ID tag.
+  </StepItem>
+  <StepItem title="Add New Tag">
+    Add the new buyer ID tag with correct format.
+  </StepItem>
+  <StepItem title="Keep Price Code">
+    If the customer has a price code tag, keep it unchanged (unless price tier also changes).
+  </StepItem>
+  <StepItem title="Save and Test">
+    Save changes and test with new buyer ID.
+  </StepItem>
+</Step>
+
+<Note type="info">
+**Backend cache**: It may take up to 15 minutes for the change to take effect due to backend caching. Test after 15 minutes if pricing doesn't update immediately.
+</Note>
+
+### Removing PunchOut Access
+
+To disable PunchOut pricing for a customer:
+
+1. Open customer profile in Shopify Admin
+2. Remove the buyer ID tag (e.g., `Ariba Buyer: AN01631249352`)
+3. Optionally remove price code tag
+4. Save changes
+
+The customer will no longer see custom pricing via PunchOut (but can still log in normally if they have a Shopify account).
+
+### Archiving Old Customers
+
+When a B2B customer relationship ends:
+
+**Option 1: Remove Tags Only**
+- Remove buyer ID and price code tags
+- Keep customer account active (for historical orders)
+
+**Option 2: Archive Customer**
+- Remove tags first
+- Disable or archive the customer account in Shopify
+- Maintains order history but prevents new purchases
+
+## Tag Audit Checklist
+
+Perform regular tag audits (monthly or quarterly):
+
+- [ ] **Check for duplicates**: Search for duplicate buyer ID tags
+- [ ] **Verify active customers**: Ensure all active B2B customers are tagged
+- [ ] **Remove inactive tags**: Clean up tags from old/inactive customers
+- [ ] **Standardize formats**: Ensure consistent tag formatting across all customers
+- [ ] **Test sample customers**: Verify pricing resolution works for 5-10 random customers
+- [ ] **Update documentation**: Maintain spreadsheet of buyer ID → customer mappings
+- [ ] **Review price codes**: Verify price codes match current pricing structure
+
+## Integration with Other Systems
+
+### Syncing with ERP/CRM
+
+If you use an ERP or CRM system:
+
+**Best practice**:
+- Maintain buyer ID mappings in your ERP/CRM
+- Use Shopify API to automatically sync tags
+- Set up periodic sync (daily or weekly)
+- Log sync results for auditing
+
+**Example workflow**:
+1. ERP contains: Customer → SAP Ariba Buyer ID → Price Tier
+2. Nightly script queries ERP for B2B customers
+3. Script updates Shopify customer tags via API
+4. Script logs any errors or mismatches
+
+### SAP Ariba Integration
+
+**Coordinate with procurement team**:
+- Request list of active buyer IDs from SAP Ariba admin
+- Confirm buyer ID format (usually starts with "AN")
+- Set up process for new buyer ID notifications
+- Establish escalation path for mismatches
+
+## Security Considerations
+
+### Access Control
+
+**Who should have tagging permissions**:
+- ✅ Shopify admin with customer management role
+- ✅ B2B account manager
+- ✅ Customer service team lead
+
+**Who should NOT have tagging permissions**:
+- ❌ General customer service reps (risk of errors)
+- ❌ External contractors (unless supervised)
+
+### Tag Confidentiality
+
+**Buyer IDs are semi-sensitive**:
+- Not personally identifiable information
+- But could be used to impersonate buyer in PunchOut
+- Don't publish buyer IDs on public websites
+- Limit access to spreadsheets containing mappings
+
+### Audit Logging
+
+**Recommended practices**:
+- Enable Shopify audit logs (if available in your plan)
+- Track who adds/removes buyer ID tags
+- Log tag changes in external system
+- Review changes quarterly
+
+## Advanced Configurations
+
+### Multiple Buyer IDs per Customer
+
+**Scenario**: One Shopify customer has multiple SAP Ariba buyer IDs.
+
+**Solution**: Add multiple buyer ID tags:
+```
+Ariba Buyer: AN01631249352
+Ariba Buyer: AN01631249353
+PRICE CODE: TIER_1
+```
+
+Both buyer IDs will resolve to the same Shopify customer.
+
+### Temporary Price Codes
+
+**Scenario**: Customer gets temporary promotional pricing.
+
+**Solution**:
+1. Add temporary price code tag: `PRICE CODE: PROMO_Q4_2024`
+2. Configure pricing system for the promo code
+3. After promo ends, change tag to: `PRICE CODE: STANDARD_TIER`
+
+### Regional Pricing
+
+**Scenario**: Same customer sees different pricing based on ship-to region.
+
+**Solution**: Use compound price codes:
+```
+Ariba Buyer: AN01631249352
+PRICE CODE: TIER_1_US_WEST
+```
+
+Configure your pricing system to handle region-specific codes.
+
+## Troubleshooting Resources
+
+<CardGrid>
+  <Card
+    title="Troubleshooting Guide"
+    href="/docs/shopify/punchout/troubleshooting"
+    description="Detailed debugging steps for common issues."
+  />
+  <Card
+    title="Deployment Guide"
+    href="/docs/shopify/punchout/deployment"
+    description="Verify tracker script is installed correctly."
+  />
+  <Card
+    title="Buyer Guide"
+    href="/docs/shopify/punchout/buyer-guide"
+    description="Share with buyers to explain their experience."
+  />
+</CardGrid>
+
+## Support
+
+If you encounter issues not covered in this guide:
+
+**Contact Weevio Support** with:
+- Customer's Shopify ID or email
+- Customer's SAP Ariba buyer ID
+- Screenshot of customer tags in Shopify
+- Description of expected vs. actual behavior
+- Any error messages from browser console
+
+**Include test details**:
+- Test URL you used
+- Browser and device
+- Whether tracker script is installed (check with developer)

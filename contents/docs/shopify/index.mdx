@@ -1,0 +1,252 @@
+---
+title: Shopify Integration
+description: Integrate Weevio Cloud with Shopify to enable advanced B2B features, custom pricing, and seamless procurement workflows.
+keywords: ["shopify", "integration", "B2B", "widgets", "ecommerce", "punchout"]
+---
+
+Weevio's Shopify Integration provides powerful tools and widgets that enhance your Shopify store with advanced B2B capabilities, custom pricing, and procurement system integrations.
+
+## Overview
+
+The Shopify Integration enables you to transform your standard Shopify store into a sophisticated B2B platform. Whether you need to display customer-specific pricing, enable PunchOut procurement workflows, or provide advanced product selection tools, Weevio's widgets integrate seamlessly with your existing Shopify theme.
+
+### Key Capabilities
+
+<CardGrid>
+  <Card
+    title="PunchOut Integration"
+    description="Enable SAP Ariba buyers to see customer-specific pricing automatically without Shopify login."
+    href="/docs/shopify/punchout"
+  />
+  <Card
+    title="Custom Pricing"
+    description="Display customer-specific pricing based on tags, price codes, and tiered pricing structures."
+  />
+  <Card
+    title="Product Widgets"
+    description="Enhanced product page widgets with variant selection, pricing, and inventory management."
+  />
+  <Card
+    title="Seamless Integration"
+    description="Lightweight widgets that integrate into your existing Shopify theme without major modifications."
+  />
+</CardGrid>
+
+## Integration Components
+
+### Product Page Widget
+
+The Weevio Product Page Widget enhances your Shopify product pages with:
+
+- **Customer-specific pricing**: Automatically displays negotiated prices for B2B customers
+- **Variant selection**: Advanced product variant selector with real-time inventory
+- **Price code support**: Tiered pricing based on customer tags and price codes
+- **PunchOut integration**: Seamless SAP Ariba buyer identification and pricing resolution
+
+**Bundle size**: Optimized for performance with minimal impact on page load times.
+
+### PunchOut Integration
+
+The PunchOut feature enables procurement buyers from SAP Ariba and other systems to:
+
+- Browse your catalog with their custom pricing automatically applied
+- No Shopify login required - pricing is resolved via URL parameters
+- Maintain separate sessions in different browser tabs
+- Seamlessly transfer carts back to their procurement system
+
+[Learn more about PunchOut Integration →](/docs/shopify/punchout)
+
+## Getting Started
+
+<Step>
+  <StepItem title="Install Product Page Widget">
+    Deploy the Weevio Product Page Widget to your Shopify theme. The widget includes all necessary components for custom pricing and PunchOut support.
+  </StepItem>
+  <StepItem title="Configure Customer Pricing">
+    Tag your B2B customers in Shopify with price codes and buyer IDs to enable custom pricing.
+  </StepItem>
+  <StepItem title="Enable PunchOut (Optional)">
+    If you support SAP Ariba or other procurement systems, install the fromIdentity tracker script to enable automatic buyer identification.
+    
+    [See PunchOut Setup Guide →](/docs/shopify/punchout/deployment)
+  </StepItem>
+  <StepItem title="Test & Verify">
+    Test the integration with sample customers and buyer IDs to ensure pricing displays correctly.
+  </StepItem>
+</Step>
+
+## Features
+
+### Customer-Specific Pricing
+
+Display negotiated prices for your B2B customers based on:
+
+- **Customer tags**: Tag customers in Shopify to identify pricing groups
+- **Price codes**: Support tiered pricing with flexible price code systems
+- **Automatic resolution**: Widget automatically detects logged-in customers or PunchOut buyers
+- **Fallback to public pricing**: Seamless fallback if customer can't be identified
+
+### PunchOut Procurement Support
+
+<Note type="info">
+PunchOut integration is ideal for businesses selling to enterprise buyers who use procurement systems like SAP Ariba, Coupa, or Jaggaer.
+</Note>
+
+The PunchOut integration provides:
+
+- **Automatic buyer identification**: Captures buyer ID from URL parameters
+- **Session management**: 12-hour sessions with per-tab isolation
+- **Custom pricing display**: Shows negotiated prices without requiring Shopify login
+- **Cart transfer compatibility**: Works alongside traditional PunchOut cart transfer
+
+**Technical details**:
+- Lightweight tracker script (1.47 KB, 0.66 KB gzipped)
+- Uses sessionStorage for privacy-friendly session management
+- Two-level caching (backend 15 min, frontend 12 hours)
+- Graceful degradation if resolution fails
+
+### Performance & Reliability
+
+The Shopify Integration is designed for:
+
+- **Minimal bundle size**: ~4-5 KB additional JavaScript
+- **Fast loading**: Async script loading with no render blocking
+- **Caching**: Multi-level caching reduces API calls and improves speed
+- **Graceful degradation**: Shows public pricing if any component fails
+- **No database changes**: Works with existing Shopify data structure
+
+## Documentation
+
+<CardGrid>
+  <Card
+    title="PunchOut Integration"
+    href="/docs/shopify/punchout"
+    description="Complete guide to enabling PunchOut custom pricing for SAP Ariba buyers."
+  />
+  <Card
+    title="Buyer Guide"
+    href="/docs/shopify/punchout/buyer-guide"
+    description="Help your procurement buyers understand how PunchOut pricing works."
+  />
+  <Card
+    title="Admin Setup"
+    href="/docs/shopify/punchout/admin-setup"
+    description="Configure customer tagging and price codes in Shopify."
+  />
+  <Card
+    title="Deployment Guide"
+    href="/docs/shopify/punchout/deployment"
+    description="Technical guide for installing and deploying widgets and tracker scripts."
+  />
+  <Card
+    title="Troubleshooting"
+    href="/docs/shopify/punchout/troubleshooting"
+    description="Diagnose and resolve common integration issues."
+  />
+</CardGrid>
+
+## Technical Architecture
+
+### Widget Integration
+
+The Product Page Widget integrates into your Shopify theme via:
+
+```liquid
+<!-- Add to product page template -->
+<div id="weevio-widget"></div>
+<script src="{{ 'product-widget.js' | asset_url }}"></script>
+```
+
+The widget automatically:
+1. Detects logged-in Shopify customers
+2. Checks for PunchOut buyer IDs in sessionStorage
+3. Calls backend API to resolve customer pricing
+4. Displays appropriate pricing (custom or public)
+
+### PunchOut Flow
+
+```
+SAP Ariba Buyer → Clicks Product
+  ↓
+Opens: yourstore.com?fromIdentity=BUYER_ID
+  ↓
+Tracker Script → Captures fromIdentity → sessionStorage
+  ↓
+Widget → Reads sessionStorage → API Call
+  ↓
+Backend → Queries Shopify Customer Tags
+  ↓
+Returns customerId + priceCode
+  ↓
+Widget → Displays Customer Pricing
+```
+
+### Data Privacy
+
+The integration is designed with privacy in mind:
+
+- **No cookies**: Uses sessionStorage instead of cookies
+- **No tracking**: Doesn't track user behavior or browsing history
+- **Per-tab isolation**: Different tabs maintain separate buyer sessions
+- **Automatic expiration**: Sessions expire after 12 hours or tab close
+- **No PII stored**: Only stores buyer ID (not personal information)
+
+## Requirements
+
+### Shopify Store Requirements
+
+- Active Shopify store (any plan)
+- Access to theme code editor
+- Ability to add custom scripts to theme
+- Customer accounts enabled (for B2B features)
+
+### Weevio Integration
+
+- Active Weevio Cloud account
+- Product Page Widget deployed
+- API access for backend integration
+- For PunchOut: fromIdentity tracker script installed
+
+### Browser Support
+
+- Chrome 4+ (sessionStorage support)
+- Firefox 3.5+
+- Safari 4+
+- Edge (all versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Support & Resources
+
+### Getting Help
+
+For integration support or technical questions:
+
+**PunchOut-specific issues**: See the [Troubleshooting Guide](/docs/shopify/punchout/troubleshooting)
+
+**General integration questions**: Contact Weevio Support with:
+- Shopify store domain
+- Widget version number
+- Description of the issue
+- Browser console logs (if applicable)
+
+### Additional Resources
+
+- [PunchOut Overview](/docs/shopify/punchout/overview) - Technical architecture details
+- [Admin Setup Guide](/docs/shopify/punchout/admin-setup) - Customer tagging configuration
+- [Deployment Guide](/docs/shopify/punchout/deployment) - Installation and deployment procedures
+
+## Next Steps
+
+Ready to enhance your Shopify store with B2B capabilities?
+
+<Step>
+  <StepItem title="Review PunchOut Features">
+    If you support enterprise buyers with procurement systems, start with the [PunchOut Integration overview](/docs/shopify/punchout).
+  </StepItem>
+  <StepItem title="Plan Your Implementation">
+    Review the [Deployment Guide](/docs/shopify/punchout/deployment) to understand the installation process.
+  </StepItem>
+  <StepItem title="Configure Customers">
+    Follow the [Admin Setup Guide](/docs/shopify/punchout/admin-setup) to tag your B2B customers for custom pricing.
+  </StepItem>
+</Step>
