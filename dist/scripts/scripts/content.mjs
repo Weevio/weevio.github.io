@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { Documents } from "@/settings/documents";
+import { Documents } from "../settings/documents.mjs";
 import grayMatter from "gray-matter";
 import remarkMdx from "remark-mdx";
 import remarkParse from "remark-parse";
