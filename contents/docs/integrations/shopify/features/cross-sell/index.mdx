@@ -1,0 +1,328 @@
+---
+title: Cross-Sell Recommendations
+description: Display complementary products after customers add items to cart to increase average order value.
+keywords: ["cross-sell", "upsell", "recommendations", "related products", "AOV"]
+---
+
+The Cross-Sell Recommendations feature displays complementary products in a modal after customers add items to their cart, helping increase average order value by suggesting relevant product associations.
+
+[Screenshot: Cross-sell modal showing related products after add-to-cart]
+
+## What It Does
+
+After a customer clicks "Add to Cart", a modal appears showing related products that complement their purchase. Customers can:
+
+- View up to 5 related products with images and pricing
+- Add additional items to cart with quantity controls
+- See customer-specific pricing (B2B)
+- Continue to cart or keep shopping
+
+## Benefits
+
+### For Your Customers
+
+- **Discover complementary products** - Find items they might have missed
+- **Convenient shopping** - Add related items without leaving the page
+- **Complete their setup** - Get everything needed in one order
+- **Save time** - Curated suggestions vs. browsing entire catalog
+
+### For Your Business
+
+- **Increase AOV** - Higher average order value per transaction
+- **Move inventory** - Promote complementary products
+- **Improve customer experience** - Help customers find complete solutions
+- **Reduce cart abandonment** - Everything added before checkout
+- **Data-driven merchandising** - Track which associations perform best
+
+## Requirements
+
+- **Feature purchase:** `integration_shopify_cross_sell_recommendations`
+- **PIMS configuration:** Product associations in `INVENTORY_ASSOCIATED_AUTOLOADS` table
+- **Shopify setup:** Products flagged with `crossSell: true` tag
+- **B2B setup (optional):** Customer tags for filtering
+
+## Configuration
+
+### Enabling the Feature
+
+```javascript
+window.weevioWidgetConfig = {
+  // ... other config ...
+
+  enableCrossSell: true,
+};
+```
+
+### Setting Up Product Associations
+
+**In PIMS:**
+
+1. Navigate to `INVENTORY_ASSOCIATED_AUTOLOADS` table
+2. Create associations between products
+3. Set relationship type (complementary, bundle, etc.)
+4. Configure priority/ordering
+
+**In Shopify:**
+
+1. Edit products that should appear in cross-sell
+2. Add tag: `crossSell: true`
+3. This flags the product as available for cross-sell display
+
+[Screenshot: Shopify product tags with crossSell flag]
+
+## Customer Experience
+
+### Modal Appearance
+
+After clicking "Add to Cart":
+
+1. Success message appears briefly
+2. Cross-sell modal slides in
+3. Shows related products with images
+4. Quantity controls for each item
+5. "Add to Cart" buttons for quick adding
+6. "Continue to Cart" to proceed to checkout
+
+[Screenshot: Cross-sell modal flow]
+
+### Product Display
+
+Each cross-sell product shows:
+
+- **Product image** - Clear photo
+- **Product title** - Full name
+- **Price** - Current price (or customer price for B2B)
+- **Quantity selector** - Adjust quantity before adding
+- **Add to Cart button** - Quick add without leaving modal
+- **Variant selector** - If product has multiple options
+
+[Screenshot: Cross-sell product card details]
+
+### Adding Cross-Sell Items
+
+Customer can:
+
+- Adjust quantity with +/- buttons
+- Add individual items to cart
+- Add multiple items at once
+- Continue browsing or go to cart
+
+## B2B Features
+
+For logged-in B2B customers or PunchOut users:
+
+### Customer-Specific Pricing
+
+- Shows wholesale prices automatically
+- Displays "Your Price" with discounts
+- Respects customer price lists
+- Real-time pricing from B2B API
+
+### Product Filtering
+
+- Filters by customer tags
+- Shows only products customer can see
+- Respects visibility rules
+- Applies purchase restrictions
+
+[Screenshot: B2B cross-sell with custom pricing]
+
+## Use Cases
+
+### Electronics Store
+
+**Product:** Laptop
+**Cross-Sell Items:**
+- Laptop bag
+- Wireless mouse
+- External hard drive
+- Screen protector
+- USB-C hub
+
+**Result:** Customer adds needed accessories, increasing order value by $150.
+
+### Apparel Store
+
+**Product:** Running shoes
+**Cross-Sell Items:**
+- Athletic socks
+- Running belt
+- Water bottle
+- Performance shirt
+- Fitness tracker
+
+**Result:** Customer completes workout outfit, higher AOV.
+
+### B2B Industrial Supply
+
+**Product:** Printer
+**Cross-Sell Items:**
+- Toner cartridges
+- Paper (500 sheets)
+- USB cable
+- Printer stand
+- Extended warranty
+
+**Result:** Business customer gets complete setup with first order.
+
+## Product Association Strategy
+
+### Association Types
+
+**Complementary Products:**
+- Items that enhance the main product
+- "Frequently bought together"
+- Complete the solution
+
+**Accessory Products:**
+- Required or recommended accessories
+- Consumables (ink, batteries, etc.)
+- Protective items (cases, covers)
+
+**Upgrade/Premium:**
+- Higher-end alternatives
+- Extended warranties
+- Premium versions
+
+### Best Practices
+
+**Relevance:**
+- Only show truly complementary items
+- Test associations for performance
+- Update based on analytics
+
+**Pricing:**
+- Mix of price points
+- Include affordable add-ons
+- Consider bundle discounts
+
+**Inventory:**
+- Ensure cross-sell items are in stock
+- Remove out-of-stock from associations
+- Update seasonally
+
+## Configuration Options
+
+### Quantity Limits
+
+Set minimum/maximum quantities for cross-sell items in PIMS configuration.
+
+### Customer Segmentation
+
+Filter cross-sell products by:
+- Customer tags
+- Purchase history
+- Account type (B2B vs. B2C)
+- Geographic location
+
+### Visual Customization
+
+```css
+/* Customize cross-sell modal */
+.weevio-cross-sell-modal {
+  max-width: 800px;
+  border-radius: 12px;
+}
+
+.weevio-cross-sell-item {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+}
+```
+
+## Performance
+
+Optimized for speed:
+
+- **Lazy loading** - Modal content loads after add-to-cart
+- **Image optimization** - Compressed product images
+- **API caching** - Cached associations for faster display
+- **Non-blocking** - Doesn't slow down add-to-cart action
+
+**Typical performance:**
+- Modal appearance: 200-300ms after add-to-cart
+- Product loading: 300-500ms
+- Add additional items: <100ms
+
+## Troubleshooting
+
+### Modal Not Appearing
+
+**Check:**
+- `enableCrossSell: true` in widget config
+- Feature purchased in Weevio Cloud
+- Product associations configured in PIMS
+- Products tagged with `crossSell: true`
+
+### No Products Showing
+
+**Check:**
+- Cross-sell products exist for added item
+- Products are in stock
+- Products have `crossSell: true` tag
+- Customer has permission (B2B filtering)
+
+### Wrong Products Displayed
+
+**Check:**
+- PIMS associations are correct
+- Association priorities set properly
+- Customer tags applied correctly
+- Inventory levels accurate
+
+### B2B Pricing Not Showing
+
+**Check:**
+- Customer is logged in or using PunchOut
+- B2B API key configured
+- Price lists assigned to customer
+- Customer ID resolved correctly
+
+See the [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting) for more solutions.
+
+## Analytics
+
+Track cross-sell performance:
+
+- **Display rate** - How often modal appears
+- **Click-through rate** - Customers viewing products
+- **Add-to-cart rate** - Items added from cross-sell
+- **Revenue impact** - Additional revenue from cross-sell
+- **Top performers** - Best-performing associations
+
+Available in Weevio Cloud analytics dashboard.
+
+## Mobile Experience
+
+Fully optimized for mobile:
+
+- Responsive modal design
+- Touch-friendly quantity controls
+- Easy scrolling through products
+- Fast loading and performance
+- Simple close/continue options
+
+[Screenshot: Mobile cross-sell modal]
+
+## Integration with Other Features
+
+Works seamlessly with:
+
+- **B2B Pricing** - Shows customer prices
+- **Shipping Estimates** - Displays for cross-sell items
+- **Multi-Source Inventory** - Accurate stock for suggestions
+- **Variant Selection** - Handle products with variants
+
+## Next Steps
+
+- [Learn about B2B Wholesale Pricing](/docs/integrations/shopify/features/b2b-pricing)
+- [Explore configuration examples](/docs/integrations/shopify/configuration/examples)
+- [Review merchandising strategies](/docs/integrations/shopify/configuration/advanced)
+
+## Need Help?
+
+Questions about cross-sell?
+
+- Review [Configuration Guide](/docs/integrations/shopify/configuration)
+- Check [Troubleshooting](/docs/integrations/shopify/troubleshooting)
+- Contact Weevio support for association setup

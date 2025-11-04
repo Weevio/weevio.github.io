@@ -1,0 +1,459 @@
+---
+title: PunchOut Commerce
+description: Seamless integration with SAP Ariba, Coupa, and other procurement systems for enterprise buyers.
+keywords: ["PunchOut", "procurement", "SAP Ariba", "Coupa", "fromIdentity", "enterprise"]
+---
+
+The PunchOut Commerce feature enables seamless integration with enterprise procurement systems like SAP Ariba and Coupa, allowing business buyers to shop from their procurement platform without logging into your store while seeing their negotiated pricing.
+
+[Screenshot: PunchOut session showing enterprise customer pricing]
+
+## What It Does
+
+PunchOut allows enterprise customers to:
+
+- Click "Shop Now" in their procurement system
+- Land on your Shopify store with a special identifier
+- See their negotiated pricing automatically
+- Shop without creating a Shopify account
+- Cart items sync back to procurement system
+
+## Benefits
+
+### For Your Customers
+
+- **No separate login** - Shop directly from procurement system
+- **Streamlined procurement** - Fits existing workflows
+- **Automatic pricing** - See negotiated rates immediately
+- **Compliance** - Stay within approved procurement processes
+- **Familiar interface** - Use their standard tools
+
+### For Your Business
+
+- **Access enterprise buyers** - Sell to Fortune 500 companies
+- **Automate B2B sales** - No manual quote generation
+- **Scale efficiently** - Handle hundreds of enterprise accounts
+- **Integration readiness** - Connect to major procurement platforms
+- **Competitive advantage** - Many competitors don't offer PunchOut
+
+## How It Works
+
+### PunchOut Flow
+
+```
+┌─────────────────────────────────┐
+│ 1. Procurement System           │
+│    (SAP Ariba, Coupa)           │
+│                                 │
+│ User clicks "Shop at Vendor"    │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ 2. Redirects to Shopify Store   │
+│    with fromIdentity parameter  │
+│                                 │
+│ ?fromIdentity=SAP_Ariba_        │
+│ Buyer:ACME_CORP_12345           │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ 3. Widget Captures FromIdentity │
+│    - Stores in sessionStorage   │
+│    - 12-hour expiration         │
+│    - Resolves to customer ID    │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ 4. Fetch Customer Pricing       │
+│    - Call B2B API               │
+│    - Get price list             │
+│    - Display "Your Price"       │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ 5. Customer Shops               │
+│    - Browse products            │
+│    - See negotiated prices      │
+│    - Add items to cart          │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│ 6. Return to Procurement        │
+│    - Cart data sent back        │
+│    - Order created in system    │
+│    - Purchase order generated   │
+└─────────────────────────────────┘
+```
+
+## Supported Procurement Systems
+
+The Weevio widget supports major procurement platforms:
+
+### SAP Ariba
+
+Leading procurement platform used by enterprise organizations:
+- Catalog management
+- Purchase order integration
+- Invoice processing
+- Supplier management
+
+### Coupa
+
+Cloud-based business spend management:
+- Requisition to payment
+- Supplier collaboration
+- Contract management
+- Spend analytics
+
+### Other Systems
+
+Any system supporting URL-based PunchOut:
+- Oracle iProcurement
+- Jaggaer (SciQuest)
+- Basware
+- Ivalua
+- Custom procurement portals
+
+## FromIdentity Formats
+
+### Approved Prefixes
+
+The widget recognizes these formats (case-insensitive):
+
+**PunchOut:**
+- `PunchOut Buyer:[customer_id]`
+- `PunchOut_Buyer:[customer_id]`
+
+**SAP Ariba:**
+- `SAP Ariba Buyer:[customer_id]`
+- `SAP_Ariba_Buyer:[customer_id]`
+- `Ariba Buyer:[customer_id]`
+- `Ariba_Buyer:[customer_id]`
+
+### Example URLs
+
+```
+https://your-store.com/products/laptop?fromIdentity=SAP_Ariba_Buyer:ACME_CORP
+
+https://your-store.com/collections/all?fromIdentity=PunchOut_Buyer:ENTERPRISE_123
+
+https://your-store.com?fromIdentity=Ariba_Buyer:CUSTOMER_XYZ
+```
+
+### Character Restrictions
+
+For security, fromIdentity values:
+
+- **Maximum length:** 50 characters
+- **Allowed characters:** Alphanumeric, hyphens, underscores, colons, spaces
+- **Sanitized:** XSS protection applied
+- **Case-insensitive:** Prefix matching is flexible
+
+## Configuration
+
+### Customer Setup
+
+**Create customer mapping in Shopify:**
+
+1. Go to Customers in Shopify Admin
+2. Create or edit customer record
+3. Add tag matching fromIdentity format
+4. Assign to appropriate B2B price list
+
+**Example customer tags:**
+- `SAP Ariba Buyer:ACME_CORP_12345`
+- `PunchOut Buyer:ENTERPRISE_ABC`
+- `Ariba_Buyer:CUSTOMER_XYZ`
+
+[Screenshot: Shopify customer with fromIdentity tag]
+
+### Tag Matching
+
+The widget matches exactly:
+
+**URL parameter:**
+```
+?fromIdentity=SAP_Ariba_Buyer:ACME_CORP_12345
+```
+
+**Customer tag (must match):**
+```
+SAP Ariba Buyer:ACME_CORP_12345
+```
+
+**Note:** Matching is flexible on separator (space vs. underscore) but exact on ID.
+
+### Widget Configuration
+
+No special widget configuration needed! FromIdentity detection is automatic.
+
+The widget:
+- Detects fromIdentity in URL
+- Stores in sessionStorage
+- Resolves to customer ID
+- Fetches pricing automatically
+
+## Session Management
+
+### Session Storage
+
+FromIdentity is stored client-side:
+
+```javascript
+// Automatically stored by widget
+sessionStorage.setItem('weevio_fromIdentity', 'SAP_Ariba_Buyer:ACME_CORP');
+sessionStorage.setItem('weevio_fromIdentity_timestamp', Date.now());
+sessionStorage.setItem('weevio_fromIdentity_customerId', 'gid://shopify/Customer/123');
+```
+
+### Session Lifetime
+
+- **Duration:** 12 hours from initial capture
+- **Storage:** Browser sessionStorage (cleared when browser closes)
+- **Persistence:** Survives page navigation within session
+- **Expiration:** Automatic after 12 hours
+
+### Multi-Page Persistence
+
+Once fromIdentity is captured:
+
+1. Customer browses product pages
+2. FromIdentity persists across pages
+3. No need to include in every URL
+4. Works for entire shopping session
+
+## Security
+
+### Input Validation
+
+All fromIdentity values are sanitized:
+
+- XSS protection applied
+- SQL injection prevention
+- Length limits enforced
+- Character whitelist applied
+
+### Authentication
+
+- No permanent credentials stored
+- Session-based only
+- No cookie tracking
+- Privacy-friendly
+
+### Data Protection
+
+- Customer IDs never exposed to frontend
+- API calls authenticated
+- Encrypted data in transit
+- Minimal data collection
+
+## Customer Experience
+
+### Initial Visit
+
+1. Customer in procurement system
+2. Clicks "Shop at [Your Store]"
+3. Lands on your store with fromIdentity
+4. Widget detects and stores identifier
+5. Pricing loads automatically (200-400ms)
+6. "Your Price" badges appear
+
+[Screenshot: Customer journey from procurement to store]
+
+### Browsing Experience
+
+Throughout the session:
+
+- All product prices show customer rates
+- Cross-sell displays customer pricing
+- Shipping estimates personalized
+- Inventory from all sources shown
+
+### Checkout
+
+When ready to purchase:
+
+- Customer adds items to cart
+- Proceeds to checkout
+- Cart data sent to procurement system
+- Order created with negotiated pricing
+
+## Use Cases
+
+### Manufacturing Company
+
+**Scenario:** ACME Manufacturing uses SAP Ariba for all purchases.
+
+**Setup:**
+- Create customer "ACME Manufacturing" in Shopify
+- Tag: `SAP Ariba Buyer:ACME_CORP_12345`
+- Assign to "Enterprise Tier" price list (20% off)
+
+**Experience:** Procurement manager clicks "Shop at Your Store" in Ariba, sees 20% discount automatically.
+
+### Technology Distributor
+
+**Scenario:** Fortune 500 companies procure through Coupa.
+
+**Setup:**
+- Multiple customer records for different divisions
+- Tags: `PunchOut Buyer:[DIVISION_ID]`
+- Different price lists per division
+
+**Experience:** Each division sees their negotiated rates automatically.
+
+### Healthcare Organization
+
+**Scenario:** Hospital system with strict procurement compliance.
+
+**Setup:**
+- Customer: "Regional Healthcare System"
+- Tag: `Ariba_Buyer:RHS_MEDICAL`
+- Contract-based pricing in price list
+
+**Experience:** Buyers shop within approved procurement process, see contract prices.
+
+## Troubleshooting
+
+### FromIdentity Not Detected
+
+**Check:**
+- URL contains `?fromIdentity=` parameter
+- Format matches approved prefixes
+- No typos in parameter name
+- JavaScript not blocked
+
+**Debug:**
+```javascript
+// Check in browser console
+console.log(sessionStorage.getItem('weevio_fromIdentity'));
+```
+
+### Customer Not Resolved
+
+**Check:**
+- Customer exists in Shopify
+- Customer tag matches fromIdentity exactly
+- Tag has correct prefix format
+- Customer assigned to price list
+
+### Pricing Not Showing
+
+**Check:**
+- Customer ID resolved correctly
+- B2B API key configured
+- Price list has pricing set
+- No API errors in console
+
+### Session Expired
+
+**Check:**
+- Less than 12 hours since first visit
+- Browser not closed/restarted
+- sessionStorage not manually cleared
+- No privacy extensions blocking storage
+
+See the [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting) for more solutions.
+
+## Testing PunchOut
+
+### Test URLs
+
+Create test URLs to verify setup:
+
+```
+# Test SAP Ariba format
+https://your-store.com?fromIdentity=SAP_Ariba_Buyer:TEST_CUSTOMER
+
+# Test PunchOut format
+https://your-store.com?fromIdentity=PunchOut_Buyer:TEST_123
+
+# Test on specific product
+https://your-store.com/products/laptop?fromIdentity=Ariba_Buyer:TEST_ORG
+```
+
+### Verification Steps
+
+1. **Open test URL**
+2. **Check console:**
+```javascript
+console.log(sessionStorage.getItem('weevio_fromIdentity'));
+// Should show: "SAP_Ariba_Buyer:TEST_CUSTOMER"
+
+console.log(sessionStorage.getItem('weevio_fromIdentity_customerId'));
+// Should show: "gid://shopify/Customer/123456"
+```
+3. **Verify pricing changes** - Should see "Your Price"
+4. **Navigate to other pages** - FromIdentity should persist
+5. **Check expiration** - Wait 12 hours or clear storage
+
+## Best Practices
+
+### Customer Management
+
+- **Clear naming** - Use descriptive customer names
+- **Tag conventions** - Consistent fromIdentity format
+- **Documentation** - Maintain mapping spreadsheet
+- **Regular audits** - Verify customer data accuracy
+
+### Testing
+
+- **Pre-launch testing** - Test all customer fromIdentity values
+- **UAT with customers** - Have customers test from their systems
+- **Monitor logs** - Check for resolution errors
+- **Error handling** - Graceful fallbacks for unrecognized IDs
+
+### Communication
+
+- **Customer onboarding** - Guide customers through setup
+- **Support documentation** - Provide customer-facing guides
+- **Troubleshooting** - Clear escalation path for issues
+- **Updates** - Notify customers of changes
+
+### Security
+
+- **Validate input** - Trust but verify fromIdentity values
+- **Monitor access** - Watch for unusual patterns
+- **Rotate credentials** - Update API keys regularly
+- **Compliance** - Follow procurement system requirements
+
+## Integration with Other Features
+
+Works seamlessly with:
+
+- **B2B Pricing** - Core dependency for PunchOut
+- **Multi-Source Inventory** - Show accurate availability
+- **Cross-Sell** - Customer-specific recommendations
+- **Shipping Estimates** - Delivery to customer location
+
+## Analytics
+
+Track PunchOut performance:
+
+- FromIdentity session counts
+- Customer resolution success rates
+- Pricing display accuracy
+- Conversion rates by procurement system
+- Average order value (PunchOut vs. standard)
+
+Available in Weevio Cloud analytics.
+
+## Next Steps
+
+- [Learn about B2B Wholesale Pricing](/docs/integrations/shopify/features/b2b-pricing)
+- [Explore configuration examples](/docs/integrations/shopify/configuration/examples)
+- [Review advanced configuration](/docs/integrations/shopify/configuration/advanced)
+
+## Need Help?
+
+Questions about PunchOut integration?
+
+- Review [B2B Pricing Documentation](/docs/integrations/shopify/features/b2b-pricing)
+- Check [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting)
+- Contact Weevio support for procurement system setup
+- Request customer onboarding assistance

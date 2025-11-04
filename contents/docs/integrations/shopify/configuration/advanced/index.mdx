@@ -1,0 +1,431 @@
+---
+title: Advanced Configuration
+description: Advanced customization options and techniques for power users.
+keywords: ["advanced", "customization", "performance", "optimization"]
+---
+
+This guide covers advanced configuration techniques, performance optimization, and customization options for power users.
+
+## Custom Styling
+
+### Widget Container Styling
+
+Customize the widget appearance with CSS:
+
+```css
+/* Target the widget root container */
+#Weevio-eCommerce-Widget-Root {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+/* Variant cards */
+.weevio-variant-card {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.weevio-variant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Cross-sell modal */
+.weevio-cross-sell-modal {
+  max-width: 900px;
+  border-radius: 12px;
+}
+
+/* B2B price badge */
+.weevio-b2b-price-badge {
+  background-color: #your-brand-color;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+```
+
+### Theme Integration
+
+Match your store's design:
+
+```css
+/* Inherit theme fonts */
+#Weevio-eCommerce-Widget-Root {
+  font-family: var(--font-body-family);
+  font-size: var(--font-body-size);
+}
+
+/* Match button styles */
+.weevio-button {
+  background-color: var(--color-button);
+  color: var(--color-button-text);
+  border-radius: var(--buttons-radius);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #Weevio-eCommerce-Widget-Root {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+}
+```
+
+## Performance Optimization
+
+### Reduce API Calls
+
+Configure caching and debouncing:
+
+```javascript
+// In Weevio Cloud team settings
+{
+  widget: {
+    apiCacheDuration: 30,  // seconds
+    debounceDelay: 2500,   // milliseconds
+    maxRetries: 3
+  }
+}
+```
+
+### Lazy Loading
+
+Widget automatically lazy loads features:
+
+- Cross-sell modal: Loads on add-to-cart
+- Recommendations: Loads when out of stock
+- Variant data: Loads on first interaction
+
+### Image Optimization
+
+For cross-sell and recommendations:
+
+```javascript
+// Configure in Weevio Cloud
+{
+  images: {
+    maxWidth: 400,
+    quality: 80,
+    format: 'webp'  // Modern format for smaller files
+  }
+}
+```
+
+## Multi-Store Configuration
+
+### Different Configs per Store
+
+If you manage multiple Shopify stores:
+
+```javascript
+// Create conditional configuration
+{% if shop.permanent_domain == 'store1.myshopify.com' %}
+  window.weevioWidgetConfig = {
+    // Store 1 specific config
+    enableCrossSell: true,
+    useStaticZipCode: "10001"
+  };
+{% elsif shop.permanent_domain == 'store2.myshopify.com' %}
+  window.weevioWidgetConfig = {
+    // Store 2 specific config
+    enableCrossSell: false,
+    useStaticZipCode: "90210"
+  };
+{% endif %}
+```
+
+### Template Variables
+
+Use Liquid for dynamic configuration:
+
+```javascript
+window.weevioWidgetConfig = {
+  // Dynamic based on product
+  enableCrossSell: {% if product.tags contains 'cross-sell' %}true{% else %}false{% endif %},
+
+  // Dynamic based on collection
+  shippingEstimates: {
+    useStaticZipCode: {% if collection.handle == 'wholesale' %}"60601"{% else %}false{% endif %}
+  }
+};
+```
+
+## Custom Error Messages
+
+### Variant Selection Errors
+
+```javascript
+{
+  invalidVariantMessage: 'Sorry, this combination is currently unavailable. Please try different options or contact us for assistance.',
+}
+```
+
+### Out of Stock Messaging
+
+Customize in Weevio Cloud backend to match your brand voice.
+
+## Conditional Feature Loading
+
+### Customer-Based Configuration
+
+```javascript
+window.weevioWidgetConfig = {
+  // Only show cross-sell to logged-in customers
+  {% if customer %}
+    enableCrossSell: true,
+    customerId: '{{ customer.id | json }}',
+  {% else %}
+    enableCrossSell: false,
+  {% endif %}
+
+  // B2B vs B2C settings
+  shippingEstimates: {
+    useStaticZipCode: {% if customer.tags contains 'b2b' %}"60601"{% else %}false{% endif %}
+  }
+};
+```
+
+### Product-Based Configuration
+
+```javascript
+window.weevioWidgetConfig = {
+  // Only enable variant selector for products with variants
+  enableImprovedVariantSelection: {% if product.variants.size > 1 %}true{% else %}false{% endif %},
+
+  // Disable cross-sell for clearance items
+  enableCrossSell: {% unless product.tags contains 'clearance' %}true{% endunless %}
+};
+```
+
+## Integration Hooks
+
+### Custom Event Handlers
+
+Listen to widget events:
+
+```javascript
+// Listen for widget loaded
+document.addEventListener('weevio:widget:loaded', function(event) {
+  console.log('Widget loaded successfully');
+});
+
+// Listen for variant change
+document.addEventListener('weevio:variant:changed', function(event) {
+  console.log('Variant changed to:', event.detail.variantId);
+  // Your custom logic here
+});
+
+// Listen for add-to-cart
+document.addEventListener('weevio:add-to-cart', function(event) {
+  console.log('Added to cart:', event.detail);
+  // Trigger your analytics
+});
+```
+
+### Custom Analytics
+
+Track widget interactions:
+
+```javascript
+document.addEventListener('weevio:cross-sell:viewed', function(event) {
+  // Send to Google Analytics
+  gtag('event', 'cross_sell_viewed', {
+    'product_id': event.detail.productId
+  });
+});
+
+document.addEventListener('weevio:cross-sell:added', function(event) {
+  // Track cross-sell conversion
+  gtag('event', 'cross_sell_purchase', {
+    'product_id': event.detail.productId,
+    'value': event.detail.price
+  });
+});
+```
+
+## Advanced B2B Configuration
+
+### Customer Segmentation
+
+```javascript
+window.weevioWidgetConfig = {
+  customerId: '{{ customer.id | json }}',
+
+  // Custom config based on customer tags
+  {% if customer.tags contains 'vip' %}
+    // VIP customers get all features
+    enableCrossSell: true,
+    enableImprovedVariantSelection: true,
+    shippingEstimates: {
+      enableDeliveryEtas: true,
+      enableLocalPickupEtas: true,
+      useStaticZipCode: false
+    }
+  {% elsif customer.tags contains 'wholesale' %}
+    // Wholesale customers get simplified experience
+    enableCrossSell: true,
+    enableImprovedVariantSelection: false,
+    shippingEstimates: {
+      enableDeliveryEtas: true,
+      enableLocalPickupEtas: false,
+      useStaticZipCode: "60601"
+    }
+  {% endif %}
+};
+```
+
+### PunchOut Customization
+
+```javascript
+// Detect PunchOut session and adjust config
+if (sessionStorage.getItem('weevio_fromIdentity')) {
+  window.weevioWidgetConfig.enableCrossSell = true;
+  window.weevioWidgetConfig.shippingEstimates.useStaticZipCode = "90210";
+}
+```
+
+## Debugging Configuration
+
+### Enable Debug Mode
+
+```javascript
+window.weevioWidgetConfig = {
+  // ... your config ...
+
+  // Enable detailed logging
+  debug: true
+};
+```
+
+This logs detailed information to browser console:
+- API requests and responses
+- Configuration validation
+- Feature enablement status
+- Error details
+
+### Console Inspection
+
+Check widget status:
+
+```javascript
+// View current config
+console.log(window.weevioWidgetConfig);
+
+// Check widget version
+console.log(window.weevioWidget?.version);
+
+// Inspect fromIdentity
+console.log({
+  fromIdentity: sessionStorage.getItem('weevio_fromIdentity'),
+  customerId: sessionStorage.getItem('weevio_fromIdentity_customerId'),
+  priceCode: sessionStorage.getItem('weevio_fromIdentity_priceCode'),
+  timestamp: sessionStorage.getItem('weevio_fromIdentity_timestamp')
+});
+```
+
+## Security Considerations
+
+### Input Validation
+
+The widget automatically sanitizes:
+- FromIdentity values
+- Zip codes
+- Customer IDs
+- Product IDs
+
+### API Key Protection
+
+Never expose sensitive keys:
+
+```javascript
+// ❌ BAD - Don't do this
+storefrontAccessToken: 'shpat_xxxxx',  // OK - Storefront token is safe
+
+// ❌ BAD - Never expose these
+adminAccessToken: 'shpat_xxxxx',  // Never!
+b2bApiKey: 'secret_key',          // Never!
+```
+
+Admin and B2B API keys stay in Weevio Cloud backend only.
+
+## Performance Monitoring
+
+### Track Widget Performance
+
+```javascript
+// Measure widget load time
+const widgetStartTime = performance.now();
+
+document.addEventListener('weevio:widget:loaded', function() {
+  const loadTime = performance.now() - widgetStartTime;
+  console.log(`Widget loaded in ${loadTime}ms`);
+
+  // Send to analytics
+  gtag('event', 'widget_performance', {
+    'load_time': loadTime
+  });
+});
+```
+
+### Optimize for Large Catalogs
+
+For stores with many variants:
+
+```javascript
+// Limit variant preloading
+{
+  variantPreloadLimit: 50,  // Only preload first 50 variants
+}
+```
+
+## Custom Add-to-Cart Button
+
+If your theme uses a non-standard button:
+
+```javascript
+{
+  addToCartButtonClass: 'my-custom-button',  // Your button's class
+  addToCartButtonSelector: '#custom-add-button',  // Or CSS selector
+}
+```
+
+## Testing & QA
+
+### Test Configuration
+
+Create a test page for QA:
+
+```liquid
+{% comment %} Create test-product.liquid template {% endcomment %}
+
+<h1>Widget Test Page</h1>
+
+<!-- Test with debug enabled -->
+<script>
+  window.weevioWidgetConfig = {
+    // ... config ...
+    debug: true
+  };
+</script>
+
+<!-- Widget container -->
+<div id="Weevio-eCommerce-Widget-Root"></div>
+
+<!-- Widget script -->
+<script defer src="https://api.weevio.com/ecommerce-widget/index.js"></script>
+
+<!-- Test buttons -->
+<button onclick="console.log(window.weevioWidgetConfig)">Show Config</button>
+<button onclick="sessionStorage.clear()">Clear Session</button>
+```
+
+## Need Help?
+
+Advanced configuration questions?
+
+- [Review configuration examples](/docs/integrations/shopify/configuration/examples)
+- [Check troubleshooting guide](/docs/integrations/shopify/troubleshooting)
+- Contact Weevio support for custom implementations

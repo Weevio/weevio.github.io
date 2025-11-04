@@ -1,0 +1,183 @@
+---
+title: Prerequisites
+description: Requirements and setup steps needed before installing the Weevio Shopify Widget.
+keywords: ["prerequisites", "requirements", "Shopify app", "API", "access token"]
+---
+
+Before installing the Weevio Shopify Widget, you'll need to set up a Shopify Custom App with the appropriate API permissions. This page walks you through the requirements and setup process.
+
+## Requirements
+
+To install the Weevio Shopify Widget, you need:
+
+- **Active Shopify Store** (any plan - Basic, Shopify, Advanced, or Plus)
+- **Admin access** to your Shopify store
+- **Weevio Cloud account** with appropriate feature purchases
+- **About 10-15 minutes** to complete setup
+
+## Creating a Shopify Custom App
+
+The Weevio Widget requires a Shopify Custom App to access your store's product, order, and inventory data. Follow these steps to create one:
+
+### Step 1: Navigate to App Development
+
+1. Log into your Shopify admin panel
+2. Go to **Settings** (bottom left corner)
+3. Click **Apps and sales channels**
+4. Click **Develop apps** (or **Develop apps for your store**)
+5. If prompted, click **Allow custom app development**
+
+[Screenshot: Shopify Settings > Apps and sales channels > Develop apps]
+
+### Step 2: Create New App
+
+1. Click **Create an app** button
+2. Enter app name: **Weevio Widget** (or your preferred name)
+3. Select App developer (usually yourself)
+4. Click **Create app**
+
+[Screenshot: Create app dialog with name "Weevio Widget"]
+
+### Step 3: Configure Admin API Scopes
+
+The widget needs access to product, order, inventory, and location data.
+
+1. Click **Configure Admin API scopes**
+2. In the search box or by scrolling, select these scopes:
+
+**Required scopes:**
+- `read_products` - Read product data
+- `write_products` - Update product information
+- `read_orders` - Read order information
+- `write_orders` - Create and update orders
+- `read_inventory` - Read inventory levels
+- `write_inventory` - Update inventory
+- `read_locations` - Read store location data
+- `read_fulfillments` - Read fulfillment information
+- `write_fulfillments` - Create fulfillments
+
+3. Click **Save** at the top right
+
+[Screenshot: Admin API scopes selection showing required scopes checked]
+
+### Step 4: Configure Storefront API (Optional)
+
+The Storefront API is only needed if you want to enable the **Improved Variant Selection** feature. If you don't plan to use this feature, you can skip this step.
+
+1. Click **Configure Storefront API scopes**
+2. Select these scopes:
+
+**Optional scopes (for improved variant selection):**
+- `unauthenticated_read_product_listings` - Read product data
+- `unauthenticated_read_product_inventory` - Read inventory
+- `unauthenticated_read_product_pickup_locations` - Read pickup locations
+- `unauthenticated_read_product_tags` - Read product tags
+
+3. Click **Save** at the top right
+
+[Screenshot: Storefront API scopes selection]
+
+### Step 5: Install the App
+
+1. Click **Install app** button (top right)
+2. Review the permissions
+3. Click **Install** to confirm
+
+[Screenshot: App installation confirmation dialog]
+
+### Step 6: Reveal and Copy API Tokens
+
+This is an important step - the Admin API access token is only shown once!
+
+**Admin API Access Token:**
+1. After installation, you'll see **Admin API access token**
+2. Click **Reveal token once**
+3. **Important:** Copy this token immediately and save it securely
+4. You won't be able to see it again without creating a new token
+
+[Screenshot: Admin API access token revealed with copy button]
+
+**Storefront API Access Token (if configured):**
+1. Scroll down to **Storefront API access token**
+2. Copy this token and save it securely
+3. This token can be viewed again later if needed
+
+[Screenshot: Storefront API access token]
+
+## What to Do with Your Tokens
+
+You'll need these tokens in the next step when configuring your integration in Weevio Cloud:
+
+- **Admin API access token** - Required for all widget features
+- **Storefront API access token** - Optional, only needed for improved variant selection
+
+Save these tokens in a secure location:
+- Password manager (recommended)
+- Secure note-taking app
+- Never commit tokens to version control or share publicly
+
+## Verifying Your Setup
+
+Before proceeding to installation, verify you have:
+
+- [ ] Created a Shopify Custom App
+- [ ] Configured all required Admin API scopes
+- [ ] (Optional) Configured Storefront API scopes
+- [ ] Installed the custom app
+- [ ] Copied and saved the Admin API access token
+- [ ] (Optional) Copied and saved the Storefront API access token
+
+## Security Best Practices
+
+**Keep your API tokens secure:**
+- Never share tokens publicly or commit them to code repositories
+- Store tokens in a password manager or secure vault
+- Only share tokens with authorized team members
+- Rotate tokens periodically for enhanced security
+- If a token is compromised, revoke it immediately and create a new one
+
+**Revoking and regenerating tokens:**
+1. Go to your Shopify custom app settings
+2. Click **Uninstall app** and reinstall to generate new tokens
+3. Update the tokens in Weevio Cloud configuration
+
+## Troubleshooting
+
+### Can't Find "Develop Apps" Option
+
+If you don't see the "Develop apps" option:
+- Ensure you have admin access to the Shopify store
+- Check that your store owner hasn't disabled custom app development
+- Contact your store owner to enable custom app development
+
+### Token Already Used or Invalid
+
+If you get this error when connecting in Weevio Cloud:
+- Verify you copied the entire token without spaces or line breaks
+- Check that you're using the Admin API access token, not the API key
+- Ensure the token hasn't been revoked
+- Try creating a new token by reinstalling the app
+
+### Missing Required Scopes
+
+If the widget features aren't working:
+- Return to your custom app settings
+- Click "Configure Admin API scopes"
+- Verify all required scopes are selected
+- Click "Save" and test again
+
+## Next Steps
+
+Once you have your API tokens ready:
+
+1. [Configure the integration in Weevio Cloud →](/docs/integrations/shopify/installation/configuration)
+2. Add the widget code to your Shopify theme
+3. Test the widget on your product pages
+
+## Need Help?
+
+If you encounter issues setting up your Shopify Custom App:
+
+- Review [Shopify's custom app documentation](https://help.shopify.com/en/manual/apps/custom-apps)
+- Check the [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting)
+- Contact Weevio support with screenshots of any errors

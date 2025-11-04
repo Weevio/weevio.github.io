@@ -1,0 +1,367 @@
+---
+title: In-Stock Recommendations
+description: Automatically suggest alternative products when items are out of stock or have low inventory.
+keywords: ["recommendations", "alternatives", "out of stock", "suggestions", "substitutes"]
+---
+
+The In-Stock Recommendations feature automatically suggests alternative products when the selected item is out of stock or has low inventory, helping customers find what they need and preventing lost sales.
+
+[Screenshot: In-stock recommendations modal showing alternative products]
+
+## What It Does
+
+When a product is out of stock or has limited inventory, the widget displays a "Similar in-stock options available" link. Clicking it opens a full-screen modal with up to 5 alternative products that:
+
+- Are currently in stock
+- Match the original product type/category
+- Show price comparisons
+- Display shipping estimates
+- Offer one-click selection
+
+## Benefits
+
+### For Your Customers
+
+- **Find alternatives instantly** - No need to search your entire catalog
+- **Stay informed** - Know which similar products are available
+- **Compare easily** - See price differences and features side-by-side
+- **Keep shopping** - Don't leave your site when first choice unavailable
+- **Save time** - Curated suggestions vs. manual searching
+
+### For Your Business
+
+- **Prevent lost sales** - Turn out-of-stock situations into purchases
+- **Reduce bounce rate** - Keep customers engaged when products unavailable
+- **Increase customer satisfaction** - Help customers find solutions
+- **Lower support burden** - Fewer "when will this be back?" inquiries
+- **Improve inventory flow** - Move stock from similar products
+
+## How It Works
+
+[Screenshot: Flow diagram showing out-of-stock → recommendations link → modal → selection]
+
+1. **Detection** - Widget identifies product is out of stock or low inventory
+2. **Link appears** - "Similar in-stock options available" link displays
+3. **Customer clicks** - Full-screen modal opens with alternatives
+4. **Browse options** - Customer reviews up to 5 similar products
+5. **Selection** - Click on alternative to view that product page
+6. **Continue shopping** - Customer proceeds with in-stock alternative
+
+## Requirements
+
+To use In-Stock Recommendations:
+
+- **Feature purchase:** `integration_shopify_in_stock_variant_recommendation`
+- **Shipping estimates enabled** - Basic or Premium plan
+- **Backend configuration** - Recommendations sourced from product type/category
+
+## Configuration
+
+### Enabling the Feature
+
+The feature is automatically enabled when:
+
+1. Feature is purchased in Weevio Cloud
+2. Shipping Estimates feature is active
+3. Backend has recommendation logic configured
+
+No additional configuration required in widget code.
+
+### How Recommendations Are Selected
+
+The backend selects alternatives based on:
+
+- **Product type match** - Same product type in Shopify
+- **Category similarity** - Similar product categories
+- **Stock availability** - Must be in stock
+- **Price range** - Similar price points preferred
+- **Customer tags** - B2B filtering if applicable
+
+[Screenshot: Weevio Cloud configuration for recommendation rules]
+
+## Customer Experience
+
+### Out of Stock Detection
+
+When a product or variant is out of stock:
+
+```
+✗ Out of Stock
+
+🔍 Similar in-stock options available
+```
+
+[Screenshot: Out-of-stock message with recommendations link]
+
+### Opening the Modal
+
+Customer clicks "Similar in-stock options available":
+
+- Modal slides in from bottom (mobile) or center (desktop)
+- Shows up to 5 alternative products
+- Full-screen overlay with close button
+- Clean, distraction-free interface
+
+[Screenshot: Recommendations modal open]
+
+### Alternative Product Display
+
+Each alternative shows:
+
+- **Product image** - Clear product photo
+- **Product title** - Full product name
+- **Price** - Current price
+- **Price comparison** - "+$20 more" or "$15 less" vs. original
+- **Availability** - "In Stock" with quantity
+- **Shipping estimate** - Delivery timeframe
+- **View button** - Navigate to product page
+
+[Screenshot: Alternative product card with all information]
+
+### Selecting an Alternative
+
+Customer clicks "View" button:
+
+- Modal closes
+- Navigates to selected product page
+- Widget displays with shipping estimates
+- Customer can add to cart or view more details
+
+## Use Cases
+
+### Electronics Store
+
+**Scenario:** Customer wants 512GB iPhone in Blue, but it's out of stock.
+
+**Recommendations show:**
+- 512GB iPhone in other colors (in stock)
+- 256GB iPhone in Blue (+$100 less)
+- Similar Android phones (if configured)
+
+[Screenshot: Electronics alternatives example]
+
+### Apparel Store
+
+**Scenario:** T-shirt in Size Large and Red is unavailable.
+
+**Recommendations show:**
+- Same t-shirt in Red, different sizes
+- Same t-shirt in Size Large, different colors
+- Similar t-shirts from other brands
+
+[Screenshot: Apparel alternatives example]
+
+### Parts/Industrial Supply
+
+**Scenario:** Specific part number out of stock.
+
+**Recommendations show:**
+- Compatible replacement parts
+- Newer model alternatives
+- Related products from other manufacturers
+
+## Price Comparison Display
+
+The widget shows price differences clearly:
+
+```
+Original Item: $99.99 (Out of Stock)
+
+Alternatives:
+└─ Similar Item A: $89.99 ($10 less) ✓ In Stock
+└─ Similar Item B: $109.99 ($10 more) ✓ In Stock
+└─ Similar Item C: $99.99 (Same price) ✓ In Stock
+```
+
+[Screenshot: Price comparison display]
+
+## Mobile Experience
+
+The modal is fully optimized for mobile:
+
+- **Swipeable interface** - Swipe between alternatives
+- **Full-screen display** - Maximum product visibility
+- **Touch-friendly buttons** - Large, easy-to-tap controls
+- **Fast loading** - Optimized images and data
+- **Easy close** - Swipe down or tap X to dismiss
+
+[Screenshot: Mobile recommendations modal]
+
+## Integration with Other Features
+
+### With B2B Pricing
+
+For logged-in B2B customers:
+
+- Shows customer-specific pricing on alternatives
+- Filters recommendations by customer tags
+- Displays wholesale prices and discounts
+- Respects customer visibility rules
+
+### With Shipping Estimates
+
+Each alternative displays:
+
+- Delivery estimates based on customer zip
+- Local pickup availability
+- Multi-source inventory status
+- Real-time stock levels
+
+### With Cross-Sell
+
+Works together seamlessly:
+
+- Recommendations for unavailable items
+- Cross-sell after adding alternative to cart
+- Different purposes, complementary features
+
+## Customization
+
+### Recommendation Count
+
+The widget shows up to 5 alternatives by default. This is optimized for:
+
+- Not overwhelming customers
+- Loading performance
+- Mobile display
+- Decision-making efficiency
+
+### Visual Styling
+
+The modal inherits your theme styles:
+
+- Fonts match your theme
+- Colors adapt to brand
+- Button styles consistent
+- Responsive design
+
+Custom styling can be added via CSS:
+
+```css
+/* Customize recommendations modal */
+.weevio-recommendations-modal {
+  border-radius: 12px;
+}
+
+.weevio-recommendation-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+```
+
+## Triggering Conditions
+
+Recommendations appear when:
+
+- **Out of stock** - Product or variant unavailable
+- **Low inventory** - Below configured threshold
+- **Discontinued** - Product marked as discontinued
+- **Preorder** - Long lead time before availability
+
+Conditions configured in Weevio Cloud settings.
+
+## Best Practices
+
+### Product Setup
+
+- **Consistent product types** - Use standard product type taxonomy
+- **Clear categorization** - Tag products appropriately
+- **Accurate inventory** - Keep stock levels synchronized
+- **Quality images** - Use high-quality product photos
+
+### Merchandising
+
+- **Strategic alternatives** - Configure relevant product associations
+- **Price positioning** - Include range of price points
+- **Seasonal rotation** - Update recommendations for seasons
+- **New products** - Feature new arrivals as alternatives
+
+### Customer Communication
+
+- **Clear messaging** - "Similar options" vs. "exact match"
+- **Price transparency** - Show price differences clearly
+- **Availability honesty** - Accurate stock information
+- **Easy navigation** - Simple path to alternatives
+
+## Performance
+
+The feature is optimized for speed:
+
+- **Lazy loading** - Modal loads only when clicked
+- **Image optimization** - Compressed product images
+- **API caching** - Brief cache of recommendation data
+- **Async rendering** - Doesn't block page load
+
+**Typical performance:**
+- Link display: <50ms
+- Modal open: 200-400ms
+- Alternative loading: 300-500ms
+
+## Troubleshooting
+
+### No Recommendations Showing
+
+**Check:**
+- Feature is purchased in Weevio Cloud
+- Shipping estimates are enabled
+- Product has product type set in Shopify
+- Similar products exist and are in stock
+
+### Wrong Alternatives Displayed
+
+**Check:**
+- Product types match correctly
+- Categories configured properly
+- Inventory is accurate
+- Recommendation rules in Weevio Cloud
+
+### Modal Not Opening
+
+**Check:**
+- No JavaScript errors in console
+- Link element is clickable (no CSS conflicts)
+- Modal container renders correctly
+- Browser JavaScript is enabled
+
+### Slow Loading
+
+**Check:**
+- Alternative product images optimized
+- API response times acceptable
+- Network conditions
+- Browser performance
+
+See the [Troubleshooting Guide](/docs/integrations/shopify/troubleshooting) for more solutions.
+
+## Analytics & Insights
+
+Track recommendation performance:
+
+- **Click-through rate** - How often customers click recommendations link
+- **Conversion rate** - Sales from recommended products
+- **Alternative selection** - Which alternatives are chosen most
+- **Revenue impact** - Sales recovered from out-of-stock situations
+
+Available through Weevio Cloud analytics dashboard.
+
+## Combining with Inventory Management
+
+Recommendations work best with:
+
+- **Real-time inventory sync** - Accurate stock levels
+- **Low stock alerts** - Proactive restocking
+- **Vendor integrations** - Multi-source inventory
+- **Backorder management** - Clear availability messaging
+
+## Next Steps
+
+- [Learn about Cross-Sell Recommendations](/docs/integrations/shopify/features/cross-sell)
+- [Explore Multi-Source Inventory](/docs/integrations/shopify/features/multi-source-inventory)
+- [See configuration examples](/docs/integrations/shopify/configuration/examples)
+
+## Need Help?
+
+Questions about in-stock recommendations?
+
+- Review [Configuration Guide](/docs/integrations/shopify/configuration)
+- Check [Troubleshooting](/docs/integrations/shopify/troubleshooting)
+- Contact Weevio support for recommendation strategy
