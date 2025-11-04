@@ -109,7 +109,7 @@ Before diving into specific issues, run these quick checks:
     
     **If no customer found**:
     - Customer not tagged correctly
-    - See [Admin Setup Guide](/docs/punchout/admin-setup)
+    - See [Admin Setup Guide](/docs/shopify/punchout/admin-setup)
     
     **If customer exists**: Continue to Check 4
   </TabsContent>
@@ -231,7 +231,7 @@ sessionStorage is **per-tab isolated** by design. Each tab maintains its own buy
     
     **If 404**: Script not uploaded to Shopify Assets
     - Re-upload the tracker script
-    - See [Deployment Guide](/docs/punchout/deployment)
+    - See [Deployment Guide](/docs/shopify/punchout/deployment)
     
     **If 200 but no console log**: Script loaded but not executing
     - Check Console tab for JavaScript errors
@@ -321,7 +321,7 @@ sessionStorage is **per-tab isolated** by design. Each tab maintains its own buy
     Example: Search for "AN01631249352"
     
     **If no results**: Customer not tagged
-    - Tag the customer (see [Admin Setup Guide](/docs/punchout/admin-setup))
+    - Tag the customer (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
     
     **If multiple results**: Duplicate buyer IDs
     - See [Handling Duplicates](#handling-duplicate-buyer-ids)
@@ -454,7 +454,7 @@ sessionStorage is **per-tab isolated** by design. Each tab maintains its own buy
     Should see: `product-widget.js` (or your widget filename) with status 200
     
     **If 404**: Widget not deployed
-    - See [Deployment Guide](/docs/punchout/deployment)
+    - See [Deployment Guide](/docs/shopify/punchout/deployment)
   </StepItem>
   <StepItem title="Check Widget Version">
     Verify you deployed the widget version with fromIdentity support.
@@ -516,7 +516,7 @@ sessionStorage is **per-tab isolated** by design. Each tab maintains its own buy
 </Step>
 
 **Solutions**:
-1. **Tag the customer** if not tagged (see [Admin Setup Guide](/docs/punchout/admin-setup))
+1. **Tag the customer** if not tagged (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
 2. **Fix tag format** if incorrect
 3. **Fix typos** in buyer ID
 4. **Remove duplicates** if multiple customers have same buyer ID
@@ -783,7 +783,7 @@ curl "https://api.weevio.com/api/v1/shopify/b2b/resolve-from-identity?fromIdenti
 
 **Solutions**:
 1. **Add widget container** to product template: `<div id="weevio-widget"></div>`
-2. **Deploy widget script** (see [Deployment Guide](/docs/punchout/deployment))
+2. **Deploy widget script** (see [Deployment Guide](/docs/shopify/punchout/deployment))
 3. **Fix JavaScript errors** blocking widget initialization
 4. **Verify widget initialization code** is present and correct
 
@@ -885,7 +885,7 @@ Complete this checklist:
 ### Buyer Education
 
 **Share with procurement teams**:
-- [Buyer Guide](/docs/punchout/buyer-guide) - explains their experience
+- [Buyer Guide](/docs/shopify/punchout/buyer-guide) - explains their experience
 - Session duration (12 hours)
 - Importance of clicking through from SAP Ariba
 - What to do if pricing looks wrong
@@ -911,22 +911,22 @@ Complete this checklist:
 <CardGrid>
   <Card
     title="Admin Setup"
-    href="/docs/punchout/admin-setup"
+    href="/docs/shopify/punchout/admin-setup"
     description="Configure customer tagging correctly to prevent resolution issues."
   />
   <Card
     title="Deployment Guide"
-    href="/docs/punchout/deployment"
+    href="/docs/shopify/punchout/deployment"
     description="Verify tracker script and widget are deployed correctly."
   />
   <Card
     title="Buyer Guide"
-    href="/docs/punchout/buyer-guide"
+    href="/docs/shopify/punchout/buyer-guide"
     description="Share with buyers to reduce support inquiries."
   />
   <Card
     title="Overview"
-    href="/docs/punchout/overview"
+    href="/docs/shopify/punchout/overview"
     description="Understand the technical architecture and data flow."
   />
 </CardGrid>

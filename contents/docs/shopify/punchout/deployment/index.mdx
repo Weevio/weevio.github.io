@@ -23,7 +23,7 @@ Before you begin:
 - [ ] Weevio Product Page Widget source code
 - [ ] Node.js 22.x installed (for building widget)
 - [ ] Understanding of Shopify Liquid templates
-- [ ] Customer tagging configured (see [Admin Setup Guide](/docs/punchout/admin-setup))
+- [ ] Customer tagging configured (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
 
 <Note type="warning">
 **Important**: The tracker script must be deployed to your Shopify theme before the widget deployment. The widget relies on data captured by the tracker script.
@@ -305,7 +305,7 @@ The widget automatically:
 
 <Step>
   <StepItem title="Set Up Test Customer">
-    In Shopify Admin, tag a test customer with a buyer ID (see [Admin Setup Guide](/docs/punchout/admin-setup)):
+    In Shopify Admin, tag a test customer with a buyer ID (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup)):
     ```
     Ariba Buyer: TEST_BUYER_123
     ```
@@ -458,7 +458,7 @@ The widget automatically:
     - Response contains `customerId` and optionally `priceCode`
   </StepItem>
   <StepItem title="Verify Customer Tagging">
-    Ensure the Shopify customer has correct buyer ID tag (see [Admin Setup Guide](/docs/punchout/admin-setup)).
+    Ensure the Shopify customer has correct buyer ID tag (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup)).
   </StepItem>
 </Step>
 
@@ -621,7 +621,7 @@ Perform these tasks regularly:
 - [ ] Test with a few real buyer IDs
 
 **Monthly**:
-- [ ] Review customer tag audit (see [Admin Setup Guide](/docs/punchout/admin-setup))
+- [ ] Review customer tag audit (see [Admin Setup Guide](/docs/shopify/punchout/admin-setup))
 - [ ] Check for duplicate buyer ID tags
 - [ ] Verify pricing data is accurate
 
@@ -718,25 +718,25 @@ Complete this checklist before deploying to production:
 - [ ] Smoke test with real buyer ID
 - [ ] Monitor error logs for first 24 hours
 - [ ] Coordinate with admin team to verify customer tagging
-- [ ] Share [Buyer Guide](/docs/punchout/buyer-guide) with procurement teams
-- [ ] Share [Troubleshooting Guide](/docs/punchout/troubleshooting) with support team
+- [ ] Share [Buyer Guide](/docs/shopify/punchout/buyer-guide) with procurement teams
+- [ ] Share [Troubleshooting Guide](/docs/shopify/punchout/troubleshooting) with support team
 
 ## Next Steps
 
 <CardGrid>
   <Card
     title="Admin Setup"
-    href="/docs/punchout/admin-setup"
+    href="/docs/shopify/punchout/admin-setup"
     description="Configure customer tagging for your B2B buyers."
   />
   <Card
     title="Troubleshooting"
-    href="/docs/punchout/troubleshooting"
+    href="/docs/shopify/punchout/troubleshooting"
     description="Debug and resolve common integration issues."
   />
   <Card
     title="Buyer Guide"
-    href="/docs/punchout/buyer-guide"
+    href="/docs/shopify/punchout/buyer-guide"
     description="Share with procurement teams to explain the buyer experience."
   />
 </CardGrid>

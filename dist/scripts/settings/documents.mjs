@@ -88,48 +88,66 @@ export const Documents = [
     },
     {
         heading: "Integrations",
-        title: "PunchOut Integration",
-        href: "/punchout",
+        title: "Shopify Integration",
+        href: "/shopify",
         items: [
             {
                 title: "Overview",
                 href: "/overview",
                 cardMeta: {
-                    subtitle: "What is PunchOut?",
-                    description: "Learn how PunchOut integration enables SAP Ariba buyers to see custom pricing automatically.",
+                    subtitle: "Shopify B2B Features",
+                    description: "Integrate Weevio with Shopify for advanced B2B capabilities and custom pricing.",
                 },
             },
             {
-                title: "Buyer Guide",
-                href: "/buyer-guide",
+                title: "PunchOut Integration",
+                href: "/punchout",
                 cardMeta: {
-                    subtitle: "For End Users",
-                    description: "How PunchOut buyers experience custom pricing without logging in to Shopify.",
+                    subtitle: "SAP Ariba Integration",
+                    description: "Enable SAP Ariba buyers to see custom pricing automatically without login.",
                 },
-            },
-            {
-                title: "Admin Setup",
-                href: "/admin-setup",
-                cardMeta: {
-                    subtitle: "For Administrators",
-                    description: "Configure customer tagging in Shopify to enable PunchOut pricing resolution.",
-                },
-            },
-            {
-                title: "Deployment Guide",
-                href: "/deployment",
-                cardMeta: {
-                    subtitle: "For Developers",
-                    description: "Install the fromIdentity tracker script and deploy the Product Page Widget.",
-                },
-            },
-            {
-                title: "Troubleshooting",
-                href: "/troubleshooting",
-                cardMeta: {
-                    subtitle: "Common Issues",
-                    description: "Resolve common PunchOut pricing issues and debug integration problems.",
-                },
+                items: [
+                    {
+                        title: "Overview",
+                        href: "/overview",
+                        cardMeta: {
+                            subtitle: "Technical Architecture",
+                            description: "Learn how PunchOut integration enables SAP Ariba buyers to see custom pricing automatically.",
+                        },
+                    },
+                    {
+                        title: "Buyer Guide",
+                        href: "/buyer-guide",
+                        cardMeta: {
+                            subtitle: "For End Users",
+                            description: "How PunchOut buyers experience custom pricing without logging in to Shopify.",
+                        },
+                    },
+                    {
+                        title: "Admin Setup",
+                        href: "/admin-setup",
+                        cardMeta: {
+                            subtitle: "For Administrators",
+                            description: "Configure customer tagging in Shopify to enable PunchOut pricing resolution.",
+                        },
+                    },
+                    {
+                        title: "Deployment Guide",
+                        href: "/deployment",
+                        cardMeta: {
+                            subtitle: "For Developers",
+                            description: "Install the fromIdentity tracker script and deploy the Product Page Widget.",
+                        },
+                    },
+                    {
+                        title: "Troubleshooting",
+                        href: "/troubleshooting",
+                        cardMeta: {
+                            subtitle: "Common Issues",
+                            description: "Resolve common PunchOut pricing issues and debug integration problems.",
+                        },
+                    },
+                ],
             },
         ],
     },
