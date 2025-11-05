@@ -125,7 +125,7 @@ npm run update           # Update all dependencies and clean code
    keywords: ["keyword1", "keyword2"]
    ---
 
-   Content goes here...
+   Content goes here... Do NOT repeat the title and description in the body, since they are presented automatically.
    ```
 
 2. **Add to navigation**: Edit [settings/documents.ts](settings/documents.ts)
