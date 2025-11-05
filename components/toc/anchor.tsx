@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import clsx from "clsx"
 
@@ -12,6 +12,48 @@ export type TableAnchorProps = {
 
 export function TableAnchor({ tocs }: TableAnchorProps) {
   const [activeId, setActiveId] = useState<string>("")
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
+
+  // Store ref for each link
+  const setLinkRef = (href: string, element: HTMLAnchorElement | null) => {
+    if (element) {
+      linkRefs.current.set(href, element)
+    } else {
+      linkRefs.current.delete(href)
+    }
+  }
+
+  // Auto-scroll effect when activeId changes
+  useEffect(() => {
+    if (!activeId || !viewportRef.current) return
+
+    const activeLink = linkRefs.current.get(activeId)
+    if (!activeLink) return
+
+    const viewport = viewportRef.current
+    const linkTop = activeLink.offsetTop
+    const linkBottom = linkTop + activeLink.offsetHeight
+    const viewportScrollTop = viewport.scrollTop
+    const viewportHeight = viewport.clientHeight
+
+    // Add padding for better UX (don't scroll if already visible with margin)
+    const padding = 60
+
+    if (linkTop < viewportScrollTop + padding) {
+      // Link is above viewport, scroll up
+      viewport.scrollTo({
+        top: linkTop - padding,
+        behavior: "smooth",
+      })
+    } else if (linkBottom > viewportScrollTop + viewportHeight - padding) {
+      // Link is below viewport, scroll down
+      viewport.scrollTo({
+        top: linkBottom - viewportHeight + padding,
+        behavior: "smooth",
+      })
+    }
+  }, [activeId])
 
   useEffect(() => {
     // Create an intersection observer to track which heading is currently visible
@@ -73,13 +115,17 @@ export function TableAnchor({ tocs }: TableAnchorProps) {
   return (
     <div className="flex w-full flex-col gap-3 pl-2">
       <h3 className="font-bold">On this page</h3>
-      <ScrollArea className="pt-0.5 pb-4 max-h-[calc(100vh-18rem)]">
+      <ScrollArea
+        className="pt-0.5 pb-4 max-h-[calc(100vh-18rem)]"
+        viewportRef={viewportRef}
+      >
         <div className="text-foreground flex flex-col gap-2.5 text-sm">
           {tocs.map(({ href, level, text }) => {
             const isActive = activeId === href
             return (
               <Link
                 key={href}
+                ref={(el) => setLinkRef(href, el)}
                 href={href}
                 title={text}
                 aria-label={text}
