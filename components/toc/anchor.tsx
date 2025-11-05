@@ -137,7 +137,7 @@ export function TableAnchor({ tocs }: TableAnchorProps) {
                     "pl-4": level == 3,
                     "pl-8": level == 4,
                   },
-                  isActive && "text-primary font-bold"
+                  isActive && "text-blue-500 font-bold pr-2 rounded-sm"
                 )}
               >
                 {text}
