@@ -1,0 +1,532 @@
+---
+title: Examples
+description: Real-world use cases and detailed examples for cross-sell visibility rules
+keywords: ["examples", "use cases", "scenarios", "patterns", "implementation"]
+---
+
+## Overview
+
+This page provides complete, production-ready examples for common visibility rule scenarios. Each example includes:
+
+- Business context and goals
+- Customer tagging strategy
+- Product tagging configuration
+- Expected behavior for different customer types
+- Testing checklist
+
+---
+
+## Example 1: VIP-Only Premium Products
+
+### Business Context
+
+**Goal:** Offer exclusive high-margin accessories only to VIP customers who have demonstrated loyalty and higher spending.
+
+**Why:** Prevents alienating budget customers with expensive upsells while maximizing revenue from high-value customers.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| VIP Members | `vip` | Lifetime spend > $5,000 or membership status |
+| Premium Members | `premium` | Lifetime spend > $2,500 |
+| Regular Customers | (no tag) | Everyone else |
+
+### Product Configuration
+
+**Product:** Premium Leather Case ($299)
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==vip
+- weevio.product.widget.cross_sell.show_if_customer_tag==premium
+```
+
+**Product:** Gold Protection Plan ($499/year)
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==vip
+```
+
+### Expected Behavior
+
+| Customer Tags | Premium Leather Case | Gold Protection Plan |
+|---------------|---------------------|---------------------|
+| `vip` | ✓ Shown | ✓ Shown |
+| `premium` | ✓ Shown | ✗ Hidden |
+| (no tags) | ✗ Hidden | ✗ Hidden |
+
+### Implementation Steps
+
+<Step>
+  <StepItem title="Tag VIP Customers">
+    Bulk tag customers with lifetime spend > $5,000: add `vip` tag
+
+    Bulk tag customers with lifetime spend > $2,500: add `premium` tag
+  </StepItem>
+
+  <StepItem title="Tag Premium Products">
+    Add visibility tags to high-end cross-sell products as shown above
+  </StepItem>
+
+  <StepItem title="Test">
+    Log in as VIP, premium, and regular customer to verify visibility
+  </StepItem>
+</Step>
+
+### Testing Checklist
+
+- [ ] VIP customer sees both premium products
+- [ ] Premium customer sees leather case but not gold plan
+- [ ] Regular customer sees neither premium product
+- [ ] Regular customer still sees standard cross-sell products
+- [ ] Guest checkout (no login) doesn't show premium products
+
+---
+
+## Example 2: Hide from Budget-Conscious Customers
+
+### Business Context
+
+**Goal:** Prevent showing expensive upsells to customers who have indicated price sensitivity, improving conversion rates by showing more appropriate alternatives.
+
+**Why:** Reduces cart abandonment and negative brand perception from "pushy" high-priced upsells.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| Budget Conscious | `budget-conscious` | Opted into "budget" segment or purchase history shows price sensitivity |
+| Price Sensitive | `price-sensitive` | Abandoned cart due to add-ons, low avg order value |
+| Regular Customers | (no tag) | Everyone else |
+
+### Product Configuration
+
+**Product:** Premium Extended Warranty ($399)
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide_if_customer_tag==budget-conscious
+- weevio.product.widget.cross_sell.hide_if_customer_tag==price-sensitive
+```
+
+**Product:** Budget Accessory Bundle ($49)
+
+```
+Tags:
+- crossSell: true
+(no visibility tags - shows to everyone including budget customers)
+```
+
+### Expected Behavior
+
+| Customer Tags | Premium Warranty | Budget Bundle |
+|---------------|-----------------|---------------|
+| `budget-conscious` | ✗ Hidden | ✓ Shown |
+| `price-sensitive` | ✗ Hidden | ✓ Shown |
+| (no tags) | ✓ Shown | ✓ Shown |
+
+### Implementation Steps
+
+<Step>
+  <StepItem title="Identify Budget Customers">
+    Use Shopify Flow or manual tagging to identify:
+    - Customers who abandoned cart after seeing cross-sell
+    - Customers with avg order value < $100
+    - Customers who opted into "budget" preferences
+  </StepItem>
+
+  <StepItem title="Tag Products">
+    Add hide_if tags to high-price cross-sell products
+
+    Leave budget-friendly products without visibility tags
+  </StepItem>
+
+  <StepItem title="Monitor Conversion">
+    Track conversion rate changes for budget customers
+  </StepItem>
+</Step>
+
+---
+
+## Example 3: B2B vs B2C Product Split
+
+### Business Context
+
+**Goal:** Show different cross-sell products to business customers vs retail customers, as their needs and buying patterns differ significantly.
+
+**Why:** B2B customers need bulk products and multi-unit accessories, while retail customers need single-unit consumer products.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| B2B Accounts | `b2b-account` | Business email domain, tax ID provided |
+| Wholesale | `wholesale` | Wholesale account registration |
+| Retail Customers | `retail-customer` | Individual consumers |
+| (no tag) | Guest/untagged | Default to retail behavior |
+
+### Product Configuration
+
+**Product:** Bulk Accessory Pack (10 units)
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==b2b-account
+- weevio.product.widget.cross_sell.show_if_customer_tag==wholesale
+```
+
+**Product:** Individual Accessory
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==retail-customer
+```
+
+**Product:** Enterprise Support Package
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==b2b-account
+- weevio.product.widget.cross_sell.hide_if_customer_tag==retail-customer
+```
+
+### Expected Behavior
+
+| Customer Tags | Bulk Pack | Individual | Enterprise Support |
+|---------------|-----------|------------|-------------------|
+| `b2b-account` | ✓ Shown | ✗ Hidden | ✓ Shown |
+| `wholesale` | ✓ Shown | ✗ Hidden | ✗ Hidden |
+| `retail-customer` | ✗ Hidden | ✓ Shown | ✗ Hidden |
+| (no tags) | ✗ Hidden | ✗ Hidden | ✗ Hidden |
+
+<Note type="warning">
+**Guest Behavior:** Untagged customers see neither B2B nor retail products in this example. Consider setting retail products to have NO show_if tags (default visible) if you want guests to see them.
+</Note>
+
+---
+
+## Example 4: Hide from Existing Coverage
+
+### Business Context
+
+**Goal:** Don't show AppleCare or warranty products to customers who already have coverage, as determined by previous purchases or account status.
+
+**Why:** Improves user experience, reduces support tickets, prevents duplicate purchases.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| Has AppleCare | `weevio.customer.ace.eligible=true` | Already purchased AppleCare or marked as covered |
+| Has Extended Warranty | `has-extended-warranty` | Previously purchased warranty |
+| No Coverage | (no tag) | Eligible for warranty products |
+
+### Product Configuration
+
+**Product:** AppleCare+ Protection
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide_if_customer_tag==weevio.customer.ace.eligible=true
+```
+
+**Product:** 3-Year Extended Warranty
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide_if_customer_tag==has-extended-warranty
+```
+
+### Expected Behavior
+
+| Customer Tags | AppleCare+ | Extended Warranty |
+|---------------|-----------|------------------|
+| `weevio.customer.ace.eligible=true` | ✗ Hidden | ✓ Shown |
+| `has-extended-warranty` | ✓ Shown | ✗ Hidden |
+| Both tags | ✗ Hidden | ✗ Hidden |
+| (no tags) | ✓ Shown | ✓ Shown |
+
+### Automation with Shopify Flow
+
+**Flow 1: Tag on AppleCare Purchase**
+```
+Trigger: Order created
+Condition: Order line items contain AppleCare product SKU
+Action: Add customer tag "weevio.customer.ace.eligible=true"
+```
+
+**Flow 2: Tag on Warranty Purchase**
+```
+Trigger: Order created
+Condition: Order line items contain warranty product SKU
+Action: Add customer tag "has-extended-warranty"
+```
+
+---
+
+## Example 5: Tiered Membership Access
+
+### Business Context
+
+**Goal:** Show progressively better cross-sell products as customers move up membership tiers, encouraging upgrades.
+
+**Why:** Creates clear value proposition for tier upgrades while ensuring appropriate products for each tier.
+
+### Customer Segmentation
+
+| Tier | Tag | Benefits |
+|------|-----|----------|
+| Tier 1 (Bronze) | `tier-1` | Basic cross-sell access |
+| Tier 2 (Silver) | `tier-2` | Access to silver + bronze products |
+| Tier 3 (Gold) | `tier-3` | Access to all products |
+| No Tier | (no tag) | Free accessories only |
+
+### Product Configuration
+
+**Product:** Free Accessory (loss leader)
+
+```
+Tags:
+- crossSell: true
+(no visibility tags - available to everyone)
+```
+
+**Product:** Bronze Member Accessory
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-1
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-2
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-3
+```
+
+**Product:** Silver Member Premium Accessory
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-2
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-3
+```
+
+**Product:** Gold Member Exclusive Accessory
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==tier-3
+```
+
+### Expected Behavior
+
+| Customer Tags | Free | Bronze | Silver | Gold |
+|---------------|------|--------|--------|------|
+| (no tag) | ✓ | ✗ | ✗ | ✗ |
+| `tier-1` | ✓ | ✓ | ✗ | ✗ |
+| `tier-2` | ✓ | ✓ | ✓ | ✗ |
+| `tier-3` | ✓ | ✓ | ✓ | ✓ |
+
+### Upgrade Incentive
+
+Display tier upgrade option in cross-sell modal when customer sees products above their tier (requires custom implementation).
+
+---
+
+## Example 6: Seasonal/Promotional Visibility
+
+### Business Context
+
+**Goal:** Show seasonal products or promotional items only to customers who opted into promotional communications or specific campaigns.
+
+**Why:** Respects customer preferences, improves relevance, complies with marketing regulations.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| Holiday Promo | `promo-holiday-2025` | Opted into holiday campaign |
+| Black Friday | `promo-black-friday` | Registered for Black Friday deals |
+| Email Subscribers | `email-subscriber` | Opted into email marketing |
+
+### Product Configuration
+
+**Product:** Holiday Gift Bundle
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==promo-holiday-2025
+- weevio.product.widget.cross_sell.show_if_customer_tag==email-subscriber
+```
+
+**Product:** Black Friday Exclusive
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==promo-black-friday
+```
+
+### Time-Based Removal
+
+After promotion ends:
+
+<Step>
+  <StepItem title="Disable Cross-Sell">
+    Add explicit hide tag to immediately remove from all customers:
+
+    `weevio.product.widget.cross_sell.hide=true`
+  </StepItem>
+
+  <StepItem title="Or Remove Tags">
+    Remove all show_if tags so product shows to no one (since show_if exists but doesn't match)
+  </StepItem>
+
+  <StepItem title="Clean Up Customer Tags">
+    Bulk remove promotional tags from customers after campaign
+  </StepItem>
+</Step>
+
+---
+
+## Example 7: Complex Multi-Segment with Exclusions
+
+### Business Context
+
+**Goal:** Show enterprise features to qualified accounts but exclude those on probation or with payment issues.
+
+**Why:** Prevents upselling to customers who aren't in good standing while maximizing revenue from qualified accounts.
+
+### Customer Segmentation
+
+| Customer Type | Tag | Criteria |
+|--------------|-----|----------|
+| Enterprise | `enterprise` | Enterprise account status |
+| Tier 2 B2B | `weevio.customer.ace.tier=2` | B2B tier 2 |
+| Tier 3 B2B | `weevio.customer.ace.tier=3` | B2B tier 3 |
+| Account Probation | `account-probation` | Payment issues, policy violations |
+| Restricted | `restricted` | Temporary restriction |
+
+### Product Configuration
+
+**Product:** Enterprise AI Analytics Module
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==enterprise
+- weevio.product.widget.cross_sell.show_if_customer_tag==weevio.customer.ace.tier=2
+- weevio.product.widget.cross_sell.show_if_customer_tag==weevio.customer.ace.tier=3
+- weevio.product.widget.cross_sell.hide_if_customer_tag==account-probation
+- weevio.product.widget.cross_sell.hide_if_customer_tag==restricted
+```
+
+### Expected Behavior
+
+| Customer Tags | Shown? | Reason |
+|---------------|--------|--------|
+| `enterprise` | ✓ | Matches show_if, no hide rules |
+| `weevio.customer.ace.tier=2` | ✓ | Matches show_if, no hide rules |
+| `enterprise`, `account-probation` | ✗ | Hide rule wins over show rule |
+| `weevio.customer.ace.tier=3`, `restricted` | ✗ | Hide rule wins over show rule |
+| `regular-customer` | ✗ | No show_if match |
+
+<Note type="info">
+**Conflict Resolution:** When customer has tags matching both show_if and hide_if, the hide_if rule wins. This ensures exclusions work even if customer otherwise qualifies.
+</Note>
+
+---
+
+## Example 8: Geographic/Regional Restrictions
+
+### Business Context
+
+**Goal:** Show region-specific products only to customers in certain markets (using customer tags as proxy for location).
+
+**Why:** Comply with regional regulations, show relevant products, manage inventory by region.
+
+### Customer Segmentation
+
+| Region | Tag | Criteria |
+|--------|-----|----------|
+| US | `region-us` | US shipping address |
+| Canada | `region-ca` | Canadian shipping address |
+| Europe | `region-eu` | European shipping address |
+| Asia Pacific | `region-apac` | APAC shipping address |
+
+### Product Configuration
+
+**Product:** US-Only Feature
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==region-us
+```
+
+**Product:** EU Compliance Bundle
+
+```
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==region-eu
+```
+
+**Product:** Global Product
+
+```
+Tags:
+- crossSell: true
+(no visibility tags - available worldwide)
+```
+
+### Automation
+
+Use Shopify Flow to tag customers based on shipping address:
+
+```
+Trigger: Customer creates account or updates address
+Condition: Shipping address country = "United States"
+Action: Add customer tag "region-us"
+```
+
+---
+
+## Testing Template
+
+Use this template to test any visibility configuration:
+
+### Test Matrix Template
+
+| Test Case | Customer Tags | Product Tags | Expected | Actual | Pass? |
+|-----------|--------------|--------------|----------|--------|-------|
+| Baseline | (none) | crossSell: true | Show | | |
+| Explicit hide | (any) | hide=true | Hide | | |
+| Hide-if match | matching-tag | hide_if==matching-tag | Hide | | |
+| Hide-if no match | other-tag | hide_if==matching-tag | Show | | |
+| Show-if match | matching-tag | show_if==matching-tag | Show | | |
+| Show-if no match | other-tag | show_if==matching-tag | Hide | | |
+| Conflict (hide wins) | conflict-tag | hide_if==conflict-tag, show_if==conflict-tag | Hide | | |
+
+---
+
+## Next Steps
+
+- **Setup your configuration:** [Setup Guide](/docs/integrations/shopify/features/cross-sell/visibility-rules/setup)
+- **Debug issues:** [Troubleshooting](/docs/integrations/shopify/features/cross-sell/visibility-rules/troubleshooting)
+- **Review tag syntax:** [Tag Reference](/docs/integrations/shopify/features/cross-sell/visibility-rules/tag-reference)
+
+<Note type="success">
+**Starting Point:** Begin with Example 1 (VIP-Only) or Example 2 (Hide from Budget) as they're the simplest and most common use cases.
+</Note>

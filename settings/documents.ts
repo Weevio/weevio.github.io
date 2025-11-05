@@ -159,7 +159,46 @@ export const Documents: Paths[] = [
                                 href: "/cross-sell",
                                 cardMeta: {
                                     description: "Show complementary products after add-to-cart to increase average order value."
-                                }
+                                },
+                                items: [
+                                    {
+                                        title: "Product Visibility Rules",
+                                        href: "/visibility-rules",
+                                        cardMeta: {
+                                            description: "Control which customers see specific cross-sell products using tag-based filtering."
+                                        },
+                                        items: [
+                                            {
+                                                title: "Tag Reference",
+                                                href: "/tag-reference",
+                                                cardMeta: {
+                                                    description: "Complete tag format documentation, evaluation logic, and validation rules."
+                                                }
+                                            },
+                                            {
+                                                title: "Setup Guide",
+                                                href: "/setup",
+                                                cardMeta: {
+                                                    description: "Step-by-step instructions for tagging products and customers in Shopify."
+                                                }
+                                            },
+                                            {
+                                                title: "Examples",
+                                                href: "/examples",
+                                                cardMeta: {
+                                                    description: "Real-world use cases with detailed product and customer tag configurations."
+                                                }
+                                            },
+                                            {
+                                                title: "Troubleshooting",
+                                                href: "/troubleshooting",
+                                                cardMeta: {
+                                                    description: "Debug visibility issues, common problems, and solutions."
+                                                }
+                                            },
+                                        ]
+                                    },
+                                ]
                             },
                             {
                                 title: "B2B Pricing",

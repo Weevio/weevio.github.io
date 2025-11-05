@@ -1,0 +1,646 @@
+---
+title: Troubleshooting
+description: Debug visibility issues, common problems, and solutions for cross-sell visibility rules
+keywords: ["troubleshooting", "debugging", "problems", "errors", "solutions"]
+---
+
+## Quick Diagnosis Checklist
+
+Before deep troubleshooting, verify these basics:
+
+- [ ] Cross-sell feature enabled in Weevio Cloud dashboard
+- [ ] Widget configured with `enableCrossSell: true`
+- [ ] Product has `crossSell: true` tag in Shopify
+- [ ] Product has cross-sell associations in PIMS
+- [ ] Customer is logged in (if using customer-specific rules)
+- [ ] Visibility tags formatted exactly as documented
+- [ ] Browser cache cleared
+
+---
+
+## Common Issues
+
+### Issue 1: Products Not Showing at All
+
+**Symptoms:** Cross-sell modal appears but expected products are missing
+
+#### Possible Causes & Solutions
+
+<Step>
+  <StepItem title="Product Not Tagged for Cross-Sell">
+    **Check:** Product has `crossSell: true` tag in Shopify admin
+
+    **Fix:** Add `crossSell: true` tag to product
+
+    **Verify:** Products → [Product] → Tags section
+  </StepItem>
+
+  <StepItem title="Product Explicitly Hidden">
+    **Check:** Product has `weevio.product.widget.cross_sell.hide=true` tag
+
+    **Fix:** Remove explicit hide tag if product should show
+
+    **Note:** Explicit hide overrides all other rules
+  </StepItem>
+
+  <StepItem title="Show-If Tag with No Match">
+    **Check:** Product has show_if tags but customer doesn't have matching tag
+
+    **Fix:** Either:
+    - Add matching tag to customer
+    - Remove show_if tags if product should show to everyone
+    - Add additional show_if tags for other customer segments
+
+    **Example:**
+    ```
+    Product tag: show_if_customer_tag==vip
+    Customer tags: ["regular"]
+    Result: Hidden (customer doesn't match)
+
+    Fix: Add "vip" tag to customer OR remove show_if tag
+    ```
+  </StepItem>
+
+  <StepItem title="Hide-If Tag Matches Customer">
+    **Check:** Product has hide_if tag matching customer's tag
+
+    **Fix:** Either:
+    - Remove customer tag if incorrectly applied
+    - Remove hide_if tag if product should show to this customer
+    - Adjust hide_if tag value
+
+    **Example:**
+    ```
+    Product tag: hide_if_customer_tag==budget-conscious
+    Customer tags: ["budget-conscious"]
+    Result: Hidden
+
+    Fix: Remove "budget-conscious" from customer OR remove hide_if tag
+    ```
+  </StepItem>
+
+  <StepItem title="No Cross-Sell Associations">
+    **Check:** Product has associations in PIMS `INVENTORY_ASSOCIATED_AUTOLOADS` table
+
+    **Fix:** Create cross-sell associations in PIMS
+
+    **Note:** Visibility tags only filter existing associations; they don't create them
+  </StepItem>
+</Step>
+
+---
+
+### Issue 2: Products Showing When They Shouldn't
+
+**Symptoms:** Products appear in cross-sell modal for customers who shouldn't see them
+
+#### Possible Causes & Solutions
+
+<Step>
+  <StepItem title="Customer Missing Expected Tag">
+    **Check:** Customer profile has the expected exclusion tag
+
+    **Fix:** Add appropriate tag to customer in Shopify admin
+
+    **Example:**
+    ```
+    Product tag: hide_if_customer_tag==budget-conscious
+    Customer tags: []
+    Result: Shown (no matching hide tag)
+
+    Fix: Add "budget-conscious" tag to customer
+    ```
+  </StepItem>
+
+  <StepItem title="Tag Name Mismatch">
+    **Check:** Product tag value EXACTLY matches customer tag (case-sensitive)
+
+    **Fix:** Correct spelling/capitalization in product tag or customer tag
+
+    **Common mistakes:**
+    ```
+    Product tag: hide_if_customer_tag==VIP
+    Customer tag: "vip"
+    Result: No match (case difference)
+
+    Fix: Change customer tag to "VIP" OR change product tag to ==vip
+    ```
+  </StepItem>
+
+  <StepItem title="Wrong Tag Format">
+    **Check:** Product tag uses exactly `==` (two equals)
+
+    **Fix:** Correct tag format
+
+    **Invalid formats:**
+    ```
+    hide_if_customer_tag=vip  ❌ (single =)
+    hide_if_customer_tag===vip  ❌ (triple =)
+    hide_if_customer_tag: vip  ❌ (colon)
+    ```
+
+    **Valid format:**
+    ```
+    hide_if_customer_tag==vip  ✓
+    ```
+  </StepItem>
+
+  <StepItem title="Show-If Tag Present But Not Applied">
+    **Check:** Product has show_if tag that should restrict visibility
+
+    **Issue:** Customer doesn't have the tag but still sees product
+
+    **Possible cause:** Tag malformed or product has no show_if tags
+
+    **Fix:** Verify show_if tags are correctly formatted and saved
+  </StepItem>
+</Step>
+
+---
+
+### Issue 3: Visibility Rules Not Taking Effect
+
+**Symptoms:** Tags appear correct but behavior doesn't match expectations
+
+#### Possible Causes & Solutions
+
+<Step>
+  <StepItem title="Tags Not Saved">
+    **Check:** Clicked Save after adding tags in Shopify admin
+
+    **Fix:** Re-add tags and ensure Save is clicked
+
+    **Note:** Shopify doesn't auto-save tag changes
+  </StepItem>
+
+  <StepItem title="Browser Cache">
+    **Check:** Cleared browser cache and hard refresh
+
+    **Fix:**
+    - Chrome/Edge: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
+    - Firefox: Ctrl+F5 (Windows) or Cmd+Shift+R (Mac)
+    - Or open incognito/private window
+  </StepItem>
+
+  <StepItem title="Shopify API Sync Delay">
+    **Check:** Recent tag changes may not be synced to Weevio Cloud yet
+
+    **Fix:** Wait 1-2 minutes and refresh page
+
+    **Note:** Shopify webhooks may have delay during high traffic
+  </StepItem>
+
+  <StepItem title="Customer Not Logged In">
+    **Check:** Customer is logged into their Shopify account
+
+    **Fix:** Log in before testing visibility rules
+
+    **Note:** Guest customers have no tags, so show_if rules hide products
+  </StepItem>
+
+  <StepItem title="Tag Format Whitespace">
+    **Check:** No extra spaces in tag format
+
+    **Invalid:**
+    ```
+    weevio.product.widget.cross_sell.hide_if_customer_tag == vip  ❌ (spaces around ==)
+    weevio.product.widget.cross_sell.hide_if_customer_tag==vip   ❌ (trailing space)
+    ```
+
+    **Valid:**
+    ```
+    weevio.product.widget.cross_sell.hide_if_customer_tag==vip  ✓
+    ```
+  </StepItem>
+</Step>
+
+---
+
+### Issue 4: Conflict Between Hide and Show Rules
+
+**Symptoms:** Product visibility behavior is confusing when customer has tags matching both hide_if and show_if
+
+#### Expected Behavior
+
+**Hide rules WIN over show rules**
+
+**Example:**
+```
+Product tags:
+- hide_if_customer_tag==restricted
+- show_if_customer_tag==vip
+
+Customer tags: ["vip", "restricted"]
+
+Result: Product HIDDEN (hide wins)
+```
+
+#### Diagnosis Steps
+
+<Step>
+  <StepItem title="List All Product Tags">
+    Check product for ALL visibility tags:
+    - Any hide=true tags?
+    - All hide_if_customer_tag tags
+    - All show_if_customer_tag tags
+  </StepItem>
+
+  <StepItem title="List All Customer Tags">
+    Check customer profile for all tags
+  </StepItem>
+
+  <StepItem title="Evaluate Step by Step">
+    Follow evaluation order:
+    1. Explicit hide? → Product hidden
+    2. Customer tag matches any hide_if? → Product hidden
+    3. Show_if tags exist?
+       - Customer matches at least one? → Product shown
+       - Customer matches none? → Product hidden
+    4. No show_if tags? → Product shown (default)
+  </StepItem>
+</Step>
+
+---
+
+### Issue 5: Guest Customers See Wrong Products
+
+**Symptoms:** Logged-out users see incorrect cross-sell products
+
+#### Expected Behavior
+
+Guest customers (not logged in) have **no tags**, so:
+
+- Products with NO visibility tags → Shown (default)
+- Products with hide=true → Hidden
+- Products with hide_if tags → Shown (no tags to match)
+- Products with show_if tags → **Hidden** (no tags to match)
+
+#### Solution
+
+If you want guests to see products that have show_if tags:
+
+**Option 1: Remove show_if tags**
+```
+Before:
+- crossSell: true
+- show_if_customer_tag==vip
+
+After:
+- crossSell: true
+(shows to everyone including guests)
+```
+
+**Option 2: Use hide_if instead**
+```
+Instead of: show_if_customer_tag==vip
+Use: hide_if_customer_tag==non-vip
+
+Tag all non-VIP customers with "non-vip"
+Guests and VIP customers see product
+```
+
+**Option 3: Separate products for guests vs members**
+```
+Product A (Guest version):
+- crossSell: true
+(no visibility tags - shows to all)
+
+Product B (VIP version):
+- crossSell: true
+- show_if_customer_tag==vip
+- hide_if_customer_tag==guest
+```
+
+---
+
+## Debugging Process
+
+### Step-by-Step Debugging
+
+<Step>
+  <StepItem title="Verify Product Configuration">
+    **Check in Shopify Admin:**
+    1. Navigate to Products → [Product]
+    2. Verify `crossSell: true` tag exists
+    3. Note all visibility tags exactly as written
+    4. Take screenshot for reference
+
+    **Verify PIMS:**
+    1. Check `INVENTORY_ASSOCIATED_AUTOLOADS` for cross-sell associations
+    2. Confirm product is associated with items in cart
+  </StepItem>
+
+  <StepItem title="Verify Customer Configuration">
+    **Check in Shopify Admin:**
+    1. Navigate to Customers → [Customer]
+    2. Note all customer tags exactly as written
+    3. Verify customer is logged in to account
+  </StepItem>
+
+  <StepItem title="Manual Evaluation">
+    **Evaluate visibility step-by-step:**
+
+    **Step 1: Explicit Hide**
+    - Does product have `weevio.product.widget.cross_sell.hide=true`?
+    - If YES → Product hidden (stop here)
+    - If NO → Continue
+
+    **Step 2: Hide-If**
+    - Does product have `hide_if_customer_tag` tags?
+    - If YES: Does customer have ANY matching tag?
+      - If match found → Product hidden (stop here)
+      - If no match → Continue
+    - If NO hide_if tags → Continue
+
+    **Step 3: Show-If**
+    - Does product have `show_if_customer_tag` tags?
+    - If YES: Does customer have at least ONE matching tag?
+      - If match found → Product shown
+      - If no match → Product hidden
+    - If NO show_if tags → Product shown (default)
+  </StepItem>
+
+  <StepItem title="Compare Expected vs Actual">
+    | Expected Result | Actual Result | Match? |
+    |----------------|---------------|--------|
+    | (from manual evaluation) | (from test) | |
+
+    If mismatch, recheck tag spelling and formatting
+  </StepItem>
+
+  <StepItem title="Test Edge Cases">
+    Test with:
+    - Customer with no tags (guest behavior)
+    - Customer with only hide_if matching tag
+    - Customer with only show_if matching tag
+    - Customer with both hide_if and show_if matching tags
+    - Customer with unrelated tags
+  </StepItem>
+</Step>
+
+---
+
+## Tag Validation
+
+### Validation Checklist
+
+Use this checklist to validate tag formatting:
+
+**Product Tag Format:**
+```
+✓ Starts with: weevio.product.widget.cross_sell.
+✓ Followed by: hide, hide_if_customer_tag, or show_if_customer_tag
+✓ For hide_if/show_if: Contains exactly ==
+✓ No spaces around == (unless part of customer tag value)
+✓ Exact capitalization
+✓ No typos in weevio.product.widget.cross_sell
+```
+
+**Customer Tag Format:**
+```
+✓ Exact match to value after == in product tag
+✓ Case-sensitive match
+✓ Character-for-character match
+✓ Includes spaces if product tag value includes spaces
+```
+
+### Tag Testing Tool
+
+Create a simple spreadsheet to test tag combinations:
+
+| Product Tag | Customer Tag | Expected Result |
+|------------|--------------|-----------------|
+| hide=true | (any) | Hidden |
+| hide_if_customer_tag==budget | budget | Hidden |
+| hide_if_customer_tag==budget | Budget | Shown (case mismatch) |
+| show_if_customer_tag==vip | vip | Shown |
+| show_if_customer_tag==vip | regular | Hidden |
+| show_if==vip, hide_if==vip | vip | Hidden (hide wins) |
+
+---
+
+## Browser Console Debugging
+
+### Enable Debug Mode (if available)
+
+Check if Weevio widget has debug mode in configuration:
+
+```javascript
+window.weevioWidget = {
+  enableCrossSell: true,
+  debug: true, // Enable verbose logging
+  // ... other config
+};
+```
+
+### Console Log Analysis
+
+Open browser developer tools (F12) and check Console tab for:
+
+**Expected log pattern:**
+```
+[Weevio Cross-Sell] Loading cross-sell data...
+[Weevio Cross-Sell] Customer tags: ["vip", "premium"]
+[Weevio Cross-Sell] Found 5 potential products
+[Weevio Cross-Sell] Evaluating: Product A
+[Weevio Cross-Sell]   - Explicit hide: false
+[Weevio Cross-Sell]   - Hide-if check: no matches
+[Weevio Cross-Sell]   - Show-if check: matched "vip"
+[Weevio Cross-Sell]   - Result: SHOW
+[Weevio Cross-Sell] Final visible products: 3
+```
+
+**Error indicators:**
+```
+[Weevio Cross-Sell] ERROR: Customer not authenticated
+[Weevio Cross-Sell] ERROR: Product tags malformed
+[Weevio Cross-Sell] WARNING: No products after filtering
+```
+
+### Network Tab Analysis
+
+Check Network tab for cross-sell API calls:
+
+<Step>
+  <StepItem title="Open Network Tab">
+    Developer Tools → Network tab → Filter by XHR or Fetch
+  </StepItem>
+
+  <StepItem title="Find Cross-Sell Request">
+    Look for API call to Weevio Cloud (e.g., `/api/shopify/cross-sell`)
+  </StepItem>
+
+  <StepItem title="Check Request">
+    Verify request includes:
+    - Customer ID (if logged in)
+    - Cart items
+    - Product SKUs
+  </StepItem>
+
+  <StepItem title="Check Response">
+    Verify response includes:
+    - Filtered product list
+    - Visibility decision logs (if debug enabled)
+    - Error messages (if any)
+  </StepItem>
+</Step>
+
+---
+
+## Common Mistakes
+
+### Mistake 1: Using Single Equals
+
+**Wrong:**
+```
+weevio.product.widget.cross_sell.hide_if_customer_tag=vip
+```
+
+**Right:**
+```
+weevio.product.widget.cross_sell.hide_if_customer_tag==vip
+```
+
+### Mistake 2: Case Mismatch
+
+**Product Tag:**
+```
+weevio.product.widget.cross_sell.show_if_customer_tag==VIP
+```
+
+**Customer Tag:**
+```
+vip
+```
+
+**Result:** No match (case sensitive)
+
+**Fix:** Match case exactly: `VIP` or `vip` in both places
+
+### Mistake 3: Trailing Spaces
+
+**Product Tag:**
+```
+weevio.product.widget.cross_sell.hide_if_customer_tag==budget-conscious
+(note trailing space after "conscious")
+```
+
+**Customer Tag:**
+```
+budget-conscious
+```
+
+**Result:** No match
+
+**Fix:** Remove trailing space from product tag
+
+### Mistake 4: Wrong Tag Prefix
+
+**Wrong:**
+```
+weevio.product.cross_sell.hide=true
+weevio.widget.cross_sell.hide=true
+cross_sell.hide=true
+```
+
+**Right:**
+```
+weevio.product.widget.cross_sell.hide=true
+```
+
+### Mistake 5: Forgetting crossSell: true Tag
+
+**Wrong:**
+```
+Product tags:
+- weevio.product.widget.cross_sell.show_if_customer_tag==vip
+(missing crossSell: true)
+```
+
+**Result:** Product never appears in cross-sell at all
+
+**Fix:** Always include `crossSell: true` first
+
+### Mistake 6: Expecting AND Logic for Multiple Tags
+
+**Wrong Assumption:**
+```
+Product tags:
+- show_if_customer_tag==vip
+- show_if_customer_tag==premium
+
+Expectation: Customer must have BOTH tags
+Reality: Customer needs just ONE tag (OR logic)
+```
+
+**Fix:** Use single show_if tag with compound customer tag if you need AND logic:
+```
+Customer tag: "vip-premium"
+Product tag: show_if_customer_tag==vip-premium
+```
+
+---
+
+## Performance Issues
+
+### Symptom: Slow Cross-Sell Modal Loading
+
+**Possible Causes:**
+
+1. **Too many visibility tags per product**
+   - Recommended limit: 10 tags
+   - Solution: Consolidate tags, use broader segments
+
+2. **Too many products in cross-sell**
+   - Problem: Filtering 100+ products is slow
+   - Solution: Limit PIMS associations to under 50 per product
+
+3. **Complex tag matching**
+   - Problem: Customer has 20+ tags
+   - Solution: Limit customer tags to essential segments
+
+---
+
+## Getting Help
+
+### Information to Provide
+
+When contacting support, include:
+
+1. **Product configuration:**
+   - Product SKU
+   - All product tags (screenshot)
+   - PIMS cross-sell associations
+
+2. **Customer configuration:**
+   - Customer email
+   - All customer tags (screenshot)
+   - Logged in status
+
+3. **Expected vs Actual:**
+   - What you expect to happen
+   - What actually happens
+   - Steps to reproduce
+
+4. **Technical details:**
+   - Browser and version
+   - Console errors (screenshot)
+   - Network request/response (screenshot)
+   - Widget configuration
+
+5. **Testing results:**
+   - Does it work for other customers?
+   - Does it work for other products?
+   - Does it work in incognito mode?
+
+---
+
+## Additional Resources
+
+- **Tag format reference:** [Tag Reference](/docs/integrations/shopify/features/cross-sell/visibility-rules/tag-reference)
+- **Setup instructions:** [Setup Guide](/docs/integrations/shopify/features/cross-sell/visibility-rules/setup)
+- **Use case examples:** [Examples](/docs/integrations/shopify/features/cross-sell/visibility-rules/examples)
+
+<Note type="success">
+**90% of visibility issues** are caused by tag spelling/case mismatches or forgetting the `crossSell: true` tag. Always check these first!
+</Note>
