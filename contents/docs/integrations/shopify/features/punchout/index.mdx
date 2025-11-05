@@ -60,8 +60,8 @@ The `fromIdentity` parameter is appended to your store URL by the procurement sy
 **Example URLs:**
 ```
 https://your-store.com/products/laptop?fromIdentity=AN01234567890
-https://your-store.com/collections/all?fromIdentity=ACME_CORP_12345
-https://your-store.com?fromIdentity=ENTERPRISE_ABC
+https://your-store.com/collections/all?fromIdentity=AN01234567890
+https://your-store.com?fromIdentity=AN01234567890
 ```
 
 ### Step 2: Tag Customers in Shopify
@@ -83,8 +83,8 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 
     **Alternative formats:**
     ```
-    SAP Ariba Buyer: ACME_CORP_12345
-    PunchOut Buyer: ENTERPRISE_XYZ
+    SAP Ariba Buyer: AN01234567890
+    PunchOut Buyer: AN01234567890
     ```
 
     <Note type="warning">
@@ -99,11 +99,11 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 
 **Example customer configuration:**
 
-| Customer Name | Tag | Price List |
-|:--------------|:----|:-----------|
-| ACME Manufacturing | `Ariba Buyer: AN01631249352` | Enterprise Tier (20% off) |
-| Regional Healthcare | `SAP Ariba Buyer: RHS_MEDICAL` | Contract Pricing |
-| Tech Distributor - Division A | `PunchOut Buyer: TECH_DIV_A` | Distributor Tier 1 |
+| Customer Name | Tag | Price List | Price Code Tag |
+|:--------------|:----|:-----------|:---------------|
+| ACME Manufacturing | `Ariba Buyer: AN01631249352` | Enterprise Tier (20% off) | `Price Code: ACME_20_OFF` |
+| Regional Healthcare | `SAP Ariba Buyer: AN01631249352` | Contract Pricing | `Price Code: REGIONAL_HEALTH` |
+| Tech Distributor - Division A | `PunchOut Buyer: AN01631249352` | Distributor Tier 1 | `Price Code: TECH_DIV_A` |
 
 ### Step 3: Test Your Configuration
 
