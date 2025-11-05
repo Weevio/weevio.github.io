@@ -112,18 +112,22 @@ Before deep troubleshooting, verify these basics:
     ```
   </StepItem>
 
-  <StepItem title="Tag Name Mismatch">
-    **Check:** Product tag value EXACTLY matches customer tag (case-sensitive)
+  <StepItem title="Tag Value Mismatch">
+    **Check:** Product tag value matches customer tag (case-insensitive, but spelling must match)
 
-    **Fix:** Correct spelling/capitalization in product tag or customer tag
+    **Fix:** Correct spelling/spacing in product tag or customer tag
 
     **Common mistakes:**
     ```
     Product tag: hide_if_customer_tag==VIP
     Customer tag: "vip"
-    Result: No match (case difference)
+    Result: ✓ Match (case-insensitive)
 
-    Fix: Change customer tag to "VIP" OR change product tag to ==vip
+    Product tag: hide_if_customer_tag==wholesale
+    Customer tag: "whole sale" (extra space)
+    Result: No match (spacing difference)
+
+    Fix: Match exactly (ignoring case): "wholesale" or "WHOLESALE"
     ```
   </StepItem>
 
@@ -399,8 +403,8 @@ Use this checklist to validate tag formatting:
 **Customer Tag Format:**
 ```
 ✓ Exact match to value after == in product tag
-✓ Case-sensitive match
-✓ Character-for-character match
+✓ Case-insensitive match (VIP = vip = Vip)
+✓ Character-for-character match (ignoring case)
 ✓ Includes spaces if product tag value includes spaces
 ```
 
@@ -513,9 +517,9 @@ weevio.product.widget.cross_sell.show_if_customer_tag==VIP
 vip
 ```
 
-**Result:** No match (case sensitive)
+**Result:** ✓ Match (case-insensitive comparison)
 
-**Fix:** Match case exactly: `VIP` or `vip` in both places
+**Note:** Customer tag values are compared case-insensitively, so this works correctly
 
 ### Mistake 3: Trailing Spaces
 

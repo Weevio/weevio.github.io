@@ -15,7 +15,7 @@ weevio.product.widget.cross_sell.<rule_type><optional_params>
 Tags are added to **products** in Shopify admin and evaluated against **customer tags** when the cross-sell modal loads.
 
 <Note type="warning">
-**Case Sensitive:** All tags are case-sensitive. `weevio.product.widget.cross_sell.hide=true` and `Weevio.Product.Widget.Cross_Sell.Hide=True` are different tags.
+**Case Sensitivity:** Product tag names/prefixes are case-sensitive (e.g., `weevio.product.widget.cross_sell.hide=true` ≠ `Weevio.Product.Widget.Cross_Sell.Hide=True`). However, customer tag values in `hide_if_customer_tag` and `show_if_customer_tag` rules are compared case-insensitively (e.g., `==VIP` matches customers tagged with "vip", "VIP", or "Vip").
 </Note>
 
 ## Tag Types
@@ -71,9 +71,9 @@ weevio.product.widget.cross_sell.hide_if_customer_tag==<customer_tag_value>
 - Multiple hide_if tags allowed per product
 
 **Matching Logic:**
-- Customer must have the EXACT tag (case-sensitive, character-for-character match)
-- If customer has ANY hide_if tag → Product hidden
-- Evaluation stops at first match (AND logic across multiple tags)
+- Customer tag values are compared case-insensitively (e.g., "VIP" matches "vip", "VIP", "Vip")
+- If customer has ANY matching hide_if tag → Product hidden
+- Evaluation stops at first match (OR logic across multiple tags)
 
 **Use Cases:**
 - Hide warranty products from customers with existing coverage
@@ -297,25 +297,28 @@ Weevio.Product.Widget.Cross_Sell.hide=true  ❌ (wrong capitalization)
 
 ### Customer Tag Matching
 
-**Matching is EXACT:**
-- Case-sensitive
-- Character-for-character comparison
-- No partial matching
-- No wildcards
+**Matching Rules:**
+- **Case-insensitive** - Tag values are compared after converting both to lowercase
+- **Character-for-character comparison** - Must match exactly (ignoring case)
+- **No partial matching** - Full tag must match
+- **No wildcards** - Literal string matching only
 
 **Examples:**
 ```
 Product tag: hide_if_customer_tag==VIP
-Customer tag: "vip"  ❌ (case mismatch)
-Customer tag: "VIP"  ✓ (exact match)
+Customer tag: "vip"  ✓ (case-insensitive match)
+Customer tag: "VIP"  ✓ (case-insensitive match)
+Customer tag: "Vip"  ✓ (case-insensitive match)
 
 Product tag: show_if_customer_tag==weevio.customer.tier=1
-Customer tag: "weevio.customer.tier=1"  ✓ (exact match)
+Customer tag: "weevio.customer.tier=1"  ✓ (match)
+Customer tag: "Weevio.Customer.Tier=1"  ✓ (case-insensitive match)
 Customer tag: "weevio.customer.tier=2"  ❌ (different value)
 
 Product tag: hide_if_customer_tag==wholesale account
 Customer tag: "wholesale"  ❌ (partial match doesn't work)
 Customer tag: "wholesale account"  ✓ (exact match with space)
+Customer tag: "WHOLESALE ACCOUNT"  ✓ (case-insensitive match)
 ```
 
 ### Recommended Limits

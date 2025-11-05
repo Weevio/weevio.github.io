@@ -10,7 +10,7 @@ Before setting up visibility rules:
 
 - [ ] Cross-sell feature enabled in Weevio Cloud
 - [ ] Products already configured with `crossSell: true` tag
-- [ ] Cross-sell associations created in PIMS
+- [ ] Cross-sell associations created in PIMS (i.e. auto-loads must exist on PIMS inventory records)
 - [ ] Access to Shopify admin (Products and Customers permissions)
 - [ ] Customer segmentation strategy defined
 
@@ -52,7 +52,7 @@ Before adding any tags, document your segmentation strategy.
 | No AppleCare | `weevio.customer.ace.eligible=true` | Already has coverage | Hide AppleCare products |
 
 <Note type="warning">
-**Tag Naming:** Use consistent, descriptive tag names. Avoid abbreviations unless they're well-documented. Remember tags are case-sensitive.
+**Tag Naming:** Use consistent, descriptive tag names. Avoid abbreviations unless they're well-documented. Product tag names/prefixes are case-sensitive (must be exactly `weevio.product.widget.cross_sell.*`), but customer tag values are compared case-insensitively (e.g., "VIP" matches "vip").
 </Note>
 
 ---
@@ -487,7 +487,7 @@ Check browser console for visibility decision logs (if debug mode enabled):
 1. Product has `crossSell: true` tag
 2. Product has cross-sell associations in PIMS
 3. Visibility tags formatted correctly (exact format)
-4. Customer has matching tag (case-sensitive)
+4. Customer has matching tag (case-insensitive for values)
 5. No explicit hide tag on product
 6. No conflicting hide_if tag
 
