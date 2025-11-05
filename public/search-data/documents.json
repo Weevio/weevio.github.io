@@ -1,5 +1,21 @@
 [
   {
+    "slug": "/integrations",
+    "title": "Integrations",
+    "description": "Weevio Cloud integrates with PIMS, Shopify, GSX, and more.",
+    "content": "",
+    "_searchMeta": {
+      "cleanContent": "",
+      "headings": [],
+      "keywords": [
+        "Shopify",
+        "PIMS",
+        "GSX",
+        "integration"
+      ]
+    }
+  },
+  {
     "slug": "/integrations/shopify/configuration/advanced",
     "title": "Advanced Configuration",
     "description": "Advanced customization options and techniques for power users.",

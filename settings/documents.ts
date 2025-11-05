@@ -90,126 +90,138 @@ export const Documents: Paths[] = [
     },
     {
         heading: "Integrations",
-        title: "Shopify Widget",
-        href: "/integrations/shopify",
+        title: "Integrations",
+        href: "/integrations",
+        cardMeta: {
+            description: "Weevio Cloud integrates with PIMS, Shopify, GSX, and more."
+        },
         items: [
             {
-                title: "Installation",
-                href: "/installation",
+                title: "Shopify Widget",
+                href: "/shopify",
                 cardMeta: {
-                    description: "Step-by-step guide to installing the Weevio Shopify Widget in your store."
+                    description: "Powerful widget for enhanced Shopify storefronts with real-time inventory, pricing, and recommendations."
                 },
                 items: [
                     {
-                        title: "Prerequisites",
-                        href: "/prerequisites",
+                        title: "Installation",
+                        href: "/installation",
                         cardMeta: {
-                            description: "Requirements and Shopify Custom App setup needed before installation."
-                        }
+                            description: "Step-by-step guide to installing the Weevio Shopify Widget in your store."
+                        },
+                        items: [
+                            {
+                                title: "Prerequisites",
+                                href: "/prerequisites",
+                                cardMeta: {
+                                    description: "Requirements and Shopify Custom App setup needed before installation."
+                                }
+                            },
+                            {
+                                title: "Configuration",
+                                href: "/configuration",
+                                cardMeta: {
+                                    description: "Configure your store in Weevio Cloud and add the widget to your Shopify theme."
+                                }
+                            },
+                        ],
+                    },
+                    {
+                        title: "Features",
+                        href: "/features",
+                        cardMeta: {
+                            description: "Explore the powerful features available in the Weevio Shopify Widget."
+                        },
+                        items: [
+                            {
+                                title: "Improved Variant Selection",
+                                href: "/variant-selection",
+                                cardMeta: {
+                                    description: "Enhanced card-based variant selector with price differences and invalid combination prevention."
+                                }
+                            },
+                            {
+                                title: "Shipping Estimates",
+                                href: "/shipping-estimates",
+                                cardMeta: {
+                                    description: "Display accurate delivery estimates and real-time stock availability."
+                                }
+                            },
+                            {
+                                title: "In-Stock Recommendations",
+                                href: "/recommendations",
+                                cardMeta: {
+                                    description: "Suggest alternative products when items are out of stock."
+                                }
+                            },
+                            {
+                                title: "Cross-Sell",
+                                href: "/cross-sell",
+                                cardMeta: {
+                                    description: "Show complementary products after add-to-cart to increase average order value."
+                                }
+                            },
+                            {
+                                title: "B2B Pricing",
+                                href: "/b2b-pricing",
+                                cardMeta: {
+                                    description: "Display negotiated wholesale pricing for logged-in business customers."
+                                }
+                            },
+                            {
+                                title: "Multi-Source Inventory",
+                                href: "/multi-source-inventory",
+                                cardMeta: {
+                                    description: "Aggregate stock from Shopify, Ingram Micro, and TD SYNNEX for accurate availability."
+                                }
+                            },
+                            {
+                                title: "PunchOut Commerce",
+                                href: "/punchout",
+                                cardMeta: {
+                                    description: "Integrate with SAP Ariba, Coupa, and other procurement systems."
+                                }
+                            },
+                        ],
                     },
                     {
                         title: "Configuration",
                         href: "/configuration",
                         cardMeta: {
-                            description: "Configure your store in Weevio Cloud and add the widget to your Shopify theme."
+                            description: "Learn how to configure and customize the widget for your store."
+                        },
+                        items: [
+                            {
+                                title: "Basic Setup",
+                                href: "/basic-setup",
+                                cardMeta: {
+                                    description: "Quick start guide for basic widget configuration."
+                                }
+                            },
+                            {
+                                title: "Advanced Configuration",
+                                href: "/advanced",
+                                cardMeta: {
+                                    description: "Advanced customization options and performance optimization techniques."
+                                }
+                            },
+                            {
+                                title: "Configuration Examples",
+                                href: "/examples",
+                                cardMeta: {
+                                    description: "Pre-built configurations for common business scenarios."
+                                }
+                            },
+                        ],
+                    },
+                    {
+                        title: "Troubleshooting",
+                        href: "/troubleshooting",
+                        cardMeta: {
+                            description: "Solutions to common issues and problems with the widget."
                         }
                     },
                 ],
-            },
-            {
-                title: "Features",
-                href: "/features",
-                cardMeta: {
-                    description: "Explore the powerful features available in the Weevio Shopify Widget."
-                },
-                items: [
-                    {
-                        title: "Improved Variant Selection",
-                        href: "/variant-selection",
-                        cardMeta: {
-                            description: "Enhanced card-based variant selector with price differences and invalid combination prevention."
-                        }
-                    },
-                    {
-                        title: "Shipping Estimates",
-                        href: "/shipping-estimates",
-                        cardMeta: {
-                            description: "Display accurate delivery estimates and real-time stock availability."
-                        }
-                    },
-                    {
-                        title: "In-Stock Recommendations",
-                        href: "/recommendations",
-                        cardMeta: {
-                            description: "Suggest alternative products when items are out of stock."
-                        }
-                    },
-                    {
-                        title: "Cross-Sell",
-                        href: "/cross-sell",
-                        cardMeta: {
-                            description: "Show complementary products after add-to-cart to increase average order value."
-                        }
-                    },
-                    {
-                        title: "B2B Pricing",
-                        href: "/b2b-pricing",
-                        cardMeta: {
-                            description: "Display negotiated wholesale pricing for logged-in business customers."
-                        }
-                    },
-                    {
-                        title: "Multi-Source Inventory",
-                        href: "/multi-source-inventory",
-                        cardMeta: {
-                            description: "Aggregate stock from Shopify, Ingram Micro, and TD SYNNEX for accurate availability."
-                        }
-                    },
-                    {
-                        title: "PunchOut Commerce",
-                        href: "/punchout",
-                        cardMeta: {
-                            description: "Integrate with SAP Ariba, Coupa, and other procurement systems."
-                        }
-                    },
-                ],
-            },
-            {
-                title: "Configuration",
-                href: "/configuration",
-                cardMeta: {
-                    description: "Learn how to configure and customize the widget for your store."
-                },
-                items: [
-                    {
-                        title: "Basic Setup",
-                        href: "/basic-setup",
-                        cardMeta: {
-                            description: "Quick start guide for basic widget configuration."
-                        }
-                    },
-                    {
-                        title: "Advanced Configuration",
-                        href: "/advanced",
-                        cardMeta: {
-                            description: "Advanced customization options and performance optimization techniques."
-                        }
-                    },
-                    {
-                        title: "Configuration Examples",
-                        href: "/examples",
-                        cardMeta: {
-                            description: "Pre-built configurations for common business scenarios."
-                        }
-                    },
-                ],
-            },
-            {
-                title: "Troubleshooting",
-                href: "/troubleshooting",
-                cardMeta: {
-                    description: "Solutions to common issues and problems with the widget."
-                }
             },
         ],
     },
