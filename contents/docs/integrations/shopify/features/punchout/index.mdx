@@ -38,7 +38,54 @@ PunchOut enables enterprise customers to shop from their procurement systems (SA
 
 ## Setup Instructions
 
-### Step 1: Understand FromIdentity Formats
+<Note type="warning">
+**Prerequisite:** The fromIdentity tracker script must be installed on your Shopify theme for PunchOut to work. This script runs on all pages to capture the `fromIdentity` parameter when customers arrive from their procurement systems.
+</Note>
+
+### Step 1: Install Tracker Script in Shopify Theme
+
+The tracker script must be added to your Shopify theme to capture the `fromIdentity` parameter on all pages.
+
+<Step>
+  <StepItem title="Navigate to Theme Editor">
+    In your Shopify admin:
+    1. Go to **Online Store** → **Themes**
+    2. Find your active theme
+    3. Click **Actions** → **Edit code**
+  </StepItem>
+
+  <StepItem title="Open theme.liquid File">
+    In the left sidebar under **Layout**, click on **theme.liquid** to open the main theme file.
+  </StepItem>
+
+  <StepItem title="Add Tracker Script to Head Section">
+    Find the `</head>` closing tag in the file (usually around line 100-200). Just **before** the `</head>` tag, add this script:
+
+    ```liquid
+    <!-- Weevio PunchOut Tracker -->
+    <script src="https://cloud.weevio.co/ecommerce-widget/fromIdentity-tracker.js" defer></script>
+    ```
+
+    **Example placement:**
+    ```liquid
+    ...other head content...
+
+    <!-- Weevio PunchOut Tracker -->
+    <script src="https://cloud.weevio.co/ecommerce-widget/fromIdentity-tracker.js" defer></script>
+  </head>
+    ```
+  </StepItem>
+
+  <StepItem title="Save Changes">
+    Click the **Save** button in the top right corner. The tracker script is now active on all pages of your store.
+  </StepItem>
+</Step>
+
+<Note type="info">
+**What does the tracker do?** This lightweight script (less than 1 KB) monitors the URL for the `fromIdentity` parameter on every page load and stores it in the browser's sessionStorage. This allows the pricing widget to identify the customer even as they navigate between pages.
+</Note>
+
+### Step 2: Understand FromIdentity Formats
 
 The `fromIdentity` parameter is appended to your store URL by the procurement system. The Weevio widget recognizes these formats (case-insensitive):
 
@@ -64,7 +111,7 @@ https://your-store.com/collections/all?fromIdentity=AN01234567890
 https://your-store.com?fromIdentity=AN01234567890
 ```
 
-### Step 2: Tag Customers in Shopify
+### Step 3: Tag Customers in Shopify
 
 For PunchOut to work, you must tag each enterprise customer in Shopify with their `fromIdentity` value.
 
@@ -105,7 +152,7 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 | Regional Healthcare | `SAP Ariba Buyer: AN01631249352` | Contract Pricing | `Price Code: REGIONAL_HEALTH` |
 | Tech Distributor - Division A | `PunchOut Buyer: AN01631249352` | Distributor Tier 1 | `Price Code: TECH_DIV_A` |
 
-### Step 3: Test Your Configuration
+### Step 4: Test Your Configuration
 
 <Step>
   <StepItem title="Create a Test URL">
@@ -186,11 +233,23 @@ No special widget configuration is required - `fromIdentity` detection is automa
 
 ## Troubleshooting
 
+### Tracker Script Not Installed
+
+**Symptoms:** Nothing happens when visiting a URL with `fromIdentity` parameter
+
+**Solutions:**
+- Verify the tracker script is added to theme.liquid in the `<head>` section
+- Check that the script URL is correct: `https://cloud.weevio.co/ecommerce-widget/fromIdentity-tracker.js`
+- Clear browser cache and reload the page
+- Check browser console for script loading errors (404 errors)
+- Ensure the theme changes were saved and published
+
 ### FromIdentity Not Detected
 
 **Symptoms:** sessionStorage shows null for `weevio_fromIdentity`
 
 **Solutions:**
+- **First, verify tracker script is installed** (see above)
 - Verify URL contains `?fromIdentity=` parameter (check spelling)
 - Ensure JavaScript is not blocked by browser extensions
 - Check that the parameter value is under 50 characters
