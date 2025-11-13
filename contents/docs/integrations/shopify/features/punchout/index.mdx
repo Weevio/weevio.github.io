@@ -198,6 +198,470 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 - **Pricing not showing**: Ensure the customer is assigned to a price list with active pricing rules
 - **Session expired**: Sessions last 12 hours - clear sessionStorage or use a fresh browser tab to retest
 
+## Cart Page Integration
+
+The cart page integration extends PunchOut functionality to display B2B pricing throughout the shopping cart experience. This ensures enterprise buyers see their negotiated pricing from product pages all the way through checkout.
+
+### Overview
+
+When a customer arrives from their procurement system (via `fromIdentity`), the cart pricing integration:
+1. Automatically detects B2B customer status
+2. Fetches negotiated pricing for all cart items
+3. Updates cart display with B2B prices
+4. Populates `window.BSS_B2B.cart` for PunchOut Cloud integration
+
+<Note type="info">
+**Prerequisite:** The fromIdentity tracker script must already be installed (see Step 1 above). The cart pricing script builds on this foundation.
+</Note>
+
+### Installation
+
+Add the cart pricing script to your Shopify cart template.
+
+<Step>
+  <StepItem title="Navigate to Cart Template">
+    In your Shopify admin:
+    1. Go to **Online Store** → **Themes**
+    2. Click **Actions** → **Edit code**
+    3. Under **Sections** or **Templates**, locate your cart template (usually `cart.liquid` or `main-cart.liquid`)
+  </StepItem>
+
+  <StepItem title="Add Configuration Script">
+    Add this configuration **before** the cart pricing script. Place it in the `<head>` section or at the top of your cart template:
+
+    ```liquid
+    <script>
+      window.weevioWidgetConfig = {
+        shopifyDomain: '{{ shop.permanent_domain }}',
+        teamID: 'YOUR_TEAM_ID',
+        baseURL: 'https://api.weevio.com',
+        cartBssPricing: {
+          enableDomUpdates: true
+        }
+      };
+    </script>
+    ```
+
+    Replace `YOUR_TEAM_ID` with your actual Weevio team ID.
+  </StepItem>
+
+  <StepItem title="Add Cart Pricing Script">
+    Just after the configuration, add the cart pricing script:
+
+    ```liquid
+    <script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+    ```
+
+    **Complete example:**
+    ```liquid
+    <script>
+      window.weevioWidgetConfig = {
+        shopifyDomain: '{{ shop.permanent_domain }}',
+        teamID: 'YOUR_TEAM_ID',
+        baseURL: 'https://api.weevio.com',
+        cartBssPricing: {
+          enableDomUpdates: true
+        }
+      };
+    </script>
+    <script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+    ```
+  </StepItem>
+
+  <StepItem title="Save Changes">
+    Click **Save** to activate cart pricing for PunchOut customers.
+  </StepItem>
+</Step>
+
+### Basic Configuration
+
+The `cartBssPricing` object controls how B2B pricing is displayed in the cart:
+
+```javascript
+window.weevioWidgetConfig = {
+  // ... other config ...
+  cartBssPricing: {
+    enableDomUpdates: true,  // Update cart UI with B2B prices
+    debug: false              // Enable console logging for troubleshooting
+  }
+};
+```
+
+**Configuration Options:**
+
+- **`enableDomUpdates`** (boolean, default: `true`)
+  - `true`: Automatically update cart prices in the DOM
+  - `false`: Data-only mode - populates `window.BSS_B2B.cart` without UI updates (useful if you're implementing custom pricing display)
+
+- **`debug`** (boolean, default: `false`)
+  - Enable detailed console logging for development and troubleshooting
+
+### Theme-Specific Setup
+
+#### Dawn Theme (and Most Standard Themes)
+
+The default configuration works out of the box with Dawn and most standard Shopify themes:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true
+}
+```
+
+No additional selector configuration needed! The script automatically detects:
+- Cart item rows
+- Price elements
+- Line totals
+- Subtotal containers
+
+#### Custom Themes
+
+For custom or heavily modified themes, you may need to configure CSS selectors:
+
+<Step>
+  <StepItem title="Identify Cart Elements">
+    Open your cart page in a browser and use Developer Tools (F12) to inspect:
+    - Cart container element
+    - Individual cart item rows
+    - Unit price elements
+    - Line total (item price × quantity) elements
+    - Cart subtotal element
+    - Variant ID attributes on cart items
+  </StepItem>
+
+  <StepItem title="Configure Custom Selectors">
+    Add the `selectors` object to your configuration:
+
+    ```javascript
+    cartBssPricing: {
+      enableDomUpdates: true,
+      selectors: {
+        cartContainer: '#my-custom-cart',
+        cartItemRow: '.cart-item',
+        cartItemPrice: '.item-unit-price',
+        cartItemLinePrice: '.item-line-total',
+        cartSubtotal: '#cart-subtotal-amount',
+        variantIdAttribute: 'data-variant-id'
+      }
+    }
+    ```
+  </StepItem>
+
+  <StepItem title="Test and Verify">
+    Reload the cart page with a PunchOut customer session and verify prices update correctly. Enable `debug: true` to see detailed selector matching information in the console.
+  </StepItem>
+</Step>
+
+**Custom Selector Reference:**
+
+| Selector | Purpose | Example Value |
+|:---------|:--------|:--------------|
+| `cartContainer` | Main cart wrapper element | `'#my-cart'`, `'.cart-wrapper'` |
+| `cartItemRow` | Individual cart line items | `'.cart-row'`, `'[data-cart-item]'` |
+| `cartItemPrice` | Unit price per item | `'.price'`, `'.unit-price'` |
+| `cartItemLinePrice` | Line total (price × qty) | `'.line-total'`, `'.item-total'` |
+| `cartSubtotal` | Cart subtotal container | `'#subtotal'`, `'.cart-subtotal'` |
+| `variantIdAttribute` | Attribute containing variant ID | `'data-variant-id'`, `'data-product-id'` |
+
+#### BSS B2B App Users
+
+If you're using the BSS: B2B Wholesale Solution app, the cart pricing script provides automatic compatibility:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true
+  // No special configuration needed!
+}
+```
+
+The script automatically detects and works with BSS attributes:
+- `bss-b2b-cart-item-key`
+- `bss-b2b-variant-id`
+- BSS-specific price containers
+
+<Note type="success">
+**Automatic Detection:** The script intelligently falls back to BSS selectors when detected, ensuring seamless integration with your existing BSS B2B setup.
+</Note>
+
+### Configuration Examples
+
+#### Minimal Configuration (Dawn Theme)
+
+Perfect for stores using Dawn or standard Shopify themes:
+
+```javascript
+window.weevioWidgetConfig = {
+  shopifyDomain: '{{ shop.permanent_domain }}',
+  teamID: 'YOUR_TEAM_ID',
+  baseURL: 'https://api.weevio.com',
+  cartBssPricing: {
+    enableDomUpdates: true
+  }
+};
+```
+
+#### European Store (EUR with Custom Formatting)
+
+Display prices in euros with European formatting conventions:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '€',
+    currencyPosition: 'after',     // "19,99 €" instead of "€19,99"
+    decimalSeparator: ',',         // Use comma for decimals
+    thousandsSeparator: '.',       // Use period for thousands
+    decimalPlaces: 2
+  }
+}
+```
+
+**Result:** Prices display as `99.999,99 €` instead of `$99,999.99`
+
+#### Show Original Price with Strikethrough
+
+Display both original and B2B pricing to highlight savings:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  indicators: {
+    showOriginalPrice: true,
+    modifiedPriceClass: 'b2b-price',
+    originalPriceClass: 'original-price'
+  }
+}
+```
+
+Add matching CSS to your theme:
+
+```css
+.original-price {
+  text-decoration: line-through;
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+
+.b2b-price {
+  font-weight: bold;
+  color: #007acc;
+}
+```
+
+**Result:** Shows ~~$99.99~~ **$79.99** to emphasize the discount.
+
+#### Custom Theme with Manual Selectors
+
+For non-standard cart layouts:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  selectors: {
+    cartContainer: '#custom-cart-container',
+    cartItemRow: '.custom-cart-row',
+    cartItemPrice: '.custom-unit-price span',
+    cartItemLinePrice: '.custom-line-total .amount',
+    cartSubtotal: '#custom-subtotal-value',
+    variantIdAttribute: 'data-product-variant-id'
+  },
+  debug: true  // Enable during setup
+}
+```
+
+#### Data-Only Mode (No DOM Updates)
+
+Use when implementing custom price display logic:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: false  // Only populate window.BSS_B2B.cart
+}
+```
+
+Access pricing data programmatically:
+
+```javascript
+// After cart pricing loads
+console.log(window.BSS_B2B.cart);
+// {
+//   items: [
+//     { variantId: 123, b2bPrice: 19.99, quantity: 2, lineTotal: 39.98 },
+//     ...
+//   ],
+//   subtotal: 139.96
+// }
+```
+
+### Price Formatting Options
+
+Control how prices are formatted and displayed:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '$',           // Currency symbol to display
+    currencyPosition: 'before',    // 'before' ($19.99) or 'after' (19.99 €)
+    decimalPlaces: 2,              // Number of decimal places (0-4)
+    thousandsSeparator: ',',       // Thousands separator character
+    decimalSeparator: '.'          // Decimal separator character
+  }
+}
+```
+
+**Formatting Examples:**
+
+| Configuration | Result |
+|:--------------|:-------|
+| `{ currencySymbol: '$', currencyPosition: 'before' }` | `$1,234.56` |
+| `{ currencySymbol: '€', currencyPosition: 'after' }` | `1,234.56 €` |
+| `{ decimalSeparator: ',', thousandsSeparator: '.' }` | `$1.234,56` |
+| `{ decimalPlaces: 0 }` | `$1,235` |
+| `{ currencySymbol: 'USD', currencyPosition: 'after' }` | `1,234.56 USD` |
+
+### Visual Indicators
+
+Enhance the cart UI to highlight B2B pricing:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  indicators: {
+    showOriginalPrice: true,        // Display original price alongside B2B price
+    modifiedPriceClass: 'b2b-price', // CSS class for B2B prices
+    originalPriceClass: 'original-price' // CSS class for original prices
+  }
+}
+```
+
+**CSS Styling Examples:**
+
+```css
+/* Highlight B2B pricing in blue */
+.b2b-price {
+  font-weight: 600;
+  color: #0066cc;
+  font-size: 1.1em;
+}
+
+/* Strikethrough original price */
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9em;
+  margin-right: 8px;
+}
+
+/* Add "Your Price" label */
+.b2b-price::before {
+  content: "Your Price: ";
+  font-weight: normal;
+  color: #666;
+  margin-right: 4px;
+}
+```
+
+### Troubleshooting Cart Pricing
+
+#### Prices Not Updating
+
+**Symptoms:** Cart displays regular prices instead of B2B pricing
+
+**Solutions:**
+1. **Verify fromIdentity is captured**
+   ```javascript
+   // Check in browser console
+   sessionStorage.getItem('weevio_fromIdentity')
+   // Should return the customer's fromIdentity value
+   ```
+
+2. **Check selector configuration**
+   - Enable debug mode: `debug: true`
+   - Open browser console and look for selector matching errors
+   - Verify selectors match your theme's HTML structure
+
+3. **Verify customer setup**
+   - Customer must be tagged with matching fromIdentity value
+   - Customer must be assigned to a B2B price list
+   - Price list must have active pricing rules
+
+4. **Check script loading**
+   ```javascript
+   // Verify script loaded
+   typeof window.weevioCartBssPricing !== 'undefined'
+   // Should return true
+   ```
+
+#### Cart Item Keys Not Matching
+
+**Symptoms:** Some cart items show B2B pricing, others don't
+
+**Solutions:**
+1. **Check variant ID attribute**
+   - Use browser DevTools to inspect cart item elements
+   - Verify the `variantIdAttribute` selector matches your theme
+   - Common attributes: `data-variant-id`, `data-id`, `data-product-variant-id`
+
+2. **Verify all variants have pricing**
+   - Check that B2B price list includes all product variants
+   - Some variants may not have negotiated pricing
+
+#### Debug Mode for Development
+
+Enable comprehensive logging during setup:
+
+```javascript
+cartBssPricing: {
+  enableDomUpdates: true,
+  debug: true
+}
+```
+
+**Debug output includes:**
+- Selector matching results
+- Detected variant IDs
+- API request/response details
+- DOM update operations
+- BSS B2B compatibility detection
+
+**Console debugging commands:**
+
+```javascript
+// Check loaded configuration
+console.log(window.weevioWidgetConfig.cartBssPricing);
+
+// Verify B2B cart data
+console.log(window.BSS_B2B?.cart);
+
+// Check detected cart items
+console.log(window.weevioCartBssPricing?.detectedItems);
+
+// Force price refresh (if implemented)
+window.weevioCartBssPricing?.refresh();
+```
+
+#### BSS B2B Compatibility Issues
+
+**Symptoms:** Conflicts with BSS: B2B Wholesale Solution app
+
+**Solutions:**
+1. **Verify automatic detection**
+   - The script should automatically detect BSS attributes
+   - Check console for BSS detection messages (with `debug: true`)
+
+2. **Disable DOM updates if needed**
+   - Use data-only mode to avoid conflicts: `enableDomUpdates: false`
+   - Implement custom display logic using `window.BSS_B2B.cart` data
+
+3. **Contact support**
+   - If issues persist, contact Weevio support with:
+     - Theme name and version
+     - BSS B2B app version
+     - Browser console errors
+     - Screenshot of cart HTML structure
+
 ## Technical Details
 
 ### Session Behavior
