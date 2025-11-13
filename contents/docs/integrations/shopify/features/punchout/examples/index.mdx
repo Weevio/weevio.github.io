@@ -1,0 +1,498 @@
+---
+title: PunchOut Configuration Examples
+description: Real-world configuration examples for different store setups and requirements.
+keywords: ["PunchOut", "configuration", "examples", "cart pricing", "custom themes"]
+---
+
+This page provides practical configuration examples for various PunchOut integration scenarios.
+
+## Basic Examples
+
+### Minimal Configuration (Dawn Theme)
+
+Works with Dawn theme and most standard Shopify themes using default selectors.
+
+```liquid
+<!-- In cart template (main-cart.liquid or cart.liquid) -->
+<script>
+  window.weevioWidgetConfig = window.weevioWidgetConfig || {};
+  window.weevioWidgetConfig.shopifyDomain = '{{ shop.permanent_domain }}';
+  window.weevioWidgetConfig.teamID = 'team-abc123';
+  window.weevioWidgetConfig.baseURL = 'https://api.weevio.com';
+  
+  window.weevioWidgetConfig.cartBssPricing = {
+    enableDomUpdates: true
+  };
+</script>
+<script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+```
+
+**Use case:** Standard Shopify store with Dawn theme, USD currency
+
+### Data-Only Mode (No DOM Updates)
+
+Populates PunchOut cart data without modifying cart page prices.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: false
+};
+```
+
+**Use case:** 
+- Custom cart logic that handles pricing display
+- Only need `window.BSS_B2B.cart` for PunchOut integration
+- Testing cart data without affecting UI
+
+**What still works:**
+- `window.BSS_B2B.cart` is populated
+- PunchOut integration functions normally
+- Cart data sent to procurement system
+
+## Currency & Formatting Examples
+
+### European Store (EUR)
+
+Configure Euro currency with European number formatting.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '€',
+    currencyPosition: 'after',      // Displays as "19,99 €"
+    decimalSeparator: ',',           // European decimal comma
+    thousandsSeparator: '.',         // European thousands separator
+    decimalPlaces: 2
+  }
+};
+```
+
+**Output examples:**
+- `1234.50` → `1.234,50 €`
+- `99.99` → `99,99 €`
+- `15000.00` → `15.000,00 €`
+
+### British Pound (GBP)
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '£',
+    currencyPosition: 'before',     // Displays as "£19.99"
+    decimalSeparator: '.',
+    thousandsSeparator: ',',
+    decimalPlaces: 2
+  }
+};
+```
+
+### Japanese Yen (JPY) - No Decimals
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '¥',
+    currencyPosition: 'before',
+    decimalPlaces: 0,                // No decimal places for Yen
+    thousandsSeparator: ','
+  }
+};
+```
+
+**Output examples:**
+- `1234.56` → `¥1,235` (rounded)
+- `15000.00` → `¥15,000`
+
+## Visual Indicator Examples
+
+### Show Original Price with Strikethrough
+
+Display both original and B2B prices for transparency.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  indicators: {
+    showOriginalPrice: true,
+    modifiedPriceClass: 'b2b-price',
+    originalPriceClass: 'original-price'
+  }
+};
+```
+
+**Add this CSS to your theme:**
+
+```css
+/* Style for original (strikethrough) price */
+.original-price {
+  text-decoration: line-through;
+  opacity: 0.6;
+  font-size: 0.9em;
+  color: #666;
+  margin-right: 8px;
+}
+
+/* Style for B2B negotiated price */
+.b2b-price {
+  font-weight: bold;
+  color: #007acc;
+  font-size: 1.1em;
+}
+```
+
+**Result in cart:**
+```
+~~$49.99~~ $39.99
+```
+
+### Highlight Savings
+
+Emphasize the discount with green color.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  indicators: {
+    showOriginalPrice: true,
+    modifiedPriceClass: 'savings-price',
+    originalPriceClass: 'old-price'
+  }
+};
+```
+
+**CSS:**
+
+```css
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.85em;
+}
+
+.savings-price {
+  color: #28a745;  /* Green */
+  font-weight: 600;
+}
+
+.savings-price::before {
+  content: "Your Price: ";
+  font-weight: normal;
+  color: #333;
+}
+```
+
+## Custom Theme Examples
+
+### Custom Theme with Manual Selectors
+
+For themes that don't use Dawn's default structure.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  selectors: {
+    cartContainer: '#shopping-cart',
+    cartItemRow: '.cart-product-row',
+    cartItemPrice: '.product-unit-price span',
+    cartItemLinePrice: '.product-line-total',
+    cartSubtotal: '#cart-subtotal-amount',
+    variantIdAttribute: 'data-product-variant-id'
+  }
+};
+```
+
+**How to find selectors:**
+
+1. Open your cart page in a browser
+2. Press F12 to open developer tools
+3. Click the "Select Element" tool (cursor icon)
+4. Click on price elements in the cart
+5. Note the class names and IDs in the inspector
+6. Use those as your selectors
+
+<Note type="info">
+**Tip:** Start with the most specific selector that uniquely identifies each element. Use browser console to test: `document.querySelector('.your-selector')` should return the element.
+</Note>
+
+### Brooklyn Theme Example
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  selectors: {
+    cartContainer: '#cart-form',
+    cartItemRow: '.cart__row',
+    cartItemPrice: '.cart__price span.money',
+    cartItemLinePrice: '.cart__price--end span.money',
+    cartSubtotal: '.cart__subtotal .money',
+    variantIdAttribute: 'data-variant-id'
+  }
+};
+```
+
+### Debut Theme Example
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  selectors: {
+    cartContainer: 'form[action="/cart"]',
+    cartItemRow: '.cart__row',
+    cartItemPrice: '.cart__price',
+    cartItemLinePrice: '.cart__final-price',
+    cartSubtotal: '.cart__subtotal',
+    variantIdAttribute: 'data-variant-id'
+  }
+};
+```
+
+## BSS B2B App Integration
+
+### Automatic BSS Detection
+
+If you're using the BSS B2B app, the script auto-detects it. No special configuration needed!
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true  // BSS auto-detection works automatically
+};
+```
+
+**Auto-detected BSS attributes:**
+- `bss-b2b-cart-item-key`
+- `bss-b2b-variant-id`
+- BSS-specific price element classes
+
+### BSS + Custom Formatting
+
+Combine BSS compatibility with custom currency formatting.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '€',
+    currencyPosition: 'after',
+    decimalSeparator: ',',
+    thousandsSeparator: '.'
+  }
+};
+```
+
+## Complete Real-World Examples
+
+### Example 1: European B2B Wholesale Store
+
+Dawn theme, EUR currency, show savings.
+
+```liquid
+<script>
+  window.weevioWidgetConfig = window.weevioWidgetConfig || {};
+  window.weevioWidgetConfig.shopifyDomain = '{{ shop.permanent_domain }}';
+  window.weevioWidgetConfig.teamID = 'eu-wholesale-team';
+  window.weevioWidgetConfig.baseURL = 'https://api.weevio.com';
+  
+  window.weevioWidgetConfig.cartBssPricing = {
+    enableDomUpdates: true,
+    formatting: {
+      currencySymbol: '€',
+      currencyPosition: 'after',
+      decimalSeparator: ',',
+      thousandsSeparator: '.',
+      decimalPlaces: 2
+    },
+    indicators: {
+      showOriginalPrice: true,
+      modifiedPriceClass: 'wholesale-price',
+      originalPriceClass: 'retail-price'
+    }
+  };
+</script>
+<script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+
+<style>
+  .retail-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+    margin-right: 10px;
+  }
+  .wholesale-price {
+    font-weight: bold;
+    color: #0066cc;
+  }
+</style>
+```
+
+### Example 2: US Industrial Supplier with Custom Theme
+
+Custom theme selectors, USD, emphasize savings percentage.
+
+```liquid
+<script>
+  window.weevioWidgetConfig = window.weevioWidgetConfig || {};
+  window.weevioWidgetConfig.shopifyDomain = '{{ shop.permanent_domain }}';
+  window.weevioWidgetConfig.teamID = 'industrial-supply-us';
+  window.weevioWidgetConfig.baseURL = 'https://api.weevio.com';
+  
+  window.weevioWidgetConfig.cartBssPricing = {
+    enableDomUpdates: true,
+    selectors: {
+      cartContainer: '#main-cart-container',
+      cartItemRow: '.line-item',
+      cartItemPrice: '.unit-price span.price',
+      cartItemLinePrice: '.line-price span.total',
+      cartSubtotal: '#order-subtotal .value',
+      variantIdAttribute: 'data-variant'
+    },
+    formatting: {
+      currencySymbol: '$',
+      currencyPosition: 'before',
+      decimalSeparator: '.',
+      thousandsSeparator: ',',
+      decimalPlaces: 2
+    },
+    indicators: {
+      showOriginalPrice: true,
+      modifiedPriceClass: 'contract-price',
+      originalPriceClass: 'list-price'
+    }
+  };
+</script>
+<script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+
+<style>
+  .list-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 0.9em;
+  }
+  .contract-price {
+    color: #28a745;
+    font-weight: 600;
+  }
+  .contract-price::after {
+    content: " (Contract Price)";
+    font-size: 0.8em;
+    font-weight: normal;
+    color: #666;
+  }
+</style>
+```
+
+### Example 3: Development/Testing with Debug Mode
+
+Enable detailed logging for troubleshooting.
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  debug: true,  // Enables console logging
+  formatting: {
+    currencySymbol: '$',
+    currencyPosition: 'before',
+    decimalPlaces: 2
+  }
+};
+```
+
+**What debug mode shows in console:**
+- Detected variant IDs
+- API request/response for pricing
+- DOM update results
+- Configuration validation
+- BSS app detection status
+- Selector matching results
+
+<Note type="warning">
+**Production Use:** Set `debug: false` (or remove it) in production. Debug logging can expose internal data and affect performance.
+</Note>
+
+## Troubleshooting Configurations
+
+### Configuration Not Working?
+
+Add debug mode to diagnose:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  debug: true  // Check browser console for detailed logs
+};
+```
+
+### Test Selectors in Browser Console
+
+Verify your selectors work before deploying:
+
+```javascript
+// Test if selector finds elements
+document.querySelectorAll('.cart-item')  // Should return cart items
+document.querySelector('#cart-subtotal')  // Should return subtotal element
+
+// Test variant ID attribute
+document.querySelector('.cart-item').getAttribute('data-variant-id')  // Should return variant ID
+```
+
+### Verify Configuration Loaded
+
+Check if config is properly loaded:
+
+```javascript
+// In browser console
+window.weevioWidgetConfig.cartBssPricing
+// Should display your configuration object
+```
+
+## Migration Examples
+
+### Migrating from Basic to Advanced
+
+**Before (basic):**
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true
+};
+```
+
+**After (with features):**
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '€',
+    currencyPosition: 'after',
+    decimalSeparator: ',',
+    thousandsSeparator: '.'
+  },
+  indicators: {
+    showOriginalPrice: true,
+    modifiedPriceClass: 'b2b-price',
+    originalPriceClass: 'original-price'
+  }
+};
+```
+
+## Need More Help?
+
+If you need assistance with your specific theme or use case:
+
+<CardGrid>
+  <Card
+    title="Full Documentation"
+    description="Complete PunchOut integration guide with detailed explanations."
+    href="/docs/integrations/shopify/features/punchout"
+  />
+  <Card
+    title="Quick Start"
+    description="Get up and running quickly with the essential setup steps."
+    href="/docs/integrations/shopify/features/punchout/quick-start"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Common issues and solutions for PunchOut integration."
+    href="/docs/integrations/shopify/troubleshooting"
+  />
+</CardGrid>

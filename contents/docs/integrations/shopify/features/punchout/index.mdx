@@ -27,12 +27,13 @@ PunchOut enables enterprise customers to shop from their procurement systems (SA
   <StepItem title="Customer Pricing Applied">
     The widget displays the customer's negotiated pricing throughout their browsing session:
     - Product pages show "Your Price"
+    - Cart pages show negotiated pricing for all items
     - Pricing persists across page navigation
     - No login required
   </StepItem>
 
   <StepItem title="Cart Return to Procurement">
-    When ready to purchase, the cart data is sent back to the procurement system where the order is created using the negotiated pricing.
+    When ready to purchase, the cart data with B2B pricing is sent back to the procurement system where the order is created using the negotiated pricing.
   </StepItem>
 </Step>
 
@@ -111,7 +112,252 @@ https://your-store.com/collections/all?fromIdentity=AN01234567890
 https://your-store.com?fromIdentity=AN01234567890
 ```
 
-### Step 3: Tag Customers in Shopify
+### Step 3: Install Cart Pricing Script
+
+The cart pricing script enables B2B pricing display on your cart page and provides cart data for PunchOut integration.
+
+<Step>
+  <StepItem title="Navigate to Theme Editor">
+    In your Shopify admin:
+    1. Go to **Online Store** → **Themes**
+    2. Find your active theme
+    3. Click **Actions** → **Edit code**
+  </StepItem>
+
+  <StepItem title="Locate Cart Template">
+    In the left sidebar:
+    - For newer themes: Look under **Sections** for `main-cart.liquid` or `cart-template.liquid`
+    - For older themes: Look under **Templates** for `cart.liquid`
+    
+    Open whichever cart template file your theme uses.
+  </StepItem>
+
+  <StepItem title="Add Cart Pricing Script">
+    At the **end of the file** (after all existing content), add this configuration and script:
+
+    ```liquid
+    <!-- Weevio Cart B2B Pricing -->
+    <script>
+      window.weevioWidgetConfig = window.weevioWidgetConfig || {};
+      window.weevioWidgetConfig.shopifyDomain = '{{ shop.permanent_domain }}';
+      window.weevioWidgetConfig.teamID = 'YOUR_TEAM_ID'; // Replace with your team ID
+      window.weevioWidgetConfig.baseURL = 'https://api.weevio.com';
+      
+      // Cart B2B Pricing Configuration
+      window.weevioWidgetConfig.cartBssPricing = {
+        enableDomUpdates: true  // Set to false for data-only mode
+      };
+    </script>
+    <script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+    ```
+
+    <Note type="info">
+    **Replace `YOUR_TEAM_ID`** with your actual Weevio team ID. Find this in your Weevio Cloud dashboard under Settings.
+    </Note>
+  </StepItem>
+
+  <StepItem title="Save Changes">
+    Click **Save** in the top right corner. The cart pricing script is now active.
+  </StepItem>
+</Step>
+
+#### What Does the Cart Pricing Script Do?
+
+The script provides two key functions:
+
+**1. B2B Price Display (Optional)**
+- Automatically updates cart page prices with B2B pricing
+- Works with Dawn theme out of the box
+- Supports custom theme selectors (see Configuration below)
+- Compatible with BSS B2B app
+
+**2. PunchOut Integration (Always Active)**
+- Populates `window.BSS_B2B.cart` with cart data and pricing
+- Used by PunchOut Cloud to send cart back to procurement system
+- Works even with `enableDomUpdates: false`
+
+#### Configuration Options
+
+The `cartBssPricing` object supports extensive customization:
+
+**Basic Configuration:**
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  // Enable/disable price updates in cart UI
+  enableDomUpdates: true,
+  
+  // Enable debug logging (development only)
+  debug: false
+};
+```
+
+**For Dawn Theme (Default)**
+
+No additional configuration needed! The script works with Dawn's default selectors:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true
+};
+```
+
+**For European Stores (EUR Currency)**
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  formatting: {
+    currencySymbol: '€',
+    currencyPosition: 'after',      // '€' appears after price
+    decimalSeparator: ',',           // 1.234,56
+    thousandsSeparator: '.'
+  }
+};
+```
+
+**Show Original Price with Strikethrough**
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  indicators: {
+    showOriginalPrice: true,
+    modifiedPriceClass: 'b2b-price',
+    originalPriceClass: 'original-price'
+  }
+};
+```
+
+Add this CSS to your theme:
+
+```css
+.original-price {
+  text-decoration: line-through;
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+.b2b-price {
+  font-weight: bold;
+  color: #007acc;
+}
+```
+
+**For Custom Themes**
+
+If you're using a custom theme, you may need to specify CSS selectors:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  selectors: {
+    cartContainer: '#my-cart',              // Main cart container
+    cartItemRow: '.cart-item',              // Individual cart item row
+    cartItemPrice: '.item-price',           // Unit price element
+    cartItemLinePrice: '.line-total',       // Line total (price × quantity)
+    cartSubtotal: '#cart-subtotal',         // Cart subtotal
+    variantIdAttribute: 'data-variant-id'   // Attribute containing variant ID
+  }
+};
+```
+
+<Note type="info">
+**Finding Custom Selectors:** Use your browser's developer tools (F12) to inspect cart elements and find the correct CSS selectors. Right-click elements and select "Inspect" to see their classes and IDs.
+</Note>
+
+**For BSS B2B App Users**
+
+If you're using the BSS B2B app, the script automatically detects it. No special configuration needed:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true  // That's it!
+};
+```
+
+The script auto-detects these BSS attributes:
+- `bss-b2b-cart-item-key`
+- `bss-b2b-variant-id`
+- BSS-specific price elements
+
+**Data-Only Mode (No DOM Updates)**
+
+If you only need PunchOut data without updating cart UI:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: false
+};
+```
+
+This mode:
+- Populates `window.BSS_B2B.cart` for PunchOut
+- Does NOT modify cart page prices
+- Useful if you have custom cart logic
+
+#### Price Formatting Reference
+
+Complete formatting options:
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `currencySymbol` | string | `'$'` | Currency symbol to display |
+| `currencyPosition` | string | `'before'` | Position: `'before'` or `'after'` |
+| `decimalPlaces` | number | `2` | Number of decimal places |
+| `thousandsSeparator` | string | `','` | Thousands separator character |
+| `decimalSeparator` | string | `'.'` | Decimal separator character |
+
+#### Visual Indicators Reference
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `showOriginalPrice` | boolean | `false` | Show original price with strikethrough |
+| `modifiedPriceClass` | string | `''` | CSS class for B2B prices |
+| `originalPriceClass` | string | `''` | CSS class for original prices |
+
+#### Troubleshooting Cart Pricing
+
+**Prices Not Updating in Cart**
+
+Solutions:
+- Verify cart pricing script is installed in cart template
+- Check browser console for errors (enable `debug: true`)
+- For custom themes: verify CSS selectors match your theme
+- Ensure `enableDomUpdates: true`
+- Clear browser cache and reload
+
+**Cart Item Keys Not Matching**
+
+Solutions:
+- Check that `variantIdAttribute` points to the correct attribute
+- Verify variant IDs exist on cart item elements
+- Enable debug mode to see variant ID detection logs
+
+**BSS B2B App Conflicts**
+
+Solutions:
+- Ensure BSS B2B app is up to date
+- The script auto-detects BSS - no manual selector configuration needed
+- Check for JavaScript errors in console
+
+**Debug Mode**
+
+Enable detailed logging during development:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true,
+  debug: true  // Shows detailed logs in browser console
+};
+```
+
+Check browser console for:
+- Variant IDs detected
+- Pricing API responses
+- DOM update results
+- Configuration validation
+
+### Step 4: Tag Customers in Shopify
 
 For PunchOut to work, you must tag each enterprise customer in Shopify with their `fromIdentity` value.
 
@@ -152,7 +398,7 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 | Regional Healthcare | `SAP Ariba Buyer: AN01631249352` | Contract Pricing | `Price Code: REGIONAL_HEALTH` |
 | Tech Distributor - Division A | `PunchOut Buyer: AN01631249352` | Distributor Tier 1 | `Price Code: TECH_DIV_A` |
 
-### Step 4: Test Your Configuration
+### Step 5: Test Your Configuration
 
 <Step>
   <StepItem title="Create a Test URL">
@@ -189,6 +435,22 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
     - The correct discounted price for this customer
     - Pricing persists when navigating to other products
   </StepItem>
+
+  <StepItem title="Verify Cart Pricing">
+    Add some products to cart and navigate to the cart page:
+    
+    **Check price display (if `enableDomUpdates: true`):**
+    - Cart items show B2B pricing
+    - Subtotal reflects negotiated prices
+    - Original prices shown with strikethrough (if configured)
+    
+    **Check PunchOut data (always available):**
+    Open browser console and run:
+    ```javascript
+    window.BSS_B2B.cart
+    // Should show cart data with B2B pricing
+    ```
+  </StepItem>
 </Step>
 
 **Common testing issues:**
@@ -196,6 +458,7 @@ For PunchOut to work, you must tag each enterprise customer in Shopify with thei
 - **FromIdentity not captured**: Check that the URL parameter is spelled correctly (`fromIdentity`, not `fromidentity`)
 - **Customer not resolved**: Verify the customer tag in Shopify exactly matches the `fromIdentity` value
 - **Pricing not showing**: Ensure the customer is assigned to a price list with active pricing rules
+- **Cart prices not updating**: Verify cart pricing script is installed and `enableDomUpdates: true`
 - **Session expired**: Sessions last 12 hours - clear sessionStorage or use a fresh browser tab to retest
 
 ## Technical Details
@@ -291,13 +554,18 @@ For additional help, see the [Troubleshooting Guide](/docs/integrations/shopify/
 
 <CardGrid>
   <Card
+    title="Quick Start Guide"
+    description="Get PunchOut integration up and running in 5 simple steps."
+    href="/docs/integrations/shopify/features/punchout/quick-start"
+  />
+  <Card
+    title="Configuration Examples"
+    description="Real-world examples for EUR formatting, custom themes, and visual indicators."
+    href="/docs/integrations/shopify/features/punchout/examples"
+  />
+  <Card
     title="B2B Wholesale Pricing"
     description="Learn how to set up price lists and customer-specific pricing that PunchOut uses."
     href="/docs/integrations/shopify/features/b2b-pricing"
-  />
-  <Card
-    title="Configuration Guide"
-    description="Review advanced configuration options for your Weevio integration."
-    href="/docs/integrations/shopify/configuration"
   />
 </CardGrid>

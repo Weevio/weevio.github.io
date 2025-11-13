@@ -1,0 +1,163 @@
+---
+title: PunchOut Quick Start
+description: Get PunchOut integration up and running in 5 simple steps.
+keywords: ["PunchOut", "quick start", "setup", "fromIdentity", "cart pricing"]
+---
+
+Get your PunchOut integration configured in minutes with this streamlined setup guide.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- Shopify store with admin access
+- Weevio Cloud account with team ID
+- Enterprise customers with Ariba Buyer IDs (or similar identifiers)
+- B2B pricing configured in Shopify (price lists)
+
+## Quick Setup Steps
+
+<Step>
+  <StepItem title="Install Tracker Script">
+    Add the fromIdentity tracker to your theme's `theme.liquid` file.
+    
+    **Location:** Before the `</head>` closing tag
+    
+    ```liquid
+    <!-- Weevio PunchOut Tracker -->
+    <script src="https://cloud.weevio.co/ecommerce-widget/fromIdentity-tracker.js" defer></script>
+    ```
+    
+    This captures the `fromIdentity` parameter from procurement system URLs.
+  </StepItem>
+
+  <StepItem title="Install Cart Pricing Script">
+    Add the cart pricing script to your cart template file.
+    
+    **Location:** End of `main-cart.liquid`, `cart-template.liquid`, or `cart.liquid`
+    
+    ```liquid
+    <!-- Weevio Cart B2B Pricing -->
+    <script>
+      window.weevioWidgetConfig = window.weevioWidgetConfig || {};
+      window.weevioWidgetConfig.shopifyDomain = '{{ shop.permanent_domain }}';
+      window.weevioWidgetConfig.teamID = 'YOUR_TEAM_ID';
+      window.weevioWidgetConfig.baseURL = 'https://api.weevio.com';
+      
+      window.weevioWidgetConfig.cartBssPricing = {
+        enableDomUpdates: true
+      };
+    </script>
+    <script src="https://cloud.weevio.co/ecommerce-widget/cartBssPricing.js" defer></script>
+    ```
+    
+    <Note type="warning">
+    Replace `YOUR_TEAM_ID` with your actual Weevio team ID from your dashboard.
+    </Note>
+  </StepItem>
+
+  <StepItem title="Tag Customers in Shopify">
+    Add fromIdentity tags to your enterprise customers.
+    
+    **Example tag formats:**
+    - `Ariba Buyer: AN01631249352`
+    - `SAP Ariba Buyer: AN01631249352`
+    - `PunchOut Buyer: AN01631249352`
+    
+    The tag must **exactly match** the identifier sent by the procurement system.
+  </StepItem>
+
+  <StepItem title="Assign Price Lists">
+    Ensure tagged customers are assigned to B2B price lists in Shopify.
+    
+    **In Shopify Admin:**
+    1. Go to Customers → Select customer
+    2. Verify price list assignment
+    3. Confirm pricing rules are active
+  </StepItem>
+
+  <StepItem title="Test the Integration">
+    Verify everything works correctly.
+    
+    **Test URL:**
+    ```
+    https://your-store.com?fromIdentity=AN01631249352
+    ```
+    
+    **Expected Results:**
+    - Product pages show "Your Price"
+    - Cart displays B2B pricing
+    - `window.BSS_B2B.cart` populated with cart data
+    
+    **Verify in browser console:**
+    ```javascript
+    sessionStorage.getItem('weevio_fromIdentity')
+    // Returns: "AN01631249352"
+    
+    window.BSS_B2B.cart
+    // Shows cart with B2B pricing
+    ```
+  </StepItem>
+</Step>
+
+## Default Configuration
+
+The basic setup uses Dawn theme defaults and works for most Shopify stores:
+
+```javascript
+window.weevioWidgetConfig.cartBssPricing = {
+  enableDomUpdates: true  // Enable price display in cart
+};
+```
+
+## Next Steps
+
+Once your basic setup is working:
+
+- **Customize Formatting**: Configure EUR currency, decimal separators
+- **Add Visual Indicators**: Show original prices with strikethrough
+- **Custom Theme Support**: Configure selectors for non-Dawn themes
+- **Advanced Configuration**: Enable debug mode, customize behavior
+
+See the [full PunchOut documentation](/docs/integrations/shopify/features/punchout) for detailed configuration options.
+
+## Common Issues
+
+**Prices Not Showing in Cart?**
+- Verify cart pricing script is installed in cart template
+- Check `enableDomUpdates: true` in configuration
+- For custom themes, you may need custom selectors
+
+**FromIdentity Not Detected?**
+- Ensure tracker script is in `theme.liquid` before `</head>`
+- Check URL has correct `?fromIdentity=` parameter
+- Verify no JavaScript errors in browser console
+
+**Customer Not Resolved?**
+- Confirm customer tag exactly matches fromIdentity value
+- Check tag uses approved format (e.g., "Ariba Buyer: ...")
+- Verify customer exists in Shopify
+
+For more troubleshooting help, see the [main PunchOut guide](/docs/integrations/shopify/features/punchout).
+
+## Support
+
+Need help? Check these resources:
+
+<CardGrid>
+  <Card
+    title="Full PunchOut Guide"
+    description="Complete documentation with advanced configuration and troubleshooting."
+    href="/docs/integrations/shopify/features/punchout"
+  />
+  <Card
+    title="Configuration Examples"
+    description="Real-world configuration examples for different use cases."
+    href="/docs/integrations/shopify/features/punchout/examples"
+  />
+  <Card
+    title="B2B Pricing Setup"
+    description="Learn how to configure B2B price lists in Shopify."
+    href="/docs/integrations/shopify/features/b2b-pricing"
+  />
+</CardGrid>
