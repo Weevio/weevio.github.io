@@ -221,6 +221,13 @@ export const Documents: Paths[] = [
                                     description: "Integrate with SAP Ariba, Coupa, and other procurement systems."
                                 }
                             },
+                            {
+                                title: "Multi-Location Store Pickup",
+                                href: "/store-pickup",
+                                cardMeta: {
+                                    description: "Let customers view pickup availability across all store locations and select their preferred pickup store."
+                                }
+                            },
                         ],
                     },
                     {
