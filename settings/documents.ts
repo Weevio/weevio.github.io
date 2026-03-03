@@ -215,6 +215,13 @@ export const Documents: Paths[] = [
                                 }
                             },
                             {
+                                title: "Vendor Shipping Notifications",
+                                href: "/shipping-notifications",
+                                cardMeta: {
+                                    description: "Automatically email customers their tracking numbers when drop-ship orders ship from Ingram Micro or TD Synnex."
+                                }
+                            },
+                            {
                                 title: "PunchOut Commerce",
                                 href: "/punchout",
                                 cardMeta: {
