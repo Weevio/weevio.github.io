@@ -1,0 +1,72 @@
+---
+title: Order Sync
+description: Automatic creation of PIMS orders from Shopify checkout events.
+keywords: ["order sync", "Shopify", "PIMS", "webhooks", "orders", "checkout"]
+---
+
+## How It Works
+
+When a customer completes checkout on your Shopify store, a webhook notification is sent to Weevio Cloud, which automatically creates a corresponding order in PIMS.
+
+The order includes all line items, shipping costs (as a separate line item), and any applicable discounts.
+
+## Webhook Topic Selection
+
+You can configure when Shopify order webhooks trigger by selecting one of three options in the Shopify integration settings:
+
+| Option | Webhook Topic | Description |
+|---|---|---|
+| Order Placed by Customer | `orders/create` | An order syncs to PIMS as soon as a customer places it |
+| Order is Marked Paid | `orders/paid` | An order syncs to PIMS only after it is marked as paid |
+| Don't Sync Orders | — | Disables order syncing entirely |
+
+<Note type="info">
+This setting is configured per Shopify store in Settings → Integrations → Shopify → Step 2.
+</Note>
+
+## Required PIMS Settings
+
+These settings are configured in Weevio Cloud under Settings → Integrations → Shopify → Step 1.
+
+### PIMS Shipping Part Code (Required)
+
+A dedicated inventory item in PIMS (e.g., part code `SHOPIFY-SHIPPING`) that represents shipping costs.
+
+Shopify calculates shipping during checkout, and the integration places the amount on a line item using this part code. The part code must have matching PIMS category and accounting entries.
+
+### PIMS Discount Part Code (Required)
+
+A dedicated inventory item in PIMS (e.g., part code `SHOPIFY-DISCOUNT`) that represents discount amounts.
+
+Shopify calculates discounts during checkout, and the integration places a negative amount on a line item using this part code. The part code must have matching PIMS category and accounting entries.
+
+### Consolidate Discounts (Optional)
+
+When enabled, all line item discounts are combined into a single "Shopify Discounts" line item in PIMS instead of individual discount lines per product.
+
+### PIMS Location Code (Optional)
+
+The location code used when generating orders in PIMS. Defaults to "MAIN" if left empty.
+
+<Note type="warning">
+PIMS worksheets do NOT get synced to other locations until converted to a sales order.
+</Note>
+
+### NB SKU Prefix (Optional)
+
+When set, the system checks for New-In-Box (NB) versions of products and substitutes them when available.
+
+**Example:** With prefix `NB-`, a product with SKU `ABC123` would check for `NB-ABC123` in inventory.
+
+## Order Field Mapping
+
+| Shopify Field | PIMS Field | Notes |
+|---|---|---|
+| Cart attribute: `po-number` | Line Item + Purchase Order Number | Requires Shopify theme modification: add `<input name="attributes[po-number]">` within the cart form |
+| Cart attribute: `dep-number` | Line Item: dep-number | Requires Shopify theme modification: add `<input name="attributes[dep-number]">` within the cart form |
+
+## Propagation Delay
+
+<Note type="warning">
+Changes to Shopify integration settings can take up to 1.5 hours to propagate to the background sync process. Orders placed during this window will use the previous settings.
+</Note>

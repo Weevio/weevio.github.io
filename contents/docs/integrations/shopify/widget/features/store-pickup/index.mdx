@@ -1,0 +1,398 @@
+---
+title: Multi-Location Store Pickup
+description: Let customers view pickup availability across all store locations and select their preferred pickup store directly on the product page.
+keywords: ["store pickup", "local pickup", "multi-location", "inventory", "BOPIS", "click and collect"]
+---
+
+The Multi-Location Store Pickup feature allows customers to browse all your store locations, view real-time inventory per location, and select a preferred store directly on the product page. This creates a personalized pickup experience that drives foot traffic and reduces shipping costs.
+
+[Screenshot: Product page showing personalized pickup messaging with store location]
+
+## What It Does
+
+This feature enhances the local pickup experience with:
+
+- **Store Availability Modal** - View all locations with per-store inventory status
+- **Personalized pickup messaging** - Location-specific messaging based on customer's preferred store
+- **Persistent preference** - Customer's store choice saved across visits
+- **Smart sorting** - Locations with stock appear first
+- **Accessibility** - Color-coded status with icons for colorblind users
+- **Mobile responsive** - Full-screen modal on mobile devices
+
+## How It Works
+
+### Customer Experience Flow
+
+<Step>
+  <StepItem title="View Product Page">
+    Customer lands on a product page with the Weevio widget loaded. The pickup section shows availability information.
+  </StepItem>
+  <StepItem title="Check Store Availability">
+    Customer clicks "Check store availability" or "Change store" link to open the Store Availability modal.
+  </StepItem>
+  <StepItem title="Browse Locations">
+    Modal displays all store locations sorted by stock level:
+    - **In Stock** locations appear first (green checkmark icon)
+    - **Low Stock** locations appear next (yellow warning icon)
+    - **Out of Stock** locations appear last (red X icon)
+    
+    Each location shows: store name, full address, and current stock status for the selected variant and quantity.
+  </StepItem>
+  <StepItem title="Select Preferred Store">
+    Customer clicks on a location to set it as their preferred pickup store. The modal closes automatically.
+  </StepItem>
+  <StepItem title="See Updated Messaging">
+    The pickup section updates to show location-specific information for the selected store. The preference is saved in the browser for future visits.
+  </StepItem>
+</Step>
+
+## Pickup Message States
+
+The widget shows different messages based on inventory and customer preferences:
+
+| Scenario | Message Shown | Action Link |
+|----------|--------------|-------------|
+| Preferred store, fully in stock | "Ready for pickup at [Store Name]" | "Change store" |
+| Preferred store, partial stock | "Only X available at [Store Name]" | "Change store" |
+| Preferred store, out of stock (others have stock) | "Out of stock at [Store Name]" | "Check other locations" |
+| Preferred store, all locations out of stock | Fallback message | None |
+| No preference, multiple locations | Aggregate pickup message | "Check store availability" |
+| Single location only | "Pickup at [Store Name] available same business day" | Store name opens modal |
+| No inventory data | Legacy pickup message | None (backward compatible) |
+
+## Store Availability Modal
+
+### What Customers See
+
+The modal displays a list of all your store locations with:
+
+**For each location:**
+- **Store name** - Bold heading for the location
+- **Full address** - Street address, city, state, and zip code
+- **Stock status** - One of three states with icon and color:
+  - ✅ **In Stock** (green) - Available quantity meets or exceeds requested amount
+  - ⚠ **Low Stock** (yellow) - Some available, but less than requested quantity
+  - ❌ **Out of Stock** (red) - No inventory available
+- **"Your Store" chip** - Displayed on the currently preferred location
+- **Available quantity** - Shows specific number for Low Stock status
+
+**Empty state:**
+If no store locations are configured or available, the modal displays: "No store locations available."
+
+### Sorting Logic
+
+Locations are automatically sorted by availability:
+
+1. **In Stock** locations (fully meeting quantity)
+2. **Low Stock** locations (partial inventory)
+3. **Out of Stock** locations
+
+Within each group, locations maintain their original order.
+
+### Accessibility
+
+The modal is designed for all users:
+
+- **Color + Icon** - Stock status indicated by both color and icon (checkmark/warning/X)
+- **Keyboard navigation** - Full tab navigation and Enter key support
+- **Screen readers** - Semantic HTML with proper ARIA labels
+- **Mobile responsive** - Full-screen on mobile devices with touch-friendly targets
+
+## Preferred Store Persistence
+
+### How Preferences Are Saved
+
+When a customer selects a store:
+
+1. The store ID is saved to browser `localStorage` under key `weevio_preferred_store`
+2. Preference persists across page visits and browser sessions
+3. Preference applies to all products in your store
+4. Customer can change preference anytime by selecting a different store
+
+### Storage Format
+
+```json
+{
+  "id": "gid://shopify/Location/123456789",
+  "name": "Store Name"
+}
+```
+
+### Privacy Considerations
+
+- **Client-side only** - Stored in customer's browser, not sent to servers
+- **Graceful fallback** - Works even if localStorage is unavailable (e.g., iframe sandboxes)
+- **No personal data** - Only stores store ID and name
+- **Customer controlled** - Can be cleared by customer at any time
+
+## Benefits
+
+### For Your Customers
+
+- **Know before they go** - See which location has stock before visiting
+- **Save time** - No need to call stores to check availability
+- **Personalized experience** - Relevant messaging for their preferred location
+- **Confidence** - Clear stock status prevents wasted trips
+- **Convenience** - One-click store selection
+
+### For Your Business
+
+- **Drive foot traffic** - Convert online browsers to in-store pickups
+- **Reduce shipping costs** - More customers choose pickup over delivery
+- **Better inventory utilization** - Surface stock across all locations
+- **Increased conversions** - Customers buy when they know item is available
+- **Customer insights** - Understand which locations are preferred
+
+## Configuration
+
+### Requirements
+
+**Prerequisites:**
+- Shopify Product Page Widget installed
+- Multiple store locations configured in Shopify
+- Per-location inventory tracking enabled in Shopify
+- Widget version 3.7.0 or higher
+
+**No additional configuration required** - The feature activates automatically when:
+1. Widget has access to per-location inventory data
+2. Multiple locations exist with inventory information
+3. Product variant has inventory data available
+
+### Data Requirements
+
+The feature requires inventory data in this format from the Shopify Storefront API:
+
+```typescript
+interface LocationInventory {
+  location: {
+    id: string;
+    name: string;
+    address: {
+      address1: string | null;
+      city: string | null;
+      province: string | null;
+      zip: string | null;
+    };
+  };
+  available: number;
+}
+```
+
+### Automatic Activation
+
+The feature is **always on** when conditions are met:
+
+- ✅ **Multi-location inventory data provided** → Feature activates
+- ✅ **Single location data provided** → Shows that location (store name as clickable link)
+- ✅ **No inventory data provided** → Falls back to legacy pickup messaging
+
+No widget configuration changes needed.
+
+## Version Information
+
+**Introduced in:** eCommerce Widget v3.7.0  
+**Release Date:** 2026  
+**Compatibility:** All Shopify themes with Weevio widget installed
+
+## Use Cases
+
+### B2C Retail Chain
+
+**Scenario:** 5 retail locations across a metro area
+
+**Customer Experience:**
+1. Customer in Beverly Hills browses product
+2. Opens store availability, sees 3 locations with stock
+3. Selects "Beverly Hills Store" as preferred location
+4. All future products show Beverly Hills availability first
+5. Customer knows exactly where to pick up
+
+**Result:** Increased pickup orders, reduced shipping costs
+
+### Hybrid Online/Retail Store
+
+**Scenario:** Main warehouse + 2 retail locations
+
+**Customer Experience:**
+1. Product out of stock at customer's preferred location
+2. Message shows "Out of stock at Downtown Store"
+3. "Check other locations" link reveals warehouse has stock
+4. Customer can choose to ship from warehouse or pick up at another store
+
+**Result:** Fewer lost sales from local stock-outs
+
+### Single Location Store
+
+**Scenario:** One physical store with online presence
+
+**Customer Experience:**
+1. Pickup section shows "Pickup at Main Street Store available same business day"
+2. Store name is a clickable link
+3. Clicking opens modal with store details and current stock
+4. Customer confirms availability before visiting
+
+**Result:** Simple, informative experience for single-location merchants
+
+## Technical Details
+
+### Components
+
+**LocationPickupModal** - New component in widget v3.7.0
+- Renders list of all store locations
+- Displays per-location inventory status
+- Handles store selection and preference saving
+- Responsive design with mobile optimization
+
+**ShippingInfo** (enhanced) - Updated in widget v3.7.0
+- Personalized messaging based on preferred store
+- Dynamic link text based on inventory state
+- Integration with LocationPickupModal
+
+**usePreferredStore** - New hook in widget v3.7.0
+- Manages localStorage access
+- Handles JSON parsing errors gracefully
+- Returns current preferred store and setter function
+
+### TypeScript Types
+
+```typescript
+interface LocationInventory {
+  location: {
+    id: string;
+    name: string;
+    address: {
+      address1: string | null;
+      city: string | null;
+      province: string | null;
+      zip: string | null;
+    };
+  };
+  available: number;
+}
+
+interface PreferredStore {
+  id: string;
+  name: string;
+}
+```
+
+## Troubleshooting
+
+### Modal Not Appearing
+
+**Check:**
+- Widget version is 3.7.0 or higher
+- Multiple store locations exist in Shopify
+- Per-location inventory tracking is enabled
+- Product has inventory data for at least one location
+- No JavaScript errors in browser console
+
+### Wrong Stock Numbers
+
+**Check:**
+- Shopify inventory is synchronized
+- Location inventory tracking is enabled for all locations
+- Product variant is set to "Track quantity"
+- Cache may need clearing (refresh page)
+
+### Preferred Store Not Saving
+
+**Check:**
+- Browser allows localStorage (not in private/incognito mode)
+- No privacy extensions blocking storage
+- localStorage quota not exceeded
+- Check browser console for errors
+
+### All Locations Show Out of Stock
+
+**Possible causes:**
+- Product genuinely out of stock at all locations
+- Inventory not allocated to any location
+- Location inventory tracking disabled
+- Shopify inventory sync issue
+
+**Solutions:**
+1. Verify inventory in Shopify admin
+2. Check location inventory settings
+3. Ensure "Track quantity" is enabled
+4. Refresh inventory data
+
+### Modal Shows "No store locations available"
+
+**Check:**
+- At least one location exists in Shopify
+- Locations have inventory data configured
+- Widget is receiving location data from Shopify API
+- Product variant has location inventory set up
+
+### Address Information Missing
+
+**Check:**
+- Location addresses are complete in Shopify settings
+- All address fields filled (street, city, state, zip)
+- Location is marked as active
+- Location has inventory tracking enabled
+
+## Performance
+
+The feature is optimized for speed:
+
+- **Lazy loading** - Modal code loaded only when needed
+- **Memoization** - Inventory data cached to prevent re-renders
+- **Debouncing** - Prevents rapid localStorage writes
+- **Minimal impact** - No performance degradation on page load
+
+**Typical performance:**
+- Modal open: &lt;100ms
+- Store selection: &lt;50ms
+- No additional API calls (uses existing inventory data)
+
+## Best Practices
+
+### Shopify Setup
+
+- **Complete addresses** - Fill all location address fields for best experience
+- **Clear naming** - Use customer-friendly location names (avoid "Warehouse 1")
+- **Active locations** - Only enable locations customers can visit
+- **Accurate inventory** - Keep stock counts synchronized
+- **Multiple locations** - Feature shines with 2+ pickup locations
+
+### Customer Communication
+
+- **Set expectations** - Explain same-day cutoff times
+- **Availability messaging** - Clarify "available" vs. "guaranteed"
+- **Hours of operation** - Include store hours in location settings
+- **Pickup instructions** - Provide clear pickup process details
+- **Contact info** - Include phone numbers for each location
+
+### Testing
+
+- **Test all locations** - Verify stock appears correctly for each
+- **Test quantities** - Check low stock thresholds trigger properly
+- **Test on mobile** - Ensure modal is usable on small screens
+- **Test selection** - Confirm preference saves and persists
+- **Test edge cases** - All out of stock, single location, no preference
+
+## Combining with Other Features
+
+Multi-Location Store Pickup works seamlessly with:
+
+- **Shipping Estimates** - Shows both pickup and delivery options
+- **In-Stock Recommendations** - Suggests alternatives when all locations out of stock
+- **B2B Pricing** - Displays customer-specific pricing for pickup items
+- **Cross-Sell** - Shows pickup availability for cross-sell items
+- **Multi-Source Inventory** - Aggregates store + vendor inventory
+
+## Next Steps
+
+- [Learn about Shipping Estimates](/docs/integrations/shopify/widget/features/shipping-estimates)
+- [Explore Multi-Source Inventory](/docs/integrations/shopify/widget/features/multi-source-inventory)
+- [Configure your widget](/docs/integrations/shopify/widget/configuration)
+
+## Need Help?
+
+Questions about multi-location store pickup?
+
+- Review [Configuration Guide](/docs/integrations/shopify/widget/configuration) for setup
+- Check [Troubleshooting](/docs/integrations/shopify/widget/troubleshooting) for issues
+- Contact Weevio support for assistance with location setup

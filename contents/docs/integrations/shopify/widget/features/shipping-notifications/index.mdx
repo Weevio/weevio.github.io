@@ -1,0 +1,128 @@
+---
+title: Vendor Shipping Notifications
+description: Automatically email customers their tracking numbers when drop-ship orders are shipped by Ingram Micro or TD Synnex.
+keywords: ["shipping notifications", "tracking", "email", "drop-ship", "Ingram Micro", "TD Synnex", "vendor", "fulfillment", "SMTP", "BCC"]
+---
+
+When a drop-ship order is fulfilled by Ingram Micro or TD Synnex, Weevio Cloud can automatically send the customer a branded shipping notification email containing their tracking numbers and order details. This keeps customers informed without any manual effort.
+
+## How It Works
+
+When a vendor ships a drop-ship order, Weevio Cloud:
+
+1. Detects the shipment event from Ingram Micro (via webhook) or TD Synnex (via polling)
+2. Verifies that all notification conditions are met (see [When a Notification Is Sent](#when-a-notification-is-sent))
+3. Sends the customer a branded email with clickable tracking numbers and a summary of the shipped items
+
+## Prerequisites
+
+Before enabling shipping notifications, make sure the following are in place:
+
+| Requirement | Details |
+|:------------|:--------|
+| **Shopify Vendor Integrations add-on** | Your account must have the Shopify Vendor Integrations feature purchased |
+| **Vendor integration connected** | At least one vendor (Ingram Micro and/or TD Synnex) must be connected and active |
+| **SMTP configured** | Your SMTP email settings must be configured in Weevio Cloud so that notification emails are sent from your own domain |
+
+<Note type="warning">
+If SMTP is not configured, shipping notification emails cannot be sent. Contact Weevio support if you need help setting up SMTP.
+</Note>
+
+## Enabling Shipping Notifications
+
+The feature is controlled by a toggle in Weevio Cloud under **Integrations > Shopify > Vendor Settings**.
+
+<Step>
+  <StepItem title="Open Vendor Settings">
+    In Weevio Cloud, navigate to **Integrations > Shopify** and scroll down to the **Vendor Settings** section.
+  </StepItem>
+  <StepItem title="Enable the Toggle">
+    Under the **Shipping Notifications** heading, turn on the **Enable automatic shipping notification emails** toggle. Once enabled, additional configuration options appear.
+  </StepItem>
+  <StepItem title="Configure Options (Optional)">
+    Two optional fields are available:
+
+    - **Test Email Override** — Enter an email address to redirect all notifications to that address instead of customers. Useful for testing before going live. See [Testing Before Going Live](#testing-before-going-live).
+    - **BCC Tracking Notifications** — Enter one or more comma-separated email addresses that should receive a blind copy of every shipping notification. Useful for internal shipment tracking or compliance.
+  </StepItem>
+  <StepItem title="Done">
+    Your changes are saved automatically. Customers will begin receiving tracking emails for new shipments.
+  </StepItem>
+</Step>
+
+<Note type="note">
+The Shipping Notifications setting applies to **all** vendor integrations (Ingram Micro and TD Synnex) simultaneously. You do not need to enable it separately for each vendor.
+</Note>
+
+## Testing Before Going Live
+
+Weevio Cloud provides two ways to test shipping notifications before customers receive them:
+
+### Test Email Override
+
+When a **Test Email Override** address is set in Vendor Settings, all shipping notification emails are redirected to that address instead of the customer. The email subject line is prefixed with `[TEST]` so you can easily identify test emails in your inbox.
+
+<Note type="note">
+While a test email override is active, no customers will receive shipping notifications. Remove the override address when you are ready to go live.
+</Note>
+
+### Send Test Email
+
+Click the **Send Test Email** button in the Shipping Notifications section of Vendor Settings. This sends a sample email with placeholder data (a fictional customer name, order number, and two sample tracking numbers) so you can preview exactly how the email will look with your branding.
+
+If you have BCC addresses configured, they will also receive the test email.
+
+## When a Notification Is Sent
+
+A tracking email is sent only when **all** of the following conditions are met:
+
+| Condition | Details |
+|:----------|:--------|
+| **Shipping Notifications enabled** | The toggle must be turned on in Vendor Settings |
+| **Drop-ship order** | The order must be flagged as a drop-ship-to-customer order in PIMS |
+| **Customer email allowed** | The customer record must not have the "Do Not Email" flag set |
+| **Email address on file** | A ship-to or bill-to email address must exist on the order |
+| **New tracking numbers** | The vendor must have provided at least one new tracking number |
+
+If any condition is not met, no email is sent and the order continues to be fulfilled normally without notification.
+
+## What the Email Contains
+
+Each shipping notification email is branded with your organization's identity and includes the following:
+
+| Section | Details |
+|:--------|:--------|
+| **Logo** | Your organization's logo (if configured in Weevio Cloud) |
+| **Header** | A branded header bar using your primary theme color with the text "Your Order Has Shipped" |
+| **Greeting** | Personalized with the customer's ship-to name |
+| **Shipment table** | A table with columns for **Item** (product description), **Qty** (quantity shipped), and **Tracking Number** (clickable link to track the shipment) |
+| **Order identifiers** | Displays applicable identifiers: **Order #** (Shopify reference number), **Invoice #** (PIMS order number), and **Customer PO #** (purchase order number) |
+| **Footer** | A closing message with your organization name |
+
+<Note type="note">
+Pricing is intentionally **not** included in shipping notification emails to protect sensitive pricing information.
+</Note>
+
+## Supported Vendors
+
+### Ingram Micro
+
+Ingram Micro shipment events are received via webhook. When Ingram ships a drop-ship order, the webhook fires immediately and Weevio Cloud sends the customer notification without delay.
+
+### TD Synnex
+
+TD Synnex tracking numbers are retrieved by a background polling process that checks for new shipments once per hour. Once new tracking numbers are detected and written to PIMS, the customer notification is sent automatically.
+
+## Customer Experience
+
+Customers receive a single email per shipment containing everything they need to track their order. Each tracking number in the email is a clickable link that opens a tracking search in a new tab. Customers do not need to log in to any portal.
+
+## Related Features
+
+- [Multi-Source Inventory](/docs/integrations/shopify/widget/features/multi-source-inventory) — Aggregate stock from Ingram Micro and TD Synnex for accurate availability on your storefront
+- [Shipping Estimates](/docs/integrations/shopify/widget/features/shipping-estimates) — Show customers estimated delivery dates before they purchase
+
+## Need Help?
+
+- Review the [Troubleshooting Guide](/docs/integrations/shopify/widget/troubleshooting) for common issues
+- Contact Weevio support if notifications are not being sent after enabling the toggle

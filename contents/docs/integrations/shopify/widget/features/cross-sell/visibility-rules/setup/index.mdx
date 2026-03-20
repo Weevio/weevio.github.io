@@ -1,0 +1,522 @@
+---
+title: Setup Guide
+description: Step-by-step instructions for configuring cross-sell visibility rules in Shopify
+keywords: ["setup", "configuration", "tagging", "shopify admin", "products", "customers"]
+---
+
+## Prerequisites
+
+Before setting up visibility rules:
+
+- [ ] Cross-sell feature enabled in Weevio Cloud
+- [ ] Products already configured with `crossSell: true` tag
+- [ ] Cross-sell associations created in PIMS (i.e. auto-loads must exist on PIMS inventory records)
+- [ ] Access to Shopify admin (Products and Customers permissions)
+- [ ] Customer segmentation strategy defined
+
+<Note type="info">
+**Planning First:** Before adding tags, document your customer segments and which products should be visible to each segment. This prevents tag sprawl and confusion.
+</Note>
+
+## Quick Start Workflow
+
+<Step>
+  <StepItem title="Define Customer Segments">
+    Create a list of customer types and their identifying tags
+  </StepItem>
+  <StepItem title="Tag Customers in Shopify">
+    Add segment tags to customer profiles
+  </StepItem>
+  <StepItem title="Tag Products in Shopify">
+    Add visibility control tags to cross-sell products
+  </StepItem>
+  <StepItem title="Test Visibility">
+    Log in as different customer types and verify products appear correctly
+  </StepItem>
+</Step>
+
+---
+
+## Step 1: Define Customer Segments
+
+Before adding any tags, document your segmentation strategy.
+
+### Example Segmentation Plan
+
+| Segment | Customer Tag | Purpose | Products to Show |
+|---------|-------------|---------|------------------|
+| VIP Customers | `vip` | Premium membership | Premium warranties, exclusive accessories |
+| B2B Accounts | `b2b-account` | Business customers | Bulk products, enterprise features |
+| Budget Customers | `budget-conscious` | Price-sensitive | Hide premium upsells |
+| Retail Customers | `retail-customer` | General public | Standard cross-sell products |
+| No AppleCare | `weevio.customer.ace.eligible=true` | Already has coverage | Hide AppleCare products |
+
+<Note type="warning">
+**Tag Naming:** Use consistent, descriptive tag names. Avoid abbreviations unless they're well-documented. Product tag names/prefixes are case-sensitive (must be exactly `weevio.product.widget.cross_sell.*`), but customer tag values are compared case-insensitively (e.g., "VIP" matches "vip").
+</Note>
+
+---
+
+## Step 2: Tag Customers in Shopify
+
+Add segment tags to customer profiles to enable filtering.
+
+### Single Customer Tagging
+
+<Step>
+  <StepItem title="Navigate to Customer">
+    In Shopify admin, go to **Customers** → Select the customer
+  </StepItem>
+
+  <StepItem title="Find Tags Section">
+    Scroll down to the **Tags** field (usually below customer notes)
+  </StepItem>
+
+  <StepItem title="Add Segment Tags">
+    Type the tag name (e.g., `vip`) and press Enter/Return
+
+    Add multiple tags by typing and pressing Enter after each
+
+    **Example tags:**
+    - `vip`
+    - `b2b-account`
+    - `retail-customer`
+    - `weevio.customer.ace.eligible=true`
+  </StepItem>
+
+  <StepItem title="Save Customer">
+    Click **Save** at the top or bottom of the page
+  </StepItem>
+</Step>
+
+**Important:** Tags must match EXACTLY (including capitalization and spacing) with tags referenced in product visibility rules.
+
+### Bulk Customer Tagging
+
+For tagging many customers at once:
+
+#### Option 1: Shopify Bulk Editor
+
+<Step>
+  <StepItem title="Open Customers">
+    Navigate to **Customers** in Shopify admin
+  </StepItem>
+
+  <StepItem title="Select Customers">
+    Check boxes next to customers to tag (or select all with checkbox at top)
+  </StepItem>
+
+  <StepItem title="Click Bulk Actions">
+    Click **Bulk actions** button at the top of the customer list
+  </StepItem>
+
+  <StepItem title="Add Tags">
+    Select **Add tags** → Enter tag names separated by commas → Click **Add tags**
+
+    Example: `vip, premium, enterprise`
+  </StepItem>
+</Step>
+
+#### Option 2: CSV Import/Export
+
+<Step>
+  <StepItem title="Export Customers">
+    **Customers** → **Export** → Select customer fields → Export CSV
+  </StepItem>
+
+  <StepItem title="Edit CSV">
+    Open CSV in spreadsheet software
+
+    Add tags to the **Tags** column (comma-separated)
+
+    **Example:**
+    ```
+    Email, Tags
+    john@example.com, vip, premium
+    jane@example.com, b2b-account, enterprise
+    ```
+  </StepItem>
+
+  <StepItem title="Import CSV">
+    **Customers** → **Import** → Upload modified CSV → Map fields → Import
+  </StepItem>
+</Step>
+
+#### Option 3: Shopify Flow (Automation)
+
+Use Shopify Flow to automatically tag customers based on conditions:
+
+**Example Flow:**
+```
+Trigger: Customer creates account
+Condition: Total orders > 10
+Action: Add customer tag "vip"
+```
+
+**Example Flow 2:**
+```
+Trigger: Order created
+Condition: Order contains specific product SKU
+Action: Add customer tag "weevio.customer.ace.eligible=true"
+```
+
+<Note type="info">
+**Shopify Flow:** Available on Shopify Plus plans. Automates tagging based on customer behavior, order history, or custom conditions.
+</Note>
+
+---
+
+## Step 3: Tag Products in Shopify
+
+Add visibility control tags to products that should have filtered visibility.
+
+### Single Product Tagging
+
+<Step>
+  <StepItem title="Navigate to Product">
+    In Shopify admin, go to **Products** → Select the product
+  </StepItem>
+
+  <StepItem title="Find Tags Section">
+    Scroll down to the **Tags** field (usually in the product organization section)
+  </StepItem>
+
+  <StepItem title="Add Visibility Tags">
+    Type the complete tag and press Enter after each
+
+    **Required:** Product must have `crossSell: true` tag first
+
+    **Then add visibility tags as needed:**
+
+    **Explicit Hide:**
+    ```
+    weevio.product.widget.cross_sell.hide=true
+    ```
+
+    **Hide from Specific Customers:**
+    ```
+    weevio.product.widget.cross_sell.hide_if_customer_tag==budget-conscious
+    ```
+
+    **Show Only to Specific Customers:**
+    ```
+    weevio.product.widget.cross_sell.show_if_customer_tag==vip
+    ```
+  </StepItem>
+
+  <StepItem title="Save Product">
+    Click **Save** at the top or bottom of the page
+  </StepItem>
+</Step>
+
+### Example Product Tag Setups
+
+#### Example 1: VIP-Only Product
+
+```
+Product: Premium Extended Warranty
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==vip
+- weevio.product.widget.cross_sell.show_if_customer_tag==premium
+```
+
+**Result:** Only customers with "vip" OR "premium" tag see this product
+
+#### Example 2: Hide from Budget Customers
+
+```
+Product: High-End Accessory
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide_if_customer_tag==budget-conscious
+- weevio.product.widget.cross_sell.hide_if_customer_tag==price-sensitive
+```
+
+**Result:** All customers see this EXCEPT those with "budget-conscious" or "price-sensitive" tags
+
+#### Example 3: B2B Only
+
+```
+Product: Bulk Pack (10 units)
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==b2b-account
+- weevio.product.widget.cross_sell.show_if_customer_tag==wholesale
+```
+
+**Result:** Only B2B accounts or wholesale customers see this product
+
+#### Example 4: Hide from Existing Coverage
+
+```
+Product: AppleCare+ Protection
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide_if_customer_tag==weevio.customer.ace.eligible=true
+```
+
+**Result:** All customers see this EXCEPT those who already have AppleCare coverage
+
+#### Example 5: Temporarily Hidden
+
+```
+Product: Out of Stock Item
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.hide=true
+```
+
+**Result:** No one sees this product (useful for temporary removal without deleting cross-sell associations)
+
+### Bulk Product Tagging
+
+#### Option 1: Shopify Bulk Editor
+
+<Step>
+  <StepItem title="Open Products">
+    Navigate to **Products** in Shopify admin
+  </StepItem>
+
+  <StepItem title="Select Products">
+    Check boxes next to products to tag
+  </StepItem>
+
+  <StepItem title="Bulk Actions">
+    Click **Bulk actions** → **Add tags** → Enter tag → Click **Add tags**
+  </StepItem>
+</Step>
+
+#### Option 2: CSV Import/Export
+
+Same process as customer CSV, but with the Products CSV export/import.
+
+<Note type="warning">
+**Tag Format in CSV:** When adding visibility tags via CSV, ensure exact formatting including the `==` delimiter. Spreadsheet software may auto-format or escape special characters.
+</Note>
+
+---
+
+## Step 4: Test Visibility Rules
+
+Verify your visibility rules are working correctly.
+
+### Manual Testing Process
+
+<Step>
+  <StepItem title="Create Test Customers">
+    Create test customer accounts with different tag combinations
+
+    **Example test accounts:**
+    - Test Customer 1: Tags = `vip`
+    - Test Customer 2: Tags = `budget-conscious`
+    - Test Customer 3: Tags = `b2b-account`
+    - Test Customer 4: No tags (guest/default)
+  </StepItem>
+
+  <StepItem title="Log In as Test Customer">
+    Use Shopify's customer impersonation or log in directly
+  </StepItem>
+
+  <StepItem title="Add Product to Cart">
+    Add a product that should trigger cross-sell modal
+  </StepItem>
+
+  <StepItem title="Open Cross-Sell Modal">
+    Click "View Cart" or trigger the cross-sell modal
+  </StepItem>
+
+  <StepItem title="Verify Products Shown">
+    Check that:
+    - Products with matching show_if tags appear
+    - Products with matching hide_if tags don't appear
+    - Explicitly hidden products never appear
+    - Products with no visibility tags appear (default)
+  </StepItem>
+
+  <StepItem title="Repeat for Each Test Customer">
+    Test with all customer tag combinations
+  </StepItem>
+</Step>
+
+### Testing Checklist
+
+- [ ] VIP customer sees VIP-only products
+- [ ] Budget customer doesn't see hidden premium products
+- [ ] B2B customer sees business products
+- [ ] Customer with no tags sees default products (no show_if tags)
+- [ ] Customer with exclusion tag doesn't see hidden products
+- [ ] Explicitly hidden products never appear for anyone
+- [ ] Products with multiple show_if tags show to any matching customer
+- [ ] Conflict resolution: hide_if wins over show_if
+
+### Browser Console Debugging
+
+Check browser console for visibility decision logs (if debug mode enabled):
+
+1. Open browser developer tools (F12)
+2. Go to Console tab
+3. Add product to cart and open cross-sell
+4. Look for visibility evaluation logs
+
+**Expected log format:**
+```
+[Cross-Sell] Evaluating visibility for Product X
+[Cross-Sell] Customer tags: ["vip", "premium"]
+[Cross-Sell] Explicit hide: false
+[Cross-Sell] Hide-if check: no matches
+[Cross-Sell] Show-if check: matched "vip"
+[Cross-Sell] Result: SHOW
+```
+
+---
+
+## Best Practices
+
+### Tag Naming Conventions
+
+**DO:**
+- Use lowercase for consistency: `vip`, `b2b-account`
+- Use hyphens for multi-word tags: `budget-conscious`, `price-sensitive`
+- Use dot notation for hierarchical tags: `weevio.customer.tier=1`
+- Document tag meanings in internal wiki
+
+**DON'T:**
+- Mix case inconsistently: `VIP` vs `vip`
+- Use spaces unless intentional: `b2b account` (confusing)
+- Use special characters that may break: `vip!`, `b2b?`
+- Create overly long tags: `this-is-a-very-long-tag-name-that-is-hard-to-maintain`
+
+### Tag Management
+
+**Organization:**
+- Maintain a tag registry document
+- Assign tag ownership to team members
+- Review tags quarterly for obsolete entries
+- Version control your tag strategy
+
+**Limits:**
+- Keep visibility tags per product under 10
+- Aim for 3-5 show_if tags maximum
+- Aim for 3-5 hide_if tags maximum
+- Use broad segments vs individual customer targeting
+
+**Maintenance:**
+- Remove obsolete tags when products are discontinued
+- Update tags when customer segments change
+- Test visibility after bulk tag updates
+- Monitor tag usage with Shopify reports
+
+### Customer Segmentation Strategy
+
+**Start Simple:**
+1. Begin with 2-3 broad segments (VIP, Budget, Default)
+2. Add 1-2 products with simple show_if rules
+3. Test thoroughly
+4. Expand gradually based on business needs
+
+**Avoid Over-Segmentation:**
+- Too many segments = management overhead
+- Too many tags per customer = confusion
+- Start broad, refine based on data
+
+**Business-Driven:**
+- Base segments on actual business value
+- Use data to identify valuable segments
+- Don't create segments without clear use case
+
+---
+
+## Common Setup Patterns
+
+### Pattern 1: Simple VIP Upsell
+
+**Goal:** Show premium products only to VIP customers
+
+**Customer Tags:**
+- VIP customers: `vip`
+- Regular customers: (no tag)
+
+**Product Tags:**
+- Premium products: `show_if_customer_tag==vip`
+
+### Pattern 2: Hide from Budget Customers
+
+**Goal:** Don't show expensive upsells to price-sensitive customers
+
+**Customer Tags:**
+- Budget customers: `budget-conscious`
+- Regular customers: (no tag)
+
+**Product Tags:**
+- Expensive products: `hide_if_customer_tag==budget-conscious`
+
+### Pattern 3: B2B vs B2C Split
+
+**Goal:** Show different products to business vs retail customers
+
+**Customer Tags:**
+- B2B: `b2b-account`
+- B2C: `retail-customer`
+
+**Product Tags:**
+- B2B products: `show_if_customer_tag==b2b-account`
+- B2C products: `show_if_customer_tag==retail-customer`
+
+### Pattern 4: Tiered Access
+
+**Goal:** Different products for different membership tiers
+
+**Customer Tags:**
+- Tier 1: `tier-1`
+- Tier 2: `tier-2`
+- Tier 3: `tier-3`
+
+**Product Tags:**
+- Basic products: (no visibility tags - show to all)
+- Tier 2+ products: `show_if_customer_tag==tier-2`, `show_if_customer_tag==tier-3`
+- Tier 3 only: `show_if_customer_tag==tier-3`
+
+---
+
+## Troubleshooting Setup
+
+### Products Not Appearing
+
+**Check:**
+1. Product has `crossSell: true` tag
+2. Product has cross-sell associations in PIMS
+3. Visibility tags formatted correctly (exact format)
+4. Customer has matching tag (case-insensitive for values)
+5. No explicit hide tag on product
+6. No conflicting hide_if tag
+
+### Products Appearing When They Shouldn't
+
+**Check:**
+1. Customer doesn't have unintended tags
+2. Product doesn't have typo in visibility tag
+3. Hide_if tag value matches customer tag exactly
+4. No conflicting show_if tag (hide wins)
+
+### Tags Not Taking Effect
+
+**Check:**
+1. Tag format exactly matches: `weevio.product.widget.cross_sell.<type><params>`
+2. Saved product/customer after adding tags
+3. Cleared browser cache
+4. Widget config has cross-sell enabled
+
+See [Troubleshooting Guide](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/troubleshooting) for detailed debugging steps.
+
+---
+
+## Next Steps
+
+- **Learn tag syntax:** [Tag Reference](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/tag-reference)
+- **See use cases:** [Examples](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/examples)
+- **Debug issues:** [Troubleshooting](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/troubleshooting)
+
+<Note type="success">
+**Pro Tip:** Start with a single product and single customer segment to test the system before rolling out to your entire catalog.
+</Note>

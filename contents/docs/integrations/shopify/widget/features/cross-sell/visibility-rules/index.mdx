@@ -1,0 +1,158 @@
+---
+title: Product Visibility Rules
+description: Control which customers see specific cross-sell products using advanced filtering based on product tags and customer tags
+keywords: ["cross-sell", "visibility", "customer tags", "product filtering", "segmentation", "B2B", "customer segmentation"]
+---
+
+## Overview
+
+The visibility rules system allows you to show or hide cross-sell products based on customer characteristics, enabling:
+
+- **Customer segmentation** - Show premium products only to VIP customers
+- **B2B filtering** - Hide retail products from wholesale accounts
+- **Eligibility management** - Hide warranty products from customers who already have coverage
+- **Promotional targeting** - Show seasonal products to specific customer groups
+- **Access control** - Restrict enterprise features to qualified accounts
+
+<Note type="info">
+**Basic vs Advanced:** If all customers should see the same cross-sell products, you only need the basic `crossSell: true` tag. Visibility rules are for advanced customer segmentation scenarios.
+</Note>
+
+## How It Works
+
+Visibility filtering uses **product tags** and **customer tags** in Shopify:
+
+1. Add visibility control tags to products in Shopify admin
+2. Add segment tags to customers in Shopify admin
+3. Widget automatically filters products based on tag matching
+4. Customers only see products they're allowed to see
+
+**No widget configuration required** - all filtering happens automatically on the server side.
+
+## Three Types of Visibility Tags
+
+### 1. Explicit Hide
+
+**Format:** `weevio.product.widget.cross_sell.hide=true`
+
+Completely prevents the product from appearing in cross-sell for any customer, regardless of other conditions.
+
+**Use when:** Product should never show in cross-sell (discontinued, internal-only, etc.)
+
+### 2. Hide-If Customer Tag
+
+**Format:** `weevio.product.widget.cross_sell.hide_if_customer_tag==<customer_tag>`
+
+Hides the product if customer has the specified tag. Can add multiple hide_if tags to exclude different customer groups.
+
+**Use when:** Product should hide from specific customer segments (budget customers, already covered, etc.)
+
+### 3. Show-If Customer Tag
+
+**Format:** `weevio.product.widget.cross_sell.show_if_customer_tag==<customer_tag>`
+
+Product ONLY shows to customers who have at least one matching tag. Can add multiple show_if tags to target different customer groups.
+
+**Use when:** Product should only appear to specific customer segments (VIP, premium, enterprise, etc.)
+
+## Quick Example
+
+**Scenario:** Show premium warranty only to VIP customers
+
+**Product Setup:**
+```
+Product: Premium Warranty Plus
+Tags:
+- crossSell: true
+- weevio.product.widget.cross_sell.show_if_customer_tag==vip
+- weevio.product.widget.cross_sell.show_if_customer_tag==enterprise
+```
+
+**Customer Setup:**
+```
+Customer A Tags: vip → Sees premium warranty
+Customer B Tags: regular → Does NOT see premium warranty
+Customer C Tags: enterprise → Sees premium warranty
+```
+
+## Evaluation Logic
+
+The widget evaluates visibility in this priority order:
+
+<Step>
+  <StepItem title="Check Explicit Hide">
+    If product has `hide=true` tag → Product never shows (stop evaluation)
+  </StepItem>
+  <StepItem title="Check Hide-If Rules">
+    If customer has ANY tag matching `hide_if_customer_tag` → Hide product
+  </StepItem>
+  <StepItem title="Check Show-If Rules">
+    If product has `show_if_customer_tag` tags:
+    - Customer has at least one matching tag → Show product
+    - Customer has no matching tags → Hide product
+
+    If product has NO show_if tags → Show product (default)
+  </StepItem>
+</Step>
+
+<Note type="warning">
+**Conflict Resolution:** If a customer tag matches BOTH hide_if AND show_if rules, the hide rule wins.
+</Note>
+
+## Documentation Pages
+
+<CardGrid>
+  <Card
+    title="Tag Reference"
+    description="Complete tag format documentation, evaluation logic, and validation rules"
+    href="/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/tag-reference"
+  />
+  <Card
+    title="Setup Guide"
+    description="Step-by-step instructions for tagging products and customers in Shopify admin"
+    href="/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/setup"
+  />
+  <Card
+    title="Examples"
+    description="Real-world use cases with detailed product and customer tag configurations"
+    href="/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/examples"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Debug visibility issues, common problems, and tag validation"
+    href="/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/troubleshooting"
+  />
+</CardGrid>
+
+## When to Use Visibility Rules
+
+**Good Use Cases:**
+- Show premium products only to qualified customers
+- Hide products from customers who already have coverage
+- Segment B2B vs retail customers
+- Target promotional products to specific groups
+- Restrict enterprise features by account type
+
+**Not Recommended For:**
+- Simple product availability (use Shopify's product availability settings instead)
+- Inventory management (use Shopify's inventory system)
+- Pricing variations (use B2B pricing feature instead)
+- Geographic restrictions (use Shopify's market settings)
+
+## Performance Considerations
+
+- Tag evaluation happens server-side for security and performance
+- Minimal impact on cross-sell API response time
+- Recommended limit: 10 visibility tags per product
+- Use broad customer segments vs individual customer targeting
+
+## Next Steps
+
+1. **New to visibility rules?** Start with the [Setup Guide](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/setup)
+2. **Need tag documentation?** See the [Tag Reference](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/tag-reference)
+3. **Want use case ideas?** Browse [Examples](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/examples)
+4. **Having issues?** Check [Troubleshooting](/docs/integrations/shopify/widget/features/cross-sell/visibility-rules/troubleshooting)
+
+<Note type="success">
+**Getting Started:** Most implementations start with simple show_if rules to target VIP customers, then add hide_if exceptions as needed.
+</Note>

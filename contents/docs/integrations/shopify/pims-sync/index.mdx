@@ -1,0 +1,36 @@
+---
+title: PIMS Sync
+description: Automatic background synchronization of products, inventory, and orders between PIMS and Shopify.
+keywords: ["PIMS", "Shopify", "sync", "inventory", "orders", "integration", "background process"]
+---
+
+Weevio Cloud runs a continuous background process that keeps PIMS and Shopify in sync. Once configured, products, inventory levels, and orders flow automatically between the two systems.
+
+## Sync Directions
+
+At a high level, there are two sync directions:
+
+- **Inventory Sync (PIMS to Shopify)**: Products and quantity levels flow from PIMS to Shopify. When you update an inventory item in PIMS, the changes automatically propagate to your Shopify store.
+- **Order Sync (Shopify to PIMS)**: When a customer places an order on Shopify, the order is automatically created in PIMS via webhook, including all line items, shipping charges, and discounts.
+
+<Mermaid
+  chart={`graph LR
+    A["PIMS Platinum/Gold"] -->|"Products, Prices, Quantities"| B["Weevio Cloud"]
+    B -->|"Create/Update Products"| C["Shopify Store"]
+    C -->|"Order Webhooks"| B
+    B -->|"Create Orders"| A`}
+/>
+
+<Note type="info">
+Settings changes can take up to 1.5 hours to propagate to the background sync process.
+</Note>
+
+<AutoNavigationCards />
+
+## Prerequisites
+
+Before setting up PIMS Sync, ensure the following are in place:
+
+- **PIMS Platinum or Gold** with a configured server URL
+- **At least one Shopify store connected** in Weevio Cloud (Settings → Integrations → Shopify)
+- **PIMS shipping and discount part codes** created for order sync

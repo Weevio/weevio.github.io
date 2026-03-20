@@ -1,0 +1,80 @@
+---
+title: Inventory Sync
+description: Continuous one-way product and inventory synchronization from PIMS to Shopify.
+keywords: ["inventory sync", "PIMS", "Shopify", "products", "quantities", "field mapping", "locations"]
+---
+
+## How It Works
+
+The inventory sync is a one-way background process that pushes product data and inventory quantities from PIMS to Shopify.
+
+- The sync process polls for changes approximately every 60 seconds.
+- New products are created in Shopify and published to all sales channels automatically.
+- Existing products are updated when their PIMS record has been modified.
+
+## Getting Started
+
+Inventory items must be flagged as "OK To Show On SHOPIFY" in PIMS before they will sync.
+
+**Where to find the flag:**
+
+- **Single item**: PIMS inventory record → WEB → Additional Data for WEB → "OK To Show On SHOPIFY"
+- **Bulk editing**: Inventory → Search Editor → select items → WEB → ADJUST OK for SHOPIFY flag
+
+## Location Matching
+
+For inventory quantities to sync correctly, Shopify location names must match PIMS location names.
+
+**Where to find locations:**
+
+- **Shopify**: Shopify Admin → Settings → Locations
+- **PIMS**: File → Locations Module → List All Locations
+
+PIMS location names must be unique.
+
+<Note type="warning">
+Location names must match exactly between Shopify and PIMS. If they don't match, quantities will not sync for that location.
+</Note>
+
+## Field Mapping
+
+The following table shows how PIMS fields map to Shopify fields during product creation and updates.
+
+| PIMS Field | Shopify Field | Synced During | Notes |
+|---|---|---|---|
+| PRODUCT NAME TO USE INSTEAD / NAME | Title | Create + Update | Only updates after creation when "PRODUCT NAME TO USE INSTEAD" is filled in, allowing title management from Shopify UI |
+| MORE INFO TEXT | Body HTML | Create | Located in PIMS under WEB → Additional Data for WEB → MORE INFO TEXT |
+| MANUFACTURER NAME | Vendor | Create + Update | Located in PIMS under Home → Vendor/Manufacturer Information |
+| ADD TO PRODUCT PAGE | Product Type | Create + Update | Located in PIMS under WEB → Additional Data for WEB. Select only one item. |
+| PRICE | Price | Create + Update | Located in PIMS under Home → Default Price/Costing → Price |
+| NON-TAXABLE | Taxable | Create + Update | Inverted: if PIMS NON-TAXABLE is checked, Shopify taxable is unchecked |
+| PART CODE | SKU | Create + Update | Located in PIMS under Home → Identification → Part Code |
+| BARCODE | Barcode | Create + Update | Located in PIMS under Home → Identification → Barcode |
+| SHP. WEIGHT | Weight | Create + Update | Located in PIMS under Home → General Information → Shp. Weight |
+| Don't Adjust On-Hands | Inventory Tracking | Create + Update | When checked in PIMS, disables inventory level tracking in Shopify for this product |
+| PRODUCT IMAGE | Image 1 | Create only | Only synced during initial product creation. Manage images via Shopify UI after creation. |
+| MORE INFO IMAGE | Image 2 | Create only | Only synced during initial product creation. Manage images via Shopify UI after creation. |
+| — | Continue selling when out of stock | Create | Enabled by default for products created by the integration |
+| LEAD TIME | Metafield: expected_ship_time | Create | Requires custom metafield in Shopify admin with namespace "custom.expected_ship_time" (integer type) |
+
+## Sync Timing
+
+<Note type="info">
+"Create" fields are synced once when the product is first created in Shopify. "Create + Update" fields are re-synced whenever the PIMS inventory record is modified.
+</Note>
+
+Some fields like Title and images use a "create only" strategy to allow merchants to manage content directly in Shopify without it being overwritten.
+
+## Product Lifecycle
+
+### What happens when a product is DISCONTINUED?
+
+The integration will continue selling until quantity reaches 0, then archive the product in Shopify.
+
+### How to remove a product from Shopify?
+
+Uncheck "OK to Show on SHOPIFY" and ensure "READY FOR SHOPIFY" is checked in PIMS — the integration will archive the product in Shopify.
+
+## Email Notifications
+
+Configure email addresses in the Shopify integration settings to receive notifications when new products are created in Shopify.

@@ -1,0 +1,408 @@
+---
+title: Multi-Source Inventory
+description: Aggregate stock from multiple sources (Shopify, Ingram Micro, TD SYNNEX) for accurate availability.
+keywords: ["inventory", "multi-source", "distributors", "Ingram Micro", "TD SYNNEX", "stock"]
+---
+
+The Multi-Source Inventory feature aggregates stock from multiple sources—your Shopify store, Ingram Micro, and TD SYNNEX—to display accurate, real-time availability and reduce out-of-stock situations.
+
+[Screenshot: Product page showing inventory from multiple sources]
+
+## What It Does
+
+Instead of only showing your Shopify inventory, the widget:
+
+- Checks stock across multiple vendors
+- Aggregates total available quantity
+- Displays combined availability
+- Respects configured minimum thresholds
+- Updates in real-time
+
+## Benefits
+
+### For Your Customers
+
+- **More products available** - See true availability across all sources
+- **Accurate stock levels** - Real-time data from vendors
+- **Confidence to order** - Know products are truly in stock
+- **Faster fulfillment** - Orders filled from nearest source
+
+### For Your Business
+
+- **Reduce out-of-stock** - Leverage distributor inventory
+- **Dropship capability** - Sell products without stocking
+- **Lower inventory costs** - Carry less on-hand inventory
+- **Expand catalog** - Offer more products without warehousing
+- **Automated sourcing** - System selects best fulfillment source
+
+## Supported Sources
+
+### Shopify Store Inventory
+
+Your on-hand inventory in Shopify:
+- Real-time from Shopify Admin API
+- All locations aggregated
+- Available to promise (ATP)
+- Reserve levels respected
+
+### Ingram Micro
+
+Leading technology distributor:
+- Real-time availability API
+- Part number matching
+- Configurable minimum threshold
+- Price and lead time data
+
+[Screenshot: Weevio Cloud Ingram Micro configuration]
+
+### TD SYNNEX
+
+Global IT distributor:
+- Real-time stock API
+- SKU matching
+- Minimum stock levels
+- Fulfillment options
+
+[Screenshot: Weevio Cloud TD SYNNEX configuration]
+
+## Requirements
+
+- **Feature purchase:** `integration_shopify_vendor_integrations`
+- **API credentials:** Vendor API keys configured in Weevio Cloud
+- **SKU matching:** Product SKUs match vendor part numbers
+- **Premium shipping:** Recommended for full feature set
+
+## Configuration
+
+### Backend Setup
+
+**In Weevio Cloud:**
+
+1. Navigate to Integrations > Shopify
+2. Scroll to Vendor Integrations
+3. Configure credentials for each vendor
+
+**Ingram Micro:**
+- Client ID
+- Client Secret
+- Customer Number
+
+**TD SYNNEX:**
+- API Key
+- API Secret
+- Account Number
+
+[Screenshot: Vendor API configuration in Weevio Cloud]
+
+### Inventory Thresholds
+
+Configure minimum inventory levels per source:
+
+```javascript
+// In Weevio Cloud team settings
+{
+  SHOPIFY_INVENTORY_MINIMUM: "1",
+  INGRAM_INVENTORY_MINIMUM: "10",
+  TDSYNNEX_INVENTORY_MINIMUM: "5"
+}
+```
+
+**Why thresholds?**
+- Prevents showing unreliable low stock
+- Accounts for order processing time
+- Reduces fulfillment errors
+- Improves customer experience
+
+### SKU Matching
+
+For multi-source inventory to work:
+
+1. **Product SKUs in Shopify** must match vendor part numbers exactly
+2. Case-sensitive matching
+3. No extra spaces or characters
+4. Example: `ABC-123-XYZ` must match exactly
+
+**Best practice:** Use manufacturer part numbers as Shopify SKUs.
+
+## Customer Experience
+
+### Stock Display
+
+**Single Source:**
+```
+✓ 5 available
+Standard delivery in 3-5 business days
+```
+
+**Multiple Sources:**
+```
+✓ 45 available across multiple sources
+  - 10 in our warehouse
+  - 25 from Ingram Micro
+  - 10 from TD SYNNEX
+
+Standard delivery in 3-5 business days
+```
+
+[Screenshot: Multi-source inventory display]
+
+### Availability Messaging
+
+**High Stock:**
+```
+✓ In Stock (45 available)
+```
+
+**Low Stock:**
+```
+⚠ Limited availability (8 available)
+```
+
+**Single Unit:**
+```
+⚠ Only 1 available - order soon!
+```
+
+**Out of Stock:**
+```
+✗ Out of Stock
+[Similar in-stock options available]
+```
+
+## How It Works
+
+### Inventory Aggregation Flow
+
+```
+Customer views product
+         │
+         ▼
+┌────────────────────────────────────┐
+│ Widget requests inventory data     │
+└────────────────────────────────────┘
+         │
+         ├─► Shopify Inventory API
+         ├─► Ingram Micro API (if configured)
+         └─► TD SYNNEX API (if configured)
+         │
+         ▼
+┌────────────────────────────────────┐
+│ Backend aggregates all sources:    │
+│ - Shopify: 10 units                │
+│ - Ingram: 25 units (≥10 threshold) │
+│ - SYNNEX: 10 units (≥5 threshold)  │
+│ Total: 45 units                    │
+└────────────────────────────────────┘
+         │
+         ▼
+┌────────────────────────────────────┐
+│ Display: "45 available across      │
+│ multiple sources"                  │
+└────────────────────────────────────┘
+```
+
+### Threshold Logic
+
+Example with Ingram minimum = 10:
+
+- Ingram has 5 units: **NOT shown** (below threshold)
+- Ingram has 15 units: **Shown** (above threshold)
+- Ingram has 0 units: **NOT shown** (unavailable)
+
+This prevents showing vendor stock that may not be reliable.
+
+## Order Fulfillment
+
+### Automatic Source Selection
+
+When customer orders, system selects source based on:
+
+1. **Availability** - In stock at source
+2. **Priority** - Shopify first, then vendors
+3. **Cost** - Lowest fulfillment cost
+4. **Speed** - Fastest delivery option
+
+### Dropship Workflow
+
+For vendor-fulfilled orders:
+
+1. Customer places order in Shopify
+2. Order syncs to PIMS
+3. PIMS creates vendor purchase order
+4. Vendor ships directly to customer
+5. Tracking updated in Shopify
+
+### Split Fulfillment
+
+If order requires multiple sources:
+
+- System splits order automatically
+- Customer receives one tracking per shipment
+- Shopify shows multiple fulfillments
+- Total cost calculated correctly
+
+## Use Cases
+
+### Electronics Retailer
+
+**Challenge:** Can't stock all 10,000 SKUs in warehouse.
+
+**Solution:** Stock top sellers, dropship rest from distributors.
+
+**Result:** Offer full catalog without inventory investment.
+
+### B2B Wholesale
+
+**Challenge:** Business customers need guaranteed availability.
+
+**Solution:** Show combined Shopify + vendor inventory.
+
+**Result:** Fewer backorders, higher customer satisfaction.
+
+### Seasonal Business
+
+**Challenge:** Inventory needs fluctuate dramatically.
+
+**Solution:** Carry minimal stock, leverage vendor inventory for peaks.
+
+**Result:** Lower holding costs, meet demand spikes.
+
+## Vendor Management
+
+### API Credential Security
+
+- Encrypted storage in Weevio Cloud
+- Never exposed to frontend
+- Rotatable without downtime
+- Access logging for compliance
+
+### Monitoring
+
+Track vendor performance:
+
+- API response times
+- Stock accuracy
+- Fulfillment speed
+- Error rates
+
+Available in Weevio Cloud dashboard.
+
+### Vendor Selection
+
+**Ingram Micro:**
+- Best for: IT hardware, consumer electronics
+- Coverage: North America, Europe
+- Inventory: 200,000+ SKUs
+
+**TD SYNNEX:**
+- Best for: IT products, AV equipment
+- Coverage: Global
+- Inventory: 150,000+ SKUs
+
+## Performance
+
+### API Caching
+
+- **Cache duration:** 30 seconds
+- **Reason:** Balance freshness and speed
+- **Override:** Can be adjusted per use case
+
+### Load Times
+
+Typical performance:
+
+- **Shopify only:** 100-200ms
+- **+ Ingram:** +150ms
+- **+ TD SYNNEX:** +150ms
+- **Total with caching:** 200-500ms
+
+### Rate Limiting
+
+To protect vendor APIs:
+
+- Requests debounced by 2.5 seconds
+- AbortController cancels stale requests
+- Request sequencing prevents race conditions
+- Retry logic for temporary failures
+
+## Troubleshooting
+
+### Vendor Inventory Not Showing
+
+**Check:**
+- API credentials configured correctly
+- Product SKU matches vendor part number exactly
+- Vendor has stock above minimum threshold
+- API connection is active
+
+### Incorrect Stock Levels
+
+**Check:**
+- SKU matching is case-sensitive
+- No spaces in SKU
+- Vendor API responding correctly
+- Cache hasn't expired (30 seconds)
+
+### Slow Loading
+
+**Check:**
+- Vendor API response times
+- Network connectivity
+- Cache duration settings
+- Too many concurrent requests
+
+### Stock Shows But Order Fails
+
+**Check:**
+- Stock dropped between view and order
+- Vendor minimum order quantities
+- Account restrictions
+- API errors in logs
+
+See the [Troubleshooting Guide](/docs/integrations/shopify/widget/troubleshooting) for more solutions.
+
+## Best Practices
+
+### SKU Management
+
+- **Use manufacturer part numbers** - Ensures vendor matching
+- **Consistent formatting** - Same format across all sources
+- **Regular audits** - Verify SKU alignment
+- **Documentation** - Maintain SKU mapping records
+
+### Threshold Settings
+
+- **Test different values** - Find optimal per vendor
+- **Monitor accuracy** - Adjust based on fulfillment success
+- **Seasonal adjustment** - Higher thresholds during peaks
+- **Vendor communication** - Understand their reliability
+
+### Fulfillment Strategy
+
+- **Clear priority order** - Shopify first, then vendors
+- **Cost optimization** - Factor shipping costs
+- **Speed requirements** - Balance cost vs. delivery time
+- **Customer communication** - Set expectations for dropship
+
+## Combining with Other Features
+
+Works seamlessly with:
+
+- **Shipping Estimates** - Shows delivery from best source
+- **In-Stock Recommendations** - Considers all sources
+- **B2B Pricing** - Vendor costs inform pricing
+- **Cross-Sell** - Accurate inventory for suggestions
+
+## Next Steps
+
+- [Learn about Shipping Estimates](/docs/integrations/shopify/widget/features/shipping-estimates)
+- [Explore configuration examples](/docs/integrations/shopify/widget/configuration/examples)
+- [Review advanced configuration](/docs/integrations/shopify/widget/configuration/advanced)
+
+## Need Help?
+
+Questions about multi-source inventory?
+
+- Review [Configuration Guide](/docs/integrations/shopify/widget/configuration)
+- Check [Troubleshooting](/docs/integrations/shopify/widget/troubleshooting)
+- Contact Weevio support for vendor API setup
