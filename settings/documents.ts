@@ -317,37 +317,20 @@ export const Documents: Paths[] = [
             },
         ],
     },
-    /*
     {
-      title: "Customer Portal",
-      href: "/customer-portal",
-      items: [
-        {
-          title: "Overview",
-          href: "/overview",
-        },
-        {
-          title: "Self-Service Features",
-          href: "/features",
-        },
-        {
-          title: "Order Tracking",
-          href: "/order-tracking",
-        },
-        {
-          title: "Invoice Payments",
-          href: "/invoice-payments",
-        },
-        {
-          title: "SRO Deposits",
-          href: "/sro-deposits",
-        },
-        {
-          title: "Customization",
-          href: "/customization",
-        },
-      ],
+        title: "Customer Portal",
+        href: "/customer-portal",
+        items: [
+            {
+                title: "Repair Status Tracking",
+                href: "/repair-status-tracking",
+                cardMeta: {
+                    description: "Let customers track their repair progress via a unique link or QR code — no login required."
+                }
+            },
+        ],
     },
+    /*
       {
         title: "Appointment Scheduler",
         href: "/appointment-scheduler",
