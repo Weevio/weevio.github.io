@@ -28,7 +28,7 @@ If your PIMS server was briefly unavailable (restart, network issue, maintenance
 - When a Shopify order webhook arrives, Weevio Cloud pings your PIMS server's `/vigil` health endpoint before processing.
 - If PIMS responds "OK" within 2.5 seconds, the order is processed normally.
 - If the health check fails (timeout, connection error, or non-OK response), Weevio Cloud returns HTTP 503 to Shopify.
-- Shopify then automatically retries the webhook with exponential backoff over approximately 48 hours.
+- Shopify then automatically retries the webhook up to 8 times over approximately 4 hours using exponential backoff.
 
 ## Key Details
 
@@ -37,7 +37,7 @@ If your PIMS server was briefly unavailable (restart, network issue, maintenance
 | Health check endpoint | `/vigil` on your PIMS server |
 | Timeout | 2.5 seconds |
 | Failure response | HTTP 503 (triggers Shopify retry) |
-| Shopify retry window | ~48 hours with exponential backoff |
+| Shopify retry window | Up to 8 retries over ~4 hours (exponential backoff) |
 | Affected webhooks | `orders/create`, `orders/paid` |
 | Configuration required | None — enabled automatically |
 | Available since | Cloud 4.1.16 |
@@ -59,9 +59,9 @@ This feature requires no configuration. It is automatically active for all tenan
 
 The health check adds at most 2.5 seconds of latency. If PIMS responds quickly (typical), the delay is negligible.
 
-### What if PIMS is down for more than 48 hours?
+### What if PIMS is down for more than 4 hours?
 
-Shopify retries webhooks for approximately 48 hours. If PIMS is still unreachable after that period, Shopify will stop retrying. For extended outages, contact Weevio support to re-process any missed orders.
+Shopify retries webhooks up to 8 times over approximately 4 hours. If PIMS is still unreachable after all retries are exhausted, Shopify will stop retrying. For extended outages, contact Weevio support to re-process any missed orders.
 
 ### Can I monitor health check failures?
 
