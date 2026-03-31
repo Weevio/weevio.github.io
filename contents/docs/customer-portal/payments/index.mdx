@@ -1,0 +1,105 @@
+---
+title: Payments
+description: Pay invoices, quotes, and repair deposits directly from the Customer Portal using ACH bank transfer or credit card.
+keywords: ["payments", "invoices", "deposits", "ACH", "credit card", "checkout", "customer portal", "Stripe"]
+---
+
+The Customer Portal allows your customers to pay outstanding invoices, accept quotes, and submit repair deposits online. Payments are processed securely through Stripe, with support for both ACH bank transfers and credit/debit card payments.
+
+## Payment Types
+
+Customers can make payments for three types of items from the **Payments** page in the Customer Portal:
+
+| Type | Description |
+|:-----|:------------|
+| **Invoices** | Outstanding invoices synced from PIMS. Customers click **Make Payment** on an invoice to begin checkout. |
+| **Quotes** | Active (non-expired) quotes. Customers click **Make Deposit** to accept a quote and submit a deposit. |
+| **Repair Deposits** | SRO repair deposits for repairs with an estimate. Customers click **Make Deposit** from the repair view. |
+
+<Note type="info">
+The **Payments** page shows all unpaid invoices, active quotes, and repairs awaiting deposits. Customers can select multiple items and pay them together in a single checkout.
+</Note>
+
+## How Payments Work
+
+<Step>
+  <StepItem title="Select Items to Pay">
+    From the **Payments** page, customers select one or more unpaid items using the checkboxes in the table. The selected total updates automatically. Alternatively, customers can click **Make Payment** or **Make Deposit** directly from an individual order or repair view.
+  </StepItem>
+  <StepItem title="Review the Payment Summary">
+    A **Payment Summary** dialog opens showing each selected item with its amount and a subtotal. If paying from a single order or repair, an **Add More Payments** button lets customers navigate to the full Payments page to combine additional items.
+  </StepItem>
+  <StepItem title="Choose a Payment Method">
+    The dialog displays available payment methods as selectable cards:
+
+    - **Bank Transfer (ACH)** — Shows the subtotal with a "No additional fees" label
+    - **Debit/Credit Card** — Shows the total including any processing fees
+
+    Customers select a method by clicking the corresponding card. The selected card is highlighted with a border.
+  </StepItem>
+  <StepItem title="Review Fees (if applicable)">
+    If a credit card processing fee applies, customers can click **View fee details** to expand a breakdown showing the subtotal, processing fee percentage, and final total. Fees are configured by the tenant administrator (see [Admin Configuration](#admin-configuration)).
+  </StepItem>
+  <StepItem title="Confirm and Pay">
+    After selecting a payment method, a **Confirm & Pay** button appears showing the exact amount to be charged. Clicking it redirects the customer to a secure Stripe checkout page to complete the payment.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Payment Summary dialog showing the card-based payment method selection with ACH and Credit Card options */}
+
+## Payment Methods
+
+### ACH Bank Transfer
+
+ACH payments allow customers to pay directly from their bank account. This method typically has no additional processing fees, making it the preferred option for larger payments.
+
+### Credit/Debit Card
+
+Customers can pay with any major credit or debit card through Stripe. If the tenant has configured a credit card processing fee for ACH-designated items, the fee is calculated automatically and displayed transparently before checkout.
+
+<Note type="warning">
+The available payment methods depend on your tenant configuration. If only ACH or only credit card payments are enabled, customers will see only the applicable option.
+</Note>
+
+## Credit Card Processing Fees
+
+Tenants can optionally pass credit card processing fees to customers on items that are designated as ACH-only. When enabled:
+
+- The **Credit Card** option shows the total including the fee
+- A **View fee details** link expands to show the fee breakdown:
+  - Subtotal (original amount)
+  - Processing fee (percentage-based)
+  - Total with fee
+- The **ACH** option continues to show the original amount with no fee
+
+This gives customers a clear comparison between payment methods so they can choose the most cost-effective option.
+
+## Admin Configuration
+
+Payment features are configured in the **Weevio Cloud** admin panel under **Settings > Customer Portal > Payments**.
+
+| Setting | Description |
+|:--------|:------------|
+| **Enable Customer Payments** | Master toggle to enable or disable the payments feature for your Customer Portal |
+| **ACH Payments** | Enable ACH bank transfer as a payment method for invoices and quotes |
+| **Credit Card Payments** | Enable credit/debit card as a payment method for invoices and quotes |
+| **SRO ACH Payments** | Enable ACH bank transfer for repair deposits |
+| **SRO Credit Card Payments** | Enable credit/debit card for repair deposits |
+| **Credit Card Fee on ACH-Only Items** | When enabled, adds a configurable processing fee percentage to credit card payments on items designated as ACH-only |
+| **Credit Card Fee Percentage** | The processing fee percentage applied to credit card payments on ACH-only items (default: 2.9%) |
+
+<Note type="info">
+Payment method availability is determined per transaction based on the item types being paid. For example, if a customer selects both an invoice and a repair deposit, the available methods are the intersection of what is enabled for orders and SROs.
+</Note>
+
+## After Payment
+
+Once a customer completes a Stripe checkout:
+
+- The payment is recorded and the invoice, quote, or repair deposit is marked as paid
+- The customer is redirected back to the Customer Portal
+- If the payment is cancelled, the customer is returned to the portal with a cancellation notice
+
+## Related Features
+
+- [Repair Status Tracking](/docs/customer-portal/repair-status-tracking) — Let customers track their repair progress via a unique link
