@@ -322,6 +322,13 @@ export const Documents: Paths[] = [
         href: "/customer-portal",
         items: [
             {
+                title: "Payments",
+                href: "/payments",
+                cardMeta: {
+                    description: "Pay invoices, quotes, and repair deposits online using ACH bank transfer or credit/debit card."
+                }
+            },
+            {
                 title: "Repair Status Tracking",
                 href: "/repair-status-tracking",
                 cardMeta: {
