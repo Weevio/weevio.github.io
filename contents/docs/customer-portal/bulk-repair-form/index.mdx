@@ -1,0 +1,167 @@
+---
+title: Bulk Repair Form & E-Signature
+description: Accept bulk device repair submissions with e-signature capture and automated terms of service compliance.
+keywords: ["bulk repair", "repair form", "e-signature", "signature", "terms of service", "device intake", "pending SROs"]
+---
+
+The Bulk Repair Form lets customers submit multiple devices for repair through a guided multi-step process. With e-signature capture, customers sign directly on-screen to agree to your terms of service, and the full terms and signature are included in confirmation emails for audit compliance.
+
+{/* TODO: Screenshot - Bulk repair form overview showing the multi-step wizard */}
+
+## What It Does
+
+- **Multi-step intake form** - Guided wizard for customer details, device list, delivery preferences, and terms
+- **Bulk device submission** - Add devices manually or import via CSV upload
+- **E-signature capture** - On-screen signature pad for terms agreement
+- **Automated emails** - Confirmation emails include full terms text and customer signature image
+- **Audit trail** - Timestamp, terms content, and signature stored with each submission
+
+## Enabling E-Signature Capture
+
+The e-signature feature is controlled via an Early Access toggle:
+
+<Step>
+  <StepItem title="Open General Settings">
+    Navigate to **General Settings** in the Weevio Cloud sidebar.
+  </StepItem>
+  <StepItem title="Go to Early Access">
+    Scroll to or select the **Early Access** section.
+  </StepItem>
+  <StepItem title="Enable Signature Capture">
+    Toggle **"SRO Agreement/Signature Capture"** to ON.
+  </StepItem>
+  <StepItem title="Refresh the Page">
+    Press **Ctrl+R** (Windows) or **Cmd+R** (Mac) to reload. The signature pad will now appear on the Terms of Service step.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Early Access toggle for SRO Agreement/Signature Capture */}
+
+<Note type="info">
+The `module_pending_sros` module and `repair_form` setting must both be active for the bulk repair form to be available.
+</Note>
+
+## Customer Experience
+
+### Form Steps
+
+The bulk repair form guides customers through a structured process:
+
+<Step>
+  <StepItem title="Customer Details">
+    Enter point of contact name, email, phone number, and address. If the customer is signed in, these fields are pre-populated automatically.
+  </StepItem>
+  <StepItem title="Device Details">
+    Add each device to the repair list. Supported device types include iMac, MacBook Air, MacBook Pro, Mac Mini, Mac Pro, iPad, iPhone, and more. Devices can also be imported in bulk via CSV upload.
+  </StepItem>
+  <StepItem title="Delivery Details">
+    Specify how devices will be delivered for repair.
+  </StepItem>
+  <StepItem title="Terms of Service & Signature">
+    Review the terms of service and provide an e-signature to confirm agreement.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Form step indicators showing progress */}
+
+### E-Signature Step
+
+On the final step, customers see:
+
+1. **Terms of Service text** - Your configured terms displayed in full
+2. **Signature pad** - A drawing area where the customer signs with mouse or finger (touch)
+3. **Clear button** - Allows the customer to redo their signature
+4. **Agreement checkbox** - Confirms acceptance of the terms
+
+{/* TODO: Screenshot - Signature pad with terms of service text */}
+
+<Note type="warning">
+Both the signature and the agreement checkbox must be completed before the form can be submitted. Missing either will display a validation error.
+</Note>
+
+### After Submission
+
+Once submitted:
+- A confirmation page displays the repair number
+- A notification email is sent to the customer and your team
+- The pending SRO is created and ready for processing
+
+## Email Notifications
+
+When e-signature capture is enabled, notification emails include:
+
+| Content | Description |
+|:--------|:------------|
+| **Full terms of service** | The complete terms text as configured, rendered in the email body |
+| **Agreement timestamp** | Date and time the customer agreed to the terms |
+| **Signature image** | The customer's handwritten signature embedded as an image |
+
+<Note type="info">
+Previously, emails only stated "Customer has agreed to Terms of Service." With e-signature enabled, the actual terms content and signature image are included for full audit compliance.
+</Note>
+
+{/* TODO: Screenshot - Email notification showing terms and signature */}
+
+## Benefits
+
+### For Your Customers
+
+- **Clear expectations** - Full terms displayed before signing
+- **Easy signature** - Sign with mouse on desktop or finger on mobile
+- **Instant confirmation** - Immediate feedback after submission
+- **Pre-filled details** - Signed-in customers skip manual entry
+
+### For Your Business
+
+- **Audit compliance** - Complete record of terms agreement with signature
+- **Reduced disputes** - Customers acknowledge specific terms before service
+- **Streamlined intake** - One form handles multiple devices
+- **Automated notifications** - Emails sent automatically with full documentation
+
+## Troubleshooting
+
+### Signature Pad Not Appearing
+
+**Check:**
+- "SRO Agreement/Signature Capture" is enabled in Early Access settings
+- Page was refreshed after enabling the toggle
+- `module_pending_sros` and `repair_form` are active
+
+### "Please provide your signature" Error
+
+The form requires a signature before submission. Draw on the signature pad and ensure the checkbox is checked.
+
+### CSV Upload Issues
+
+**Check:**
+- File is in CSV format
+- Required columns are present (device type, serial number)
+- File size is within limits
+- No special characters in headers
+
+### Email Not Showing Terms or Signature
+
+**Check:**
+- E-signature capture is enabled in Early Access settings
+- Terms of service content is configured in your portal settings
+- Signature was captured successfully during form submission
+
+## Best Practices
+
+- **Keep terms concise** - Customers are more likely to read shorter, clear terms
+- **Test the form** - Submit a test repair to verify emails include the terms and signature
+- **Mobile testing** - Ensure the signature pad works well on touch devices
+- **Configure all fields** - Fill in your terms of service content so it renders correctly in emails
+
+## Related Features
+
+- [Payments](/docs/customer-portal/payments) - Online payment for repair invoices and deposits
+- [Repair Status Tracking](/docs/customer-portal/repair-status-tracking) - Let customers track repair progress
+- [Pending SROs V2](/docs/store/pending-sros) - Process incoming devices with scan-to-receive
+
+## Need Help?
+
+Questions about the bulk repair form or e-signature setup?
+
+- Review [Customer Portal](/docs/customer-portal) for an overview
+- Contact Weevio support for assistance with terms of service configuration

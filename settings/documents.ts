@@ -69,6 +69,13 @@ export const Documents: Paths[] = [
                     },
                 ],
             },
+            {
+                title: "Pending SROs V2",
+                href: "/pending-sros",
+                cardMeta: {
+                    description: "Streamline device intake with the scan-to-receive workflow that automatically creates SROs in PIMS."
+                }
+            },
             /*
             {
                 title: "Service Repair Orders",
@@ -326,6 +333,13 @@ export const Documents: Paths[] = [
                 href: "/payments",
                 cardMeta: {
                     description: "Pay invoices, quotes, and repair deposits online using ACH bank transfer or credit/debit card."
+                }
+            },
+            {
+                title: "Bulk Repair Form",
+                href: "/bulk-repair-form",
+                cardMeta: {
+                    description: "Accept bulk device repair submissions with e-signature capture and automated terms of service compliance."
                 }
             },
             {

@@ -1,0 +1,177 @@
+---
+title: Pending SROs V2 — Scan-to-Receive
+description: Streamline device intake with the scan-to-receive workflow that automatically creates SROs in PIMS.
+keywords: ["pending SROs", "scan to receive", "SRO", "device intake", "batch", "serial number", "equipment tag"]
+---
+
+The Pending SROs V2 workflow replaces manual multi-step SRO creation with a fast scan-to-receive approach. Technicians scan serial numbers to automatically create SROs in PIMS, with real-time feedback, batch management, and equipment tag printing.
+
+{/* TODO: Screenshot - Pending SROs V2 batch list view */}
+
+<Note type="info">
+This feature is currently in **Early Access**. You must enable it in General Settings before it becomes available.
+</Note>
+
+## What It Does
+
+- **Scan-to-receive** - Scan or type serial numbers to instantly create SROs in PIMS
+- **Batch management** - Group devices into batches with progress tracking
+- **Customer verification** - Link a verified customer to all SROs in a batch
+- **Equipment tag printing** - Print labels per device on demand or automatically
+- **Duplicate detection** - Detects previously received serial numbers via PIMS lookup
+- **Universal search** - Search across batches by serial number, customer name, or confirmation number
+
+## Enabling the Feature
+
+<Step>
+  <StepItem title="Open General Settings">
+    Navigate to **General Settings** in the Weevio Cloud sidebar.
+  </StepItem>
+  <StepItem title="Go to Early Access">
+    Scroll to or select the **Early Access** section.
+  </StepItem>
+  <StepItem title="Enable Pending SROs V2">
+    Toggle **"Pending SROs V2 (Scan-to-Receive Workflow)"** to ON.
+  </StepItem>
+  <StepItem title="Refresh the Page">
+    Press **Ctrl+R** (Windows) or **Cmd+R** (Mac) to reload. The new workflow will appear in the Pending SROs section.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Early Access settings panel with Pending SROs V2 toggle */}
+
+## Batch List View
+
+The main screen shows all pending SRO batches with at-a-glance progress:
+
+| Status | Meaning |
+|:-------|:--------|
+| **Not Started** | Batch created but no devices received yet |
+| **Partially Received** | Some devices scanned, batch still open |
+| **Fully Received** | All devices in the batch have been received |
+
+- **Search** across all batches by serial number, customer name, or confirmation number
+- **Sort** batches by date or status
+- Click a batch to open its detail view
+
+{/* TODO: Screenshot - Batch list view with progress chips */}
+
+## Scan-to-Receive Workflow
+
+### Customer Verification
+
+Before receiving devices, verify the customer:
+
+<Step>
+  <StepItem title="Search for Customer">
+    Search for the customer by name, email, or phone number. The system looks up the customer in PIMS.
+  </StepItem>
+  <StepItem title="Verify Customer">
+    Select the correct customer from the search results. The verified customer is linked to all SROs created in this batch.
+  </StepItem>
+</Step>
+
+<Note type="warning">
+Once a device has been received in a batch, the customer can no longer be changed. Verify the correct customer **before** scanning devices.
+</Note>
+
+### Scanning Devices
+
+<Step>
+  <StepItem title="Scan or Type Serial Number">
+    Use a barcode scanner or manually type the device serial number into the input field.
+  </StepItem>
+  <StepItem title="Review Feedback">
+    The system provides real-time feedback for each scan:
+    - **Success** - SRO created in PIMS, device added to batch
+    - **Duplicate warning** - Serial number already exists in PIMS (option to force-receive)
+    - **Error** - Issue creating the SRO, with details shown
+  </StepItem>
+  <StepItem title="Continue Scanning">
+    Repeat for each device. Each successful scan creates an individual SRO in PIMS automatically.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Scan-to-receive interface with serial number input and feedback */}
+
+### SRO Status Selector
+
+Choose which PIMS status to assign to newly created SROs:
+
+- Select from available SRO statuses in the dropdown
+- Use **"Save as default"** to remember your preferred status for future scans
+- Status applies to all SROs created during the current session
+
+### Editing Serial Numbers
+
+Before a device is received, you can edit its serial number directly in the batch. Once received, the serial number is locked.
+
+## Equipment Tag Printing
+
+Print identification tags for each device:
+
+- **On-demand printing** - Click the print icon next to any received device
+- **Auto-print** - Toggle automatic printing to print a tag immediately after each successful scan
+
+**Each tag includes:**
+- SRO number
+- Serial number
+- Customer name
+- Device type
+- Date received
+
+{/* TODO: Screenshot - Equipment tag print preview */}
+
+## Batch Management
+
+### Canceling a Batch
+
+Cancel a batch if it was created in error or is no longer needed. Canceled batches are moved to a separate view and can be restored.
+
+### Restoring a Batch
+
+Previously canceled batches can be restored to active status if needed.
+
+## Troubleshooting
+
+### Feature Not Appearing After Enable
+
+**Check:**
+- "Pending SROs V2" toggle is ON in Early Access settings
+- Page was refreshed after enabling (Ctrl+R / Cmd+R)
+- You have the `module_pending_sros` module active
+
+### SRO Not Created After Scan
+
+**Check:**
+- Customer is verified before scanning
+- Serial number format is valid
+- PIMS connection is active
+- No duplicate serial number conflict (check the warning message)
+
+### Equipment Tags Not Printing
+
+**Check:**
+- Browser pop-up blocker is not preventing the print dialog
+- Printer is configured and connected
+- Auto-print toggle is enabled if expecting automatic tags
+
+## Best Practices
+
+- **Verify the customer first** - Always confirm the customer before scanning any devices to avoid reassignment issues
+- **Use a barcode scanner** - Speeds up intake and reduces typos
+- **Enable auto-print** - Saves time when processing large batches
+- **Set a default SRO status** - Avoids selecting the status for every scan
+- **Review duplicates carefully** - When a duplicate is detected, confirm whether it is a true duplicate or a re-intake before force-receiving
+
+## Next Steps
+
+- [Learn about Orders](/docs/store/orders)
+- [Explore Customer Portal features](/docs/customer-portal)
+
+## Need Help?
+
+Questions about the scan-to-receive workflow?
+
+- Check the [Troubleshooting](#troubleshooting) section above
+- Contact Weevio support for assistance with PIMS configuration
