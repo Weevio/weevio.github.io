@@ -1,5 +1,53 @@
 [
   {
+    "slug": "/customer-portal/bulk-repair-form",
+    "title": "Bulk Repair Form",
+    "description": "Let customers submit multiple devices for repair with e-signature capture, terms of service agreement, and delivery preferences.",
+    "content": "The Bulk Repair Form allows customers to submit multiple devices for repair in a single submission through the Customer Portal. The form guides customers through providing their contact details, listing devices, choosing delivery options, and agreeing to your terms of service with an electronic signature.\n\n## Form Steps\n\nThe bulk repair form is a multi-step wizard:\n\n## E-Signature Capture\n\nThe final step requires customers to sign electronically before submitting the repair form.\n\n### What the Customer Sees\n\n{/* TODO: Screenshot - Terms of service step showing terms text, agreement checkbox, and signature canvas */}\n\nThe terms step includes:\n\n1. **Terms of Service text** — Your custom terms displayed in a formatted card. These are configured in your Weevio Cloud team settings.\n2. **Agreement checkbox** — The customer must check \"I agree to the Terms of Service\" to proceed.\n3. **Additional comments field** — An optional text area for the customer to add notes about their repair.\n4. **Signature canvas** — A drawing area where the customer signs using their mouse or finger (on touch devices).\n5. **Clear Signature button** — Allows the customer to erase and redo their signature.\n\n### How It Works\n\n* The signature canvas adjusts to the screen width on mobile devices for a comfortable signing experience\n* The signature is captured as an image and stored alongside the repair submission\n* Both the signature and the terms of service are included in confirmation emails\n\n## Email Notifications\n\nAfter the form is submitted, confirmation emails are sent to both the customer and your team. These emails now include the full terms of service and the customer's signature.\n\n### What's Included in the Email\n\n| Section | Description |\n|---------|-------------|\n| **Repair details** | Customer info, device list, and delivery preferences |\n| **Terms of Service** | The full text of your terms, rendered with formatting (headings, lists, bold/italic text) |\n| **Agreement timestamp** | The date and time when the customer agreed to the terms |\n| **Customer signature** | The customer's electronic signature displayed as an image |\n\n### Terms of Service in Emails\n\nYour terms of service are rendered with full formatting support:\n\n* **Headings** for section titles\n* **Numbered and bulleted lists** for terms and conditions\n* **Bold, italic, and underlined text** for emphasis\n* Wrapped in a styled box for clear visual separation\n\n## Configuring Terms of Service\n\nTerms of service content is managed in your Weevio Cloud team settings. The same terms appear on the Customer Portal form and in email notifications.\n\n## Best Practices\n\n### For Your Terms of Service\n\n* **Keep it clear** — Use plain language that customers can understand quickly\n* **Use formatting** — Headings and lists make terms easier to scan\n* **Cover key points** — Include repair turnaround expectations, liability limitations, and data handling policies\n* **Review regularly** — Update terms when your policies change\n\n### For the Repair Form\n\n* **Test the flow** — Submit a test repair to verify the signature capture and email content\n* **Check email rendering** — Review how terms and signatures appear in the notification emails\n* **Mobile testing** — Ensure the signature canvas works well on phones and tablets\n",
+    "_searchMeta": {
+      "cleanContent": "the bulk repair form allows customers to submit multiple devices for repair in a single submission through the customer portal the form guides customers through providing their contact details listing devices choosing delivery options and agreeing to your terms of service with an electronic signature form steps the bulk repair form is a multi-step wizard: e-signature capture the final step requires customers to sign electronically before submitting the repair form what the customer sees todo: screenshot - terms of service step showing terms text agreement checkbox and signature canvas the terms step includes: terms of service text your custom terms displayed in a formatted card these are configured in your weevio cloud team settings agreement checkbox the customer must check i agree to the terms of service to proceed additional comments field an optional text area for the customer to add notes about their repair signature canvas a drawing area where the customer signs using their mouse or finger on touch devices clear signature button allows the customer to erase and redo their signature how it works the signature canvas adjusts to the screen width on mobile devices for a comfortable signing experience the signature is captured as an image and stored alongside the repair submission both the signature and the terms of service are included in confirmation emails email notifications after the form is submitted confirmation emails are sent to both the customer and your team these emails now include the full terms of service and the customer s signature what s included in the email section description--------- -------------repair details customer info device list and delivery preferencesterms of service the full text of your terms rendered with formatting headings lists bold italic text agreement timestamp the date and time when the customer agreed to the termscustomer signature the customer s electronic signature displayed as an image terms of service in emails your terms of service are rendered with full formatting support: headings for section titles numbered and bulleted lists for terms and conditions bold italic and underlined text for emphasis wrapped in a styled box for clear visual separation configuring terms of service terms of service content is managed in your weevio cloud team settings the same terms appear on the customer portal form and in email notifications best practices for your terms of service keep it clear use plain language that customers can understand quickly use formatting headings and lists make terms easier to scan cover key points include repair turnaround expectations liability limitations and data handling policies review regularly update terms when your policies change for the repair form test the flow submit a test repair to verify the signature capture and email content check email rendering review how terms and signatures appear in the notification emails mobile testing ensure the signature canvas works well on phones and tablets",
+      "headings": [
+        "Form Steps",
+        "E-Signature Capture",
+        "Email Notifications",
+        "Configuring Terms of Service",
+        "Best Practices"
+      ],
+      "keywords": [
+        "bulk repair",
+        "repair form",
+        "e-signature",
+        "terms of service",
+        "device submission",
+        "customer portal",
+        "Form Steps",
+        "E-Signature Capture",
+        "Email Notifications",
+        "Configuring Terms of Service",
+        "Best Practices",
+        "Terms of Service text",
+        "Agreement checkbox",
+        "Additional comments field",
+        "Signature canvas",
+        "Clear Signature button",
+        "Repair details",
+        "Terms of Service",
+        "Agreement timestamp",
+        "Customer signature",
+        "Headings",
+        "Numbered and bulleted lists",
+        "Bold, italic, and underlined text",
+        "Keep it clear",
+        "Use formatting",
+        "Cover key points",
+        "Review regularly",
+        "Test the flow",
+        "Check email rendering",
+        "Mobile testing"
+      ]
+    }
+  },
+  {
     "slug": "/customer-portal",
     "title": "Customer Portal",
     "description": "Self-service tools that let your customers track repairs, view orders, and manage their account — all branded with your business identity.",
@@ -3296,6 +3344,92 @@
         "Permissions",
         "[Customer Management](/docs/store/orders/customer-management)",
         "[Line Items](/docs/store/orders/line-items)"
+      ]
+    }
+  },
+  {
+    "slug": "/store/service-repair-orders",
+    "title": "Service Repair Orders",
+    "description": "Track and manage service repair orders (SROs) with streamlined device intake, status tracking, and customer communication.",
+    "content": "Service Repair Orders (SROs) in Weevio Cloud provide a complete workflow for managing device repairs — from customer intake through completion. Whether you're processing walk-in repairs or handling bulk device submissions, the SRO system keeps everything organized and connected to your PIMS system.\n\n## Features\n\n<Note type=\"info\" title=\"More Features Coming Soon\">\n  Additional SRO documentation — including SRO creation, status management, and reporting — is currently being developed and will be available soon.\n</Note>\n",
+    "_searchMeta": {
+      "cleanContent": "service repair orders sros in weevio cloud provide a complete workflow for managing device repairs from customer intake through completion whether you re processing walk-in repairs or handling bulk device submissions the sro system keeps everything organized and connected to your pims system features additional sro documentation including sro creation status management and reporting is currently being developed and will be available soon",
+      "headings": [
+        "Features"
+      ],
+      "keywords": [
+        "SRO",
+        "service repair",
+        "repair orders",
+        "device intake",
+        "repair tracking",
+        "Features"
+      ]
+    }
+  },
+  {
+    "slug": "/store/service-repair-orders/pending-sros-v2",
+    "title": "Pending SROs V2 — Scan-to-Receive",
+    "description": "Speed up device intake with barcode scanning, automatic SRO creation, customer verification, and equipment tag printing.",
+    "content": "Pending SROs V2 replaces the original pending SRO workflow with a faster, scan-driven device intake process. Staff can scan device serial numbers to instantly create SROs in PIMS, verify customers, and print equipment tags — all from a single screen.\n\n## Enabling the Feature\n\n{/* TODO: Screenshot - General Settings > Early Access section with the Pending SROs V2 toggle */}\n\n## Batch List View\n\nWhen you open Pending SROs, you see a list of all pending repair batches. Each batch represents a group of devices submitted by a customer (typically through the Customer Portal bulk repair form).\n\n### What You See\n\nEach batch row displays:\n\n| Column | Description |\n|--------|-------------|\n| **Confirmation** | The repair confirmation number |\n| **Customer** | Contact name (with a checkmark if verified in PIMS) |\n| **Company** | Company name |\n| **Email** | Customer email |\n| **Phone** | Customer phone number |\n| **Date** | When the batch was created |\n| **Devices** | Number of devices in the batch |\n| **Progress** | Visual chip showing batch status |\n\n{/* TODO: Screenshot - Batch list view showing several batches with progress chips */}\n\n### Batch Progress States\n\n* **Not Started** — No devices have been received yet\n* **Partially Received** — Some devices received, others still pending\n* **Fully Received** — All devices in the batch have been received\n\n### Searching and Filtering\n\nUse the search toolbar to find batches by serial number, customer name, or confirmation number. You can also filter by batch status using the **Active** and **Canceled** tabs.\n\n### Canceling and Restoring Batches\n\n* Click the cancel icon on a batch row to move it to the **Canceled** tab\n* Canceled batches can be restored using the restore icon in the Canceled tab\n\n## Batch Check-In Workflow\n\nClick any batch to open the check-in view, where you receive devices one at a time.\n\n{/* TODO: Screenshot - Batch check-in view showing scan input, activity feed, and progress bar */}\n\n### Customer Verification\n\nBefore receiving devices, verify the customer in PIMS. The system automatically searches for matching PIMS records based on the customer's name, email, or customer code from the repair form.\n\n<Note type=\"info\">\n  You can change the verified customer at any time before receiving the first device. After a device is received, the customer link is locked.\n</Note>\n\n{/* TODO: Screenshot - Customer verification modal with matching records tab */}\n\n### Selecting the SRO Status\n\nBefore scanning, choose which SRO status to assign to newly created SROs using the dropdown at the top of the scan panel. Click **Save as Default** to remember your preferred status for future sessions.\n\n### Scanning Devices\n\nThe scan input field is the core of the workflow. It accepts serial numbers from a barcode scanner or manual keyboard entry.\n\n### Handling Errors and Duplicates\n\n* **Duplicate serial numbers** — If a serial number already exists in PIMS, you'll see a warning with the option to **force-receive** the device\n* **Processing timeout** — If SRO creation takes longer than 10 seconds, a **Cancel** button appears so you can abort and retry\n* **Failed scans** — Error details appear in the activity feed with a red indicator\n\n### Equipment Tag Printing\n\nPrint equipment tags for each received device to attach to the physical unit.\n\n* **On-demand printing** — Click the print icon next to any received device\n* **Auto-print** — Toggle on **Auto-Print** in the scan panel to automatically print a tag after each successful scan\n\nEach tag includes: SRO number, serial number, customer name, device type, and date.\n\n{/* TODO: Screenshot - Equipment tag example showing printed label content */}\n\n## Device Table\n\nBelow the scan controls, the full device table shows all devices in the batch with their current status.\n\n| Column | Description |\n|--------|-------------|\n| **Serial Number** | The device serial number |\n| **Device Type** | Type of device |\n| **SRO Number** | Assigned SRO number (after receiving) |\n| **Status** | Pending or Received |\n\n## Best Practices\n\n### For Efficient Device Intake\n\n* **Use a barcode scanner** — Much faster than manual serial entry for high-volume intake\n* **Enable auto-print** — Eliminates the extra step of printing tags after each scan\n* **Set a default SRO status** — Save your most common status to avoid re-selecting it each session\n* **Verify the customer first** — Always verify before scanning to ensure SROs are linked to the correct PIMS customer\n\n### For Batch Management\n\n* **Process batches promptly** — Receive devices soon after the customer submits them\n* **Use search** — Quickly locate specific batches by serial number or customer name\n* **Check progress chips** — At a glance, see which batches need attention\n\n## Troubleshooting\n\n### Feature Not Appearing\n\n* Confirm **Pending SROs V2** is enabled in Settings → General Settings → Early Access\n* Refresh your browser after enabling the feature\n* Check that you have the correct permissions in Weevio Cloud\n\n### Scan Not Creating SRO\n\n* Verify the customer is linked to the batch before scanning\n* Check that the serial number matches a pending device in the batch\n* Ensure your PIMS system is online and accessible\n* Look at the activity feed for specific error messages\n\n### Equipment Tags Not Printing\n\n* Check that your browser allows pop-ups for the Weevio Cloud domain\n* Verify your printer is connected and online\n* Try printing a single tag manually before enabling auto-print\n\n### Customer Not Found in Verification\n\n* Use the **Search Customers** tab to search by different criteria\n* Verify the customer exists in your PIMS system\n* Check for spelling differences between the repair form submission and PIMS records\n",
+    "_searchMeta": {
+      "cleanContent": "pending sros v2 replaces the original pending sro workflow with a faster scan-driven device intake process staff can scan device serial numbers to instantly create sros in pims verify customers and print equipment tags all from a single screen enabling the feature todo: screenshot - general settings early access section with the pending sros v2 toggle batch list view when you open pending sros you see a list of all pending repair batches each batch represents a group of devices submitted by a customer typically through the customer portal bulk repair form what you see each batch row displays: column description-------- -------------confirmation the repair confirmation numbercustomer contact name with a checkmark if verified in pims company company nameemail customer emailphone customer phone numberdate when the batch was createddevices number of devices in the batchprogress visual chip showing batch status todo: screenshot - batch list view showing several batches with progress chips batch progress states not started no devices have been received yet partially received some devices received others still pending fully received all devices in the batch have been received searching and filtering use the search toolbar to find batches by serial number customer name or confirmation number you can also filter by batch status using the active and canceled tabs canceling and restoring batches click the cancel icon on a batch row to move it to the canceled tab canceled batches can be restored using the restore icon in the canceled tab batch check-in workflow click any batch to open the check-in view where you receive devices one at a time todo: screenshot - batch check-in view showing scan input activity feed and progress bar customer verification before receiving devices verify the customer in pims the system automatically searches for matching pims records based on the customer s name email or customer code from the repair form you can change the verified customer at any time before receiving the first device after a device is received the customer link is locked todo: screenshot - customer verification modal with matching records tab selecting the sro status before scanning choose which sro status to assign to newly created sros using the dropdown at the top of the scan panel click save as default to remember your preferred status for future sessions scanning devices the scan input field is the core of the workflow it accepts serial numbers from a barcode scanner or manual keyboard entry handling errors and duplicates duplicate serial numbers if a serial number already exists in pims you ll see a warning with the option to force-receive the device processing timeout if sro creation takes longer than 10 seconds a cancel button appears so you can abort and retry failed scans error details appear in the activity feed with a red indicator equipment tag printing print equipment tags for each received device to attach to the physical unit on-demand printing click the print icon next to any received device auto-print toggle on auto-print in the scan panel to automatically print a tag after each successful scan each tag includes: sro number serial number customer name device type and date todo: screenshot - equipment tag example showing printed label content device table below the scan controls the full device table shows all devices in the batch with their current status column description-------- -------------serial number the device serial numberdevice type type of devicesro number assigned sro number after receiving status pending or received best practices for efficient device intake use a barcode scanner much faster than manual serial entry for high-volume intake enable auto-print eliminates the extra step of printing tags after each scan set a default sro status save your most common status to avoid re-selecting it each session verify the customer first always verify before scanning to ensure sros are linked to the correct pims customer for batch management process batches promptly receive devices soon after the customer submits them use search quickly locate specific batches by serial number or customer name check progress chips at a glance see which batches need attention troubleshooting feature not appearing confirm pending sros v2 is enabled in settings general settings early access refresh your browser after enabling the feature check that you have the correct permissions in weevio cloud scan not creating sro verify the customer is linked to the batch before scanning check that the serial number matches a pending device in the batch ensure your pims system is online and accessible look at the activity feed for specific error messages equipment tags not printing check that your browser allows pop-ups for the weevio cloud domain verify your printer is connected and online try printing a single tag manually before enabling auto-print customer not found in verification use the search customers tab to search by different criteria verify the customer exists in your pims system check for spelling differences between the repair form submission and pims records",
+      "headings": [
+        "Enabling the Feature",
+        "Batch List View",
+        "Batch Check-In Workflow",
+        "Device Table",
+        "Best Practices",
+        "Troubleshooting"
+      ],
+      "keywords": [
+        "pending SROs",
+        "scan to receive",
+        "barcode scanning",
+        "device intake",
+        "SRO creation",
+        "equipment tags",
+        "Enabling the Feature",
+        "Batch List View",
+        "Batch Check-In Workflow",
+        "Device Table",
+        "Best Practices",
+        "Troubleshooting",
+        "Confirmation",
+        "Customer",
+        "Company",
+        "Email",
+        "Phone",
+        "Date",
+        "Devices",
+        "Progress",
+        "Not Started",
+        "Partially Received",
+        "Fully Received",
+        "Active",
+        "Canceled",
+        "Save as Default",
+        "Duplicate serial numbers",
+        "force-receive",
+        "Processing timeout",
+        "Cancel",
+        "Failed scans",
+        "On-demand printing",
+        "Auto-print",
+        "Auto-Print",
+        "Serial Number",
+        "Device Type",
+        "SRO Number",
+        "Status",
+        "Use a barcode scanner",
+        "Enable auto-print",
+        "Set a default SRO status",
+        "Verify the customer first",
+        "Process batches promptly",
+        "Use search",
+        "Check progress chips",
+        "Pending SROs V2",
+        "Search Customers"
       ]
     }
   }

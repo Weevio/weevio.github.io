@@ -1,0 +1,101 @@
+---
+title: Bulk Repair Form
+description: Let customers submit multiple devices for repair with e-signature capture, terms of service agreement, and delivery preferences.
+keywords: ["bulk repair", "repair form", "e-signature", "terms of service", "device submission", "customer portal"]
+---
+
+The Bulk Repair Form allows customers to submit multiple devices for repair in a single submission through the Customer Portal. The form guides customers through providing their contact details, listing devices, choosing delivery options, and agreeing to your terms of service with an electronic signature.
+
+## Form Steps
+
+The bulk repair form is a multi-step wizard:
+
+<Step>
+  <StepItem title="Customer Details">
+    The customer enters their contact information — name, email, phone number, and address. If the customer is signed in, these fields are pre-filled.
+  </StepItem>
+  <StepItem title="Devices">
+    The customer lists each device that needs repair, including serial numbers and device types. For large submissions, devices can be uploaded via CSV file.
+  </StepItem>
+  <StepItem title="Delivery Details">
+    The customer selects how they'll send devices and how they'd like them returned (e.g., drop-off, shipping). This step may be hidden depending on your portal configuration.
+  </StepItem>
+  <StepItem title="Terms of Service & Signature">
+    The customer reviews your terms of service, checks the agreement box, and provides an electronic signature. This step is required before submission.
+  </StepItem>
+</Step>
+
+## E-Signature Capture
+
+The final step requires customers to sign electronically before submitting the repair form.
+
+### What the Customer Sees
+
+{/* TODO: Screenshot - Terms of service step showing terms text, agreement checkbox, and signature canvas */}
+
+The terms step includes:
+
+1. **Terms of Service text** — Your custom terms displayed in a formatted card. These are configured in your Weevio Cloud team settings.
+2. **Agreement checkbox** — The customer must check "I agree to the Terms of Service" to proceed.
+3. **Additional comments field** — An optional text area for the customer to add notes about their repair.
+4. **Signature canvas** — A drawing area where the customer signs using their mouse or finger (on touch devices).
+5. **Clear Signature button** — Allows the customer to erase and redo their signature.
+
+<Note type="info">
+The signature is required. The form cannot be submitted without a valid signature. If the customer tries to submit without signing, the signature canvas highlights in red with the message "Please provide your signature."
+</Note>
+
+### How It Works
+
+- The signature canvas adjusts to the screen width on mobile devices for a comfortable signing experience
+- The signature is captured as an image and stored alongside the repair submission
+- Both the signature and the terms of service are included in confirmation emails
+
+## Email Notifications
+
+After the form is submitted, confirmation emails are sent to both the customer and your team. These emails now include the full terms of service and the customer's signature.
+
+### What's Included in the Email
+
+| Section | Description |
+|---------|-------------|
+| **Repair details** | Customer info, device list, and delivery preferences |
+| **Terms of Service** | The full text of your terms, rendered with formatting (headings, lists, bold/italic text) |
+| **Agreement timestamp** | The date and time when the customer agreed to the terms |
+| **Customer signature** | The customer's electronic signature displayed as an image |
+
+<Note type="success" title="Improved Transparency">
+Previously, emails only stated "Customer has agreed to Terms of Service." Now, the actual terms content and signature are included, providing a complete record for both parties.
+</Note>
+
+### Terms of Service in Emails
+
+Your terms of service are rendered with full formatting support:
+
+- **Headings** for section titles
+- **Numbered and bulleted lists** for terms and conditions
+- **Bold, italic, and underlined text** for emphasis
+- Wrapped in a styled box for clear visual separation
+
+## Configuring Terms of Service
+
+Terms of service content is managed in your Weevio Cloud team settings. The same terms appear on the Customer Portal form and in email notifications.
+
+<Note type="info">
+Contact your Weevio Cloud administrator to update the terms of service text. Changes apply to all future repair form submissions.
+</Note>
+
+## Best Practices
+
+### For Your Terms of Service
+
+- **Keep it clear** — Use plain language that customers can understand quickly
+- **Use formatting** — Headings and lists make terms easier to scan
+- **Cover key points** — Include repair turnaround expectations, liability limitations, and data handling policies
+- **Review regularly** — Update terms when your policies change
+
+### For the Repair Form
+
+- **Test the flow** — Submit a test repair to verify the signature capture and email content
+- **Check email rendering** — Review how terms and signatures appear in the notification emails
+- **Mobile testing** — Ensure the signature canvas works well on phones and tablets

@@ -69,11 +69,23 @@ export const Documents: Paths[] = [
                     },
                 ],
             },
-            /*
             {
                 title: "Service Repair Orders",
-                href: "/sros",
+                href: "/service-repair-orders",
+                cardMeta: {
+                    description: "Track and manage service repair orders with streamlined device intake and status tracking."
+                },
+                items: [
+                    {
+                        title: "Pending SROs V2 — Scan-to-Receive",
+                        href: "/pending-sros-v2",
+                        cardMeta: {
+                            description: "Speed up device intake with barcode scanning, automatic SRO creation, and equipment tag printing."
+                        }
+                    },
+                ],
             },
+            /*
             {
                 title: "Customer Management",
                 href: "/customers",
@@ -333,6 +345,13 @@ export const Documents: Paths[] = [
                 href: "/repair-status-tracking",
                 cardMeta: {
                     description: "Let customers track their repair progress via a unique link or QR code — no login required."
+                }
+            },
+            {
+                title: "Bulk Repair Form",
+                href: "/bulk-repair-form",
+                cardMeta: {
+                    description: "Let customers submit multiple devices for repair with e-signature capture and terms of service agreement."
                 }
             },
         ],

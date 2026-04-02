@@ -1,0 +1,191 @@
+---
+title: Pending SROs V2 — Scan-to-Receive
+description: Speed up device intake with barcode scanning, automatic SRO creation, customer verification, and equipment tag printing.
+keywords: ["pending SROs", "scan to receive", "barcode scanning", "device intake", "SRO creation", "equipment tags"]
+---
+
+Pending SROs V2 replaces the original pending SRO workflow with a faster, scan-driven device intake process. Staff can scan device serial numbers to instantly create SROs in PIMS, verify customers, and print equipment tags — all from a single screen.
+
+<Note type="warning">
+This feature is in **Early Access**. You must enable it in Settings before it becomes available.
+</Note>
+
+## Enabling the Feature
+
+<Step>
+  <StepItem title="Open General Settings">
+    Navigate to **Settings** → **General Settings** in Weevio Cloud.
+  </StepItem>
+  <StepItem title="Find Early Access">
+    Scroll to the **Pending SROs** section.
+  </StepItem>
+  <StepItem title="Enable Pending SROs V2">
+    Toggle on **"Pending SROs V2 (Scan-to-Receive Workflow)"**.
+  </StepItem>
+  <StepItem title="Refresh the Page">
+    A notification will prompt you to refresh. Refresh your browser for the changes to take effect.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - General Settings > Early Access section with the Pending SROs V2 toggle */}
+
+## Batch List View
+
+When you open Pending SROs, you see a list of all pending repair batches. Each batch represents a group of devices submitted by a customer (typically through the Customer Portal bulk repair form).
+
+### What You See
+
+Each batch row displays:
+
+| Column | Description |
+|--------|-------------|
+| **Confirmation** | The repair confirmation number |
+| **Customer** | Contact name (with a checkmark if verified in PIMS) |
+| **Company** | Company name |
+| **Email** | Customer email |
+| **Phone** | Customer phone number |
+| **Date** | When the batch was created |
+| **Devices** | Number of devices in the batch |
+| **Progress** | Visual chip showing batch status |
+
+{/* TODO: Screenshot - Batch list view showing several batches with progress chips */}
+
+### Batch Progress States
+
+- **Not Started** — No devices have been received yet
+- **Partially Received** — Some devices received, others still pending
+- **Fully Received** — All devices in the batch have been received
+
+### Searching and Filtering
+
+Use the search toolbar to find batches by serial number, customer name, or confirmation number. You can also filter by batch status using the **Active** and **Canceled** tabs.
+
+### Canceling and Restoring Batches
+
+- Click the cancel icon on a batch row to move it to the **Canceled** tab
+- Canceled batches can be restored using the restore icon in the Canceled tab
+
+## Batch Check-In Workflow
+
+Click any batch to open the check-in view, where you receive devices one at a time.
+
+{/* TODO: Screenshot - Batch check-in view showing scan input, activity feed, and progress bar */}
+
+### Customer Verification
+
+Before receiving devices, verify the customer in PIMS. The system automatically searches for matching PIMS records based on the customer's name, email, or customer code from the repair form.
+
+<Step>
+  <StepItem title="Review Suggested Matches">
+    The verification modal shows PIMS customers that match the batch's contact information. Customers who submitted the form while signed in are labeled **"Signed-In"**.
+  </StepItem>
+  <StepItem title="Select the Customer">
+    Click the correct customer record and then click **Confirm** to link them to the batch.
+  </StepItem>
+  <StepItem title="Or Search Manually">
+    If no match appears, switch to the **Search Customers** tab to find the customer by name or code.
+  </StepItem>
+</Step>
+
+<Note type="info">
+You can change the verified customer at any time before receiving the first device. After a device is received, the customer link is locked.
+</Note>
+
+{/* TODO: Screenshot - Customer verification modal with matching records tab */}
+
+### Selecting the SRO Status
+
+Before scanning, choose which SRO status to assign to newly created SROs using the dropdown at the top of the scan panel. Click **Save as Default** to remember your preferred status for future sessions.
+
+### Scanning Devices
+
+The scan input field is the core of the workflow. It accepts serial numbers from a barcode scanner or manual keyboard entry.
+
+<Step>
+  <StepItem title="Scan or Type a Serial Number">
+    Place your cursor in the scan field (it auto-focuses when you open the page). Scan a barcode or type a serial number and press **Enter** or **Tab**.
+  </StepItem>
+  <StepItem title="SRO Created Automatically">
+    The system creates an SRO in PIMS for the scanned device. A success entry appears in the activity feed showing the assigned SRO number.
+  </StepItem>
+  <StepItem title="Review the Activity Feed">
+    The right panel shows your last 20 scan results with serial number, device type, SRO number, timestamp, and success/error status.
+  </StepItem>
+  <StepItem title="Repeat Until Complete">
+    Continue scanning devices. The progress bar at the top updates as each device is received.
+  </StepItem>
+</Step>
+
+### Handling Errors and Duplicates
+
+- **Duplicate serial numbers** — If a serial number already exists in PIMS, you'll see a warning with the option to **force-receive** the device
+- **Processing timeout** — If SRO creation takes longer than 10 seconds, a **Cancel** button appears so you can abort and retry
+- **Failed scans** — Error details appear in the activity feed with a red indicator
+
+### Equipment Tag Printing
+
+Print equipment tags for each received device to attach to the physical unit.
+
+- **On-demand printing** — Click the print icon next to any received device
+- **Auto-print** — Toggle on **Auto-Print** in the scan panel to automatically print a tag after each successful scan
+
+Each tag includes: SRO number, serial number, customer name, device type, and date.
+
+{/* TODO: Screenshot - Equipment tag example showing printed label content */}
+
+## Device Table
+
+Below the scan controls, the full device table shows all devices in the batch with their current status.
+
+| Column | Description |
+|--------|-------------|
+| **Serial Number** | The device serial number |
+| **Device Type** | Type of device |
+| **SRO Number** | Assigned SRO number (after receiving) |
+| **Status** | Pending or Received |
+
+<Note type="info">
+Serial numbers for pending devices can be edited before the device is received, in case the original submission contained a typo.
+</Note>
+
+## Best Practices
+
+### For Efficient Device Intake
+
+- **Use a barcode scanner** — Much faster than manual serial entry for high-volume intake
+- **Enable auto-print** — Eliminates the extra step of printing tags after each scan
+- **Set a default SRO status** — Save your most common status to avoid re-selecting it each session
+- **Verify the customer first** — Always verify before scanning to ensure SROs are linked to the correct PIMS customer
+
+### For Batch Management
+
+- **Process batches promptly** — Receive devices soon after the customer submits them
+- **Use search** — Quickly locate specific batches by serial number or customer name
+- **Check progress chips** — At a glance, see which batches need attention
+
+## Troubleshooting
+
+### Feature Not Appearing
+
+- Confirm **Pending SROs V2** is enabled in Settings → General Settings → Early Access
+- Refresh your browser after enabling the feature
+- Check that you have the correct permissions in Weevio Cloud
+
+### Scan Not Creating SRO
+
+- Verify the customer is linked to the batch before scanning
+- Check that the serial number matches a pending device in the batch
+- Ensure your PIMS system is online and accessible
+- Look at the activity feed for specific error messages
+
+### Equipment Tags Not Printing
+
+- Check that your browser allows pop-ups for the Weevio Cloud domain
+- Verify your printer is connected and online
+- Try printing a single tag manually before enabling auto-print
+
+### Customer Not Found in Verification
+
+- Use the **Search Customers** tab to search by different criteria
+- Verify the customer exists in your PIMS system
+- Check for spelling differences between the repair form submission and PIMS records
