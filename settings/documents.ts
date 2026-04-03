@@ -329,6 +329,13 @@ export const Documents: Paths[] = [
         href: "/customer-portal",
         items: [
             {
+                title: "SRO Approval Workflow",
+                href: "/sro-approval",
+                cardMeta: {
+                    description: "Let customers approve or decline repair orders directly from the Customer Portal, with optional payment integration."
+                }
+            },
+            {
                 title: "Payments",
                 href: "/payments",
                 cardMeta: {

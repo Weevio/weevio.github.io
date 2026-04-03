@@ -1,0 +1,132 @@
+---
+title: SRO Approval Workflow
+description: Let customers approve or decline repair orders directly from the Customer Portal, with optional payment integration.
+keywords: ["SRO", "approval", "decline", "repair orders", "customer portal", "action required", "payment", "workflow"]
+---
+
+The SRO Approval Workflow allows your customers to review, approve, or decline repair orders (SROs) directly from the Customer Portal. When enabled, customers see an **Action Required** tab on their Repairs page listing all SROs awaiting their decision. After approval, customers can be directed to pay online before work begins.
+
+## How It Works
+
+When a repair reaches the "Awaiting Customer Approval" status in PIMS, it appears in the customer's **Action Required** tab in the Customer Portal. The customer can then approve or decline the repair — individually or in bulk.
+
+<Mermaid
+  chart={`graph TD;
+    A[SRO reaches Awaiting Approval status] --> B[Customer sees repair in Action Required tab];
+    B --> C{Customer decision};
+    C -->|Approve| D{Payment required?};
+    C -->|Decline| E[Status set to Declined — technician notified];
+    D -->|Yes| F[Status set to Awaiting Payment];
+    F --> G[Customer directed to Payments page];
+    G --> H[Customer pays via Stripe];
+    H --> I[Status set to Paid & Approved];
+    D -->|No| J[Status set to Approved — technician notified];`}
+/>
+
+## Repairs Page Tabs
+
+When the approval workflow is enabled, the Repairs page displays four tabs:
+
+| Tab | Description |
+|:----|:------------|
+| **Open** | All currently open repairs |
+| **Action Required** | Repairs awaiting customer approval or payment. Displays a notification badge when items need attention. |
+| **Closed** | Completed or cancelled repairs |
+| **All Repairs** | Every repair regardless of status |
+
+The **Action Required** tab shows color-coded status indicators for each repair:
+
+| Status | Color |
+|:-------|:------|
+| Awaiting Customer Approval | Orange |
+| Awaiting Customer Payment | Blue |
+| Approved | Green |
+| Declined | Red |
+
+## Approving and Declining Repairs
+
+### Single Repair
+
+From the repair detail view, two action buttons appear for any repair in an actionable status:
+
+- **Approve Repair** — Approves the repair. If payment is required, a dialog prompts the customer to proceed to the Payments page.
+- **Decline Repair** — Opens a confirmation dialog. Once confirmed, the repair is declined and the assigned technician is notified.
+
+{/* TODO: Screenshot - Repair detail view showing the Approve Repair and Decline Repair buttons */}
+
+### Bulk Actions
+
+From the **Action Required** tab, customers can select multiple repairs using checkboxes and use the bulk action buttons:
+
+- **Approve Selected** — Approves all selected repairs at once (up to 20 per action)
+- **Decline Selected** — Declines all selected repairs after confirmation
+
+<Note type="info">
+Bulk actions process up to 20 repairs per request. If a customer has more than 20 repairs to approve, they can approve them in batches.
+</Note>
+
+{/* TODO: Screenshot - Action Required tab showing checkbox selection with Approve Selected and Decline Selected buttons */}
+
+## Post-Approval Payment Flow
+
+When a customer approves a repair that requires payment, a **"Thank you for approving!"** dialog appears with a summary of how many repairs were approved and how many require payment.
+
+The dialog offers two options:
+
+- **Stay Here** — Remain on the Repairs page
+- **Go to Payments** — Navigate to the Payments page with the approved repairs pre-selected for checkout
+
+On the Payments page, the approved repairs that require payment are automatically selected, and the payment dialog opens so the customer can complete checkout immediately.
+
+<Note type="info">
+**Terms customers** (customers with payment terms such as Net 30, On Account, or Invoice) are automatically approved without requiring upfront payment, regardless of the payment requirement setting. Their repairs move directly to the "Approved" status.
+</Note>
+
+{/* TODO: Screenshot - Post-approval dialog showing the approval summary and Go to Payments button */}
+
+## Zero-Cost Repairs
+
+Repairs with a $0 estimate are approved immediately without requiring payment, even when payment is normally required. These repairs transition directly to the "Approved" status.
+
+## Admin Configuration
+
+The approval workflow is configured in the **Weevio Cloud** admin panel under **Settings > Customer Portal**.
+
+### Enabling the Feature
+
+Toggle **Enable customers to approve SROs** to activate the approval workflow for your Customer Portal.
+
+### Workflow Settings
+
+| Setting | Description | Default |
+|:--------|:------------|:--------|
+| **Awaiting Approval Status** | The PIMS status that triggers a repair to appear in the Action Required tab | Awaiting Customer Approval |
+| **Awaiting Payment Status** | The status assigned after approval when payment is required | Awaiting Customer Payment |
+| **Approved Status** | The status assigned after approval when no payment is needed (or for terms customers) | Approved |
+| **Declined Status** | The status assigned when a customer declines a repair | Declined |
+| **Paid & Approved Status** | The status assigned after both approval and payment are complete | Customer Paid & Approved |
+| **Require Payment for Approval** | When enabled, non-terms customers must pay after approving before work begins | Enabled |
+
+<Note type="warning">
+The status values configured here must match the statuses defined in your PIMS system. If they don't match, repairs may not appear correctly in the Customer Portal.
+</Note>
+
+{/* TODO: Screenshot - Admin panel showing the approval workflow configuration settings */}
+
+### Terms Customer Detection
+
+Customers are automatically identified as "terms customers" based on their **Default Payment Type** field in PIMS. The following payment types are recognized:
+
+- **Terms**
+- **Net** (e.g., Net 30, Net 60)
+- **On Account**
+- **Invoice**
+- **Bill Me**
+
+Terms customers skip the payment step entirely — their approved repairs move directly to the "Approved" status since they are invoiced on account.
+
+## Related Features
+
+- [Payments](/docs/customer-portal/payments) — Process repair deposit payments through the Customer Portal
+- [Repair Status Tracking](/docs/customer-portal/repair-status-tracking) — Let customers track repair progress via a unique link
+- [E-Signature & Terms of Service](/docs/customer-portal/e-signature) — Collect digital signatures on repair terms
