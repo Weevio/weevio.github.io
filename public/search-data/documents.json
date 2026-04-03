@@ -1,5 +1,35 @@
 [
   {
+    "slug": "/customer-portal/e-signature",
+    "title": "E-Signature & Terms of Service",
+    "description": "Customers sign a digital signature and agree to your terms of service before submitting a bulk repair request through the Customer Portal.",
+    "content": "When customers submit a bulk repair request through the Customer Portal, they are required to review your terms of service, agree to them, and provide a digital signature before the form can be submitted. This ensures clear acknowledgment of repair terms and creates a verifiable record for your business.\n\n## How It Works\n\n### Customer Experience\n\n{/* TODO: Screenshot - Customer Portal terms step showing the signature pad and \"I agree\" checkbox */}\n\n## Validation\n\nBoth the agreement checkbox and the signature are required:\n\n| Field | Requirement | Error if Missing |\n|-------|------------|------------------|\n| Terms agreement checkbox | Must be checked | Checkbox highlights in red with error message |\n| Signature pad | Must contain a signature | Pad border turns red with \"Please provide your signature\" message |\n\nThe form cannot be submitted until both validations pass.\n\n## Email Notifications\n\nAfter a bulk repair request is submitted, notification emails now include the full terms of service content along with the customer's signature. Previously, emails only stated \"Customer has agreed to Terms of Service\" without showing the actual terms.\n\n**Emails now include:**\n\n* The complete terms of service text (with all formatting preserved)\n* The date and time the customer agreed\n* The customer's signature image\n\nThis provides a complete record for both your team and the customer.\n\n## Signature Data\n\n* Signatures are captured as images and stored alongside the repair request\n* The signature is linked to the specific terms content the customer reviewed\n* Data is stored securely and associated with the pending SRO record\n\n## Configuration\n\nNo additional configuration is required. The e-signature and terms display activate automatically when your shop has terms of service content configured.\n\nTo update your terms of service content, edit the terms in your account settings. Changes apply to all future repair submissions — existing signed agreements retain the original terms content.\n",
+    "_searchMeta": {
+      "cleanContent": "when customers submit a bulk repair request through the customer portal they are required to review your terms of service agree to them and provide a digital signature before the form can be submitted this ensures clear acknowledgment of repair terms and creates a verifiable record for your business how it works customer experience todo: screenshot - customer portal terms step showing the signature pad and i agree checkbox validation both the agreement checkbox and the signature are required: field requirement error if missing------- ------------ ------------------terms agreement checkbox must be checked checkbox highlights in red with error messagesignature pad must contain a signature pad border turns red with please provide your signature message the form cannot be submitted until both validations pass email notifications after a bulk repair request is submitted notification emails now include the full terms of service content along with the customer s signature previously emails only stated customer has agreed to terms of service without showing the actual terms emails now include: the complete terms of service text with all formatting preserved the date and time the customer agreed the customer s signature image this provides a complete record for both your team and the customer signature data signatures are captured as images and stored alongside the repair request the signature is linked to the specific terms content the customer reviewed data is stored securely and associated with the pending sro record configuration no additional configuration is required the e-signature and terms display activate automatically when your shop has terms of service content configured to update your terms of service content edit the terms in your account settings changes apply to all future repair submissions existing signed agreements retain the original terms content",
+      "headings": [
+        "How It Works",
+        "Validation",
+        "Email Notifications",
+        "Signature Data",
+        "Configuration"
+      ],
+      "keywords": [
+        "e-signature",
+        "terms of service",
+        "digital signature",
+        "bulk repair",
+        "customer portal",
+        "repair form",
+        "How It Works",
+        "Validation",
+        "Email Notifications",
+        "Signature Data",
+        "Configuration",
+        "Emails now include:"
+      ]
+    }
+  },
+  {
     "slug": "/customer-portal",
     "title": "Customer Portal",
     "description": "Self-service tools that let your customers track repairs, view orders, and manage their account — all branded with your business identity.",
@@ -3296,6 +3326,57 @@
         "Permissions",
         "[Customer Management](/docs/store/orders/customer-management)",
         "[Line Items](/docs/store/orders/line-items)"
+      ]
+    }
+  },
+  {
+    "slug": "/store/pending-sros-v2",
+    "title": "Pending SROs V2: Scan-to-Receive",
+    "description": "Receive repair devices quickly with barcode scanning, automatic SRO creation, customer verification, and equipment tag printing.",
+    "content": "Pending SROs V2 introduces a streamlined scan-to-receive workflow for processing incoming repair devices. Scan serial numbers to automatically create SROs in PIMS, verify customers, and print equipment tags — all from a single screen.\n\n## Batch List\n\nThe main view displays all pending repair batches in a sortable, paginated table.\n\n{/* TODO: Screenshot - Batch list view showing active batches with progress indicators */}\n\n**Each batch shows:**\n\n* Confirmation number\n* Customer name (with a verification badge if confirmed in PIMS)\n* Company name, email, and phone\n* Submission date\n* Device count\n* Progress indicator showing how many devices have been received\n\n**Filtering:**\n\n* **Active tab** — batches awaiting processing (default view)\n* **Canceled tab** — batches that have been canceled (can be restored)\n\nClick any batch row to open its detail view.\n\n## Receiving Devices\n\n### Step 1: Verify Customer\n\nBefore receiving devices, you must verify the customer in PIMS. This links all SROs created during the batch to the correct customer record.\n\n{/* TODO: Screenshot - Customer verification modal with matching records tab */}\n\n### Step 2: Configure Scan Settings\n\nBefore scanning, configure your preferences:\n\n* **SRO Status** — Select the default status for newly created SROs from the dropdown. Click **\"Save as Default\"** to remember your choice for future sessions.\n* **Auto-Print** — Toggle on to automatically print an equipment tag after each successful scan.\n\n### Step 3: Scan Devices\n\n{/* TODO: Screenshot - Scan-to-receive panel with scan input, status selector, and recent activity feed */}\n\n### Recent Activity Feed\n\nA scrollable log on the right side of the scan panel shows your last 20 scan results in real time. Each entry displays:\n\n* Serial number and assigned SRO number\n* Device type\n* Relative timestamp (\"just now\", \"2 min ago\")\n* Success or error indicator\n\n## Device Table\n\nThe batch detail view includes a table of all devices with their current status:\n\n| Status | Icon | Description |\n|--------|------|-------------|\n| Pending | Grey circle | Awaiting SRO assignment |\n| Received | Green checkmark | SRO created successfully |\n| Canceled | Ban icon | Device removed from batch |\n\n**Table features:**\n\n* **Inline serial editing** — Edit serial numbers directly in the table before a device is received\n* **SRO links** — Click any SRO number to open its detail page in PIMS\n* **Print tags** — Reprint equipment tags for any received device\n* **Expandable rows** — View additional details like passwords, repair notes, and symptom descriptions\n* **Visual feedback** — Recently received devices flash green briefly for confirmation\n\nDevices are sorted by status: pending devices appear first, then received, then canceled.\n\n## Equipment Tags\n\nEquipment tags can be printed for each received device. Tags display:\n\n* SRO number\n* Serial number\n* Customer name\n* Device type\n* Date received\n\n**Printing options:**\n\n* **Auto-print** — Enable the toggle in the scan panel to print automatically after each successful scan\n* **Manual print** — Click the print icon next to any received device in the table\n\n## Batch Management\n\n* **Cancel a batch** — Click the cancel icon (red X) on the batch list. Canceled batches move to the \"Canceled\" tab.\n* **Restore a batch** — Open the \"Canceled\" tab and restore any previously canceled batch.\n* **Progress tracking** — Summary chips at the top of the batch detail show pending and received device counts, updating in real time as you scan.\n\n## Workflow Summary\n",
+    "_searchMeta": {
+      "cleanContent": "pending sros v2 introduces a streamlined scan-to-receive workflow for processing incoming repair devices scan serial numbers to automatically create sros in pims verify customers and print equipment tags all from a single screen batch list the main view displays all pending repair batches in a sortable paginated table todo: screenshot - batch list view showing active batches with progress indicators each batch shows: confirmation number customer name with a verification badge if confirmed in pims company name email and phone submission date device count progress indicator showing how many devices have been received filtering: active tab batches awaiting processing default view canceled tab batches that have been canceled can be restored click any batch row to open its detail view receiving devices step 1: verify customer before receiving devices you must verify the customer in pims this links all sros created during the batch to the correct customer record todo: screenshot - customer verification modal with matching records tab step 2: configure scan settings before scanning configure your preferences: sro status select the default status for newly created sros from the dropdown click save as default to remember your choice for future sessions auto-print toggle on to automatically print an equipment tag after each successful scan step 3: scan devices todo: screenshot - scan-to-receive panel with scan input status selector and recent activity feed recent activity feed a scrollable log on the right side of the scan panel shows your last 20 scan results in real time each entry displays: serial number and assigned sro number device type relative timestamp just now 2 min ago success or error indicator device table the batch detail view includes a table of all devices with their current status: status icon description-------- ------ -------------pending grey circle awaiting sro assignmentreceived green checkmark sro created successfullycanceled ban icon device removed from batch table features: inline serial editing edit serial numbers directly in the table before a device is received sro links click any sro number to open its detail page in pims print tags reprint equipment tags for any received device expandable rows view additional details like passwords repair notes and symptom descriptions visual feedback recently received devices flash green briefly for confirmation devices are sorted by status: pending devices appear first then received then canceled equipment tags equipment tags can be printed for each received device tags display: sro number serial number customer name device type date received printing options: auto-print enable the toggle in the scan panel to print automatically after each successful scan manual print click the print icon next to any received device in the table batch management cancel a batch click the cancel icon red x on the batch list canceled batches move to the canceled tab restore a batch open the canceled tab and restore any previously canceled batch progress tracking summary chips at the top of the batch detail show pending and received device counts updating in real time as you scan workflow summary",
+      "headings": [
+        "Batch List",
+        "Receiving Devices",
+        "Device Table",
+        "Equipment Tags",
+        "Batch Management",
+        "Workflow Summary"
+      ],
+      "keywords": [
+        "pending SROs",
+        "scan to receive",
+        "barcode scanning",
+        "SRO",
+        "service repair order",
+        "equipment tag",
+        "device receiving",
+        "Batch List",
+        "Receiving Devices",
+        "Device Table",
+        "Equipment Tags",
+        "Batch Management",
+        "Workflow Summary",
+        "Each batch shows:",
+        "Filtering:",
+        "Active tab",
+        "Canceled tab",
+        "SRO Status",
+        "\"Save as Default\"",
+        "Auto-Print",
+        "Table features:",
+        "Inline serial editing",
+        "SRO links",
+        "Print tags",
+        "Expandable rows",
+        "Visual feedback",
+        "Printing options:",
+        "Auto-print",
+        "Manual print",
+        "Cancel a batch",
+        "Restore a batch",
+        "Progress tracking"
       ]
     }
   }

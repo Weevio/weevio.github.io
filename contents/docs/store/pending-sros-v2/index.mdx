@@ -1,0 +1,147 @@
+---
+title: "Pending SROs V2: Scan-to-Receive"
+description: Receive repair devices quickly with barcode scanning, automatic SRO creation, customer verification, and equipment tag printing.
+keywords: ["pending SROs", "scan to receive", "barcode scanning", "SRO", "service repair order", "equipment tag", "device receiving"]
+---
+
+Pending SROs V2 introduces a streamlined scan-to-receive workflow for processing incoming repair devices. Scan serial numbers to automatically create SROs in PIMS, verify customers, and print equipment tags — all from a single screen.
+
+<Note type="warning">
+This feature is in **Early Access**. To enable it, go to **Settings → General Settings → Early Access** and toggle on **"Pending SROs V2 (Scan-to-Receive Workflow)"**. A page refresh is required after enabling.
+</Note>
+
+## Batch List
+
+The main view displays all pending repair batches in a sortable, paginated table.
+
+{/* TODO: Screenshot - Batch list view showing active batches with progress indicators */}
+
+**Each batch shows:**
+
+- Confirmation number
+- Customer name (with a verification badge if confirmed in PIMS)
+- Company name, email, and phone
+- Submission date
+- Device count
+- Progress indicator showing how many devices have been received
+
+**Filtering:**
+
+- **Active tab** — batches awaiting processing (default view)
+- **Canceled tab** — batches that have been canceled (can be restored)
+
+Click any batch row to open its detail view.
+
+## Receiving Devices
+
+### Step 1: Verify Customer
+
+Before receiving devices, you must verify the customer in PIMS. This links all SROs created during the batch to the correct customer record.
+
+<Step>
+  <StepItem title="Open Customer Verification">
+    Click **"Verify Customer"** in the batch detail view. A modal opens with two tabs.
+  </StepItem>
+  <StepItem title="Find the Customer">
+    - **Matching Records** — Shows customers that automatically match the batch's contact information
+    - **Search Customers** — Search PIMS manually by name or customer code
+  </StepItem>
+  <StepItem title="Confirm Selection">
+    Select the correct customer and click **Confirm**. You can change the verified customer later if needed (only before any devices are received).
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Customer verification modal with matching records tab */}
+
+### Step 2: Configure Scan Settings
+
+Before scanning, configure your preferences:
+
+- **SRO Status** — Select the default status for newly created SROs from the dropdown. Click **"Save as Default"** to remember your choice for future sessions.
+- **Auto-Print** — Toggle on to automatically print an equipment tag after each successful scan.
+
+### Step 3: Scan Devices
+
+<Step>
+  <StepItem title="Scan or Type Serial Number">
+    Place your cursor in the scan input field (it auto-focuses for continuous scanning). Scan a barcode or type a serial number and press **Enter** or **Tab**.
+  </StepItem>
+  <StepItem title="Review Feedback">
+    Each scan produces immediate feedback:
+
+    - **Success** — Shows the generated SRO number. The device moves to "Received" status in the table.
+    - **Duplicate Warning** — Alerts you if an open SRO already exists for this serial. You can choose to force-create a new SRO if needed.
+    - **Error** — Displays the error message. The scan input resets for the next attempt.
+  </StepItem>
+  <StepItem title="Continue Scanning">
+    The input field clears and refocuses automatically after each scan, allowing rapid batch processing without clicking.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Scan-to-receive panel with scan input, status selector, and recent activity feed */}
+
+### Recent Activity Feed
+
+A scrollable log on the right side of the scan panel shows your last 20 scan results in real time. Each entry displays:
+
+- Serial number and assigned SRO number
+- Device type
+- Relative timestamp ("just now", "2 min ago")
+- Success or error indicator
+
+## Device Table
+
+The batch detail view includes a table of all devices with their current status:
+
+| Status | Icon | Description |
+|--------|------|-------------|
+| Pending | Grey circle | Awaiting SRO assignment |
+| Received | Green checkmark | SRO created successfully |
+| Canceled | Ban icon | Device removed from batch |
+
+**Table features:**
+
+- **Inline serial editing** — Edit serial numbers directly in the table before a device is received
+- **SRO links** — Click any SRO number to open its detail page in PIMS
+- **Print tags** — Reprint equipment tags for any received device
+- **Expandable rows** — View additional details like passwords, repair notes, and symptom descriptions
+- **Visual feedback** — Recently received devices flash green briefly for confirmation
+
+Devices are sorted by status: pending devices appear first, then received, then canceled.
+
+## Equipment Tags
+
+Equipment tags can be printed for each received device. Tags display:
+
+- SRO number
+- Serial number
+- Customer name
+- Device type
+- Date received
+
+**Printing options:**
+
+- **Auto-print** — Enable the toggle in the scan panel to print automatically after each successful scan
+- **Manual print** — Click the print icon next to any received device in the table
+
+## Batch Management
+
+- **Cancel a batch** — Click the cancel icon (red X) on the batch list. Canceled batches move to the "Canceled" tab.
+- **Restore a batch** — Open the "Canceled" tab and restore any previously canceled batch.
+- **Progress tracking** — Summary chips at the top of the batch detail show pending and received device counts, updating in real time as you scan.
+
+## Workflow Summary
+
+<Mermaid
+  chart={`graph TD;
+    A[Open Pending SROs V2] --> B[Select a Batch];
+    B --> C{Customer Verified?};
+    C -->|No| D[Verify Customer in PIMS];
+    D --> E[Set SRO Status & Auto-Print];
+    C -->|Yes| E;
+    E --> F[Scan Device Serial Numbers];
+    F --> G[SRO Created Automatically];
+    G --> H{More Devices?};
+    H -->|Yes| F;
+    H -->|No| I[Review & Print Tags];`}
+/>

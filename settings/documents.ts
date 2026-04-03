@@ -69,6 +69,13 @@ export const Documents: Paths[] = [
                     },
                 ],
             },
+            {
+                title: "Pending SROs V2",
+                href: "/pending-sros-v2",
+                cardMeta: {
+                    description: "Receive repair devices with barcode scanning, automatic SRO creation, customer verification, and equipment tag printing."
+                }
+            },
             /*
             {
                 title: "Service Repair Orders",
@@ -333,6 +340,13 @@ export const Documents: Paths[] = [
                 href: "/repair-status-tracking",
                 cardMeta: {
                     description: "Let customers track their repair progress via a unique link or QR code — no login required."
+                }
+            },
+            {
+                title: "E-Signature & Terms of Service",
+                href: "/e-signature",
+                cardMeta: {
+                    description: "Customers sign digitally and agree to your terms of service before submitting a bulk repair request."
                 }
             },
         ],

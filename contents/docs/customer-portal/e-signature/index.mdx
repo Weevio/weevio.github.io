@@ -1,0 +1,72 @@
+---
+title: E-Signature & Terms of Service
+description: Customers sign a digital signature and agree to your terms of service before submitting a bulk repair request through the Customer Portal.
+keywords: ["e-signature", "terms of service", "digital signature", "bulk repair", "customer portal", "repair form"]
+---
+
+When customers submit a bulk repair request through the Customer Portal, they are required to review your terms of service, agree to them, and provide a digital signature before the form can be submitted. This ensures clear acknowledgment of repair terms and creates a verifiable record for your business.
+
+## How It Works
+
+### Customer Experience
+
+<Step>
+  <StepItem title="Complete Repair Details">
+    The customer fills in device information and contact details in the earlier steps of the bulk repair form.
+  </StepItem>
+  <StepItem title="Review Terms of Service">
+    On the final step, the customer sees your shop's terms of service displayed in full. The terms are rendered with formatting (headings, paragraphs, numbered lists, bold/italic text) exactly as configured in your account settings.
+  </StepItem>
+  <StepItem title="Agree to Terms">
+    The customer checks the **"I agree"** checkbox to acknowledge the terms. This checkbox is required — the form cannot be submitted without it.
+  </StepItem>
+  <StepItem title="Provide Signature">
+    A digital signature pad appears below the terms. The customer draws their signature directly on the pad using a mouse, trackpad, or finger on touch devices.
+
+    If the signature needs to be redone, clicking **"Clear Signature"** resets the pad.
+  </StepItem>
+  <StepItem title="Submit">
+    Once the terms are agreed to and a signature is provided, the customer clicks **Submit** to complete the repair request.
+  </StepItem>
+</Step>
+
+{/* TODO: Screenshot - Customer Portal terms step showing the signature pad and "I agree" checkbox */}
+
+## Validation
+
+Both the agreement checkbox and the signature are required:
+
+| Field | Requirement | Error if Missing |
+|-------|------------|------------------|
+| Terms agreement checkbox | Must be checked | Checkbox highlights in red with error message |
+| Signature pad | Must contain a signature | Pad border turns red with "Please provide your signature" message |
+
+The form cannot be submitted until both validations pass.
+
+## Email Notifications
+
+After a bulk repair request is submitted, notification emails now include the full terms of service content along with the customer's signature. Previously, emails only stated "Customer has agreed to Terms of Service" without showing the actual terms.
+
+**Emails now include:**
+
+- The complete terms of service text (with all formatting preserved)
+- The date and time the customer agreed
+- The customer's signature image
+
+This provides a complete record for both your team and the customer.
+
+## Signature Data
+
+- Signatures are captured as images and stored alongside the repair request
+- The signature is linked to the specific terms content the customer reviewed
+- Data is stored securely and associated with the pending SRO record
+
+<Note type="info">
+The signature pad is responsive — it displays at a comfortable size on both desktop and mobile devices, ensuring customers can sign easily regardless of their device.
+</Note>
+
+## Configuration
+
+No additional configuration is required. The e-signature and terms display activate automatically when your shop has terms of service content configured.
+
+To update your terms of service content, edit the terms in your account settings. Changes apply to all future repair submissions — existing signed agreements retain the original terms content.
