@@ -111,6 +111,13 @@ export const Documents: Paths[] = [
                 },
                 items: [
                     {
+                        title: "Store Connection",
+                        href: "/store-connection",
+                        cardMeta: {
+                            description: "Connect your Shopify stores to Weevio Cloud using OAuth or legacy API credentials, and manage multi-store setups."
+                        }
+                    },
+                    {
                         title: "Widget",
                         href: "/widget",
                         cardMeta: {

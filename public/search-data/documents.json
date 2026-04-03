@@ -179,9 +179,9 @@
     "slug": "/integrations/shopify",
     "title": "Shopify Integration",
     "description": "Powerful Shopify integration with real-time inventory, intelligent shipping estimates, personalized recommendations, and seamless PIMS synchronization.",
-    "content": "The Weevio Shopify Integration connects your PIMS system and Shopify store into a unified commerce platform. It includes two major components:\n\n* **Widget** — A product page enhancement that provides real-time inventory visibility, shipping estimates, smart recommendations, B2B pricing, and more directly on your Shopify storefront.\n* **PIMS Sync** — A continuous background process that automatically synchronizes products, inventory levels, and orders between PIMS and Shopify.\n",
+    "content": "The Weevio Shopify Integration connects your PIMS system and Shopify store into a unified commerce platform. Start by connecting your store, then explore the two major feature areas:\n\n* **Store Connection** — Connect one or more Shopify stores to Weevio Cloud using OAuth (recommended) or legacy API credentials.\n* **Widget** — A product page enhancement that provides real-time inventory visibility, shipping estimates, smart recommendations, B2B pricing, and more directly on your Shopify storefront.\n* **PIMS Sync** — A continuous background process that automatically synchronizes products, inventory levels, and orders between PIMS and Shopify.\n",
     "_searchMeta": {
-      "cleanContent": "the weevio shopify integration connects your pims system and shopify store into a unified commerce platform it includes two major components: widget a product page enhancement that provides real-time inventory visibility shipping estimates smart recommendations b2b pricing and more directly on your shopify storefront pims sync a continuous background process that automatically synchronizes products inventory levels and orders between pims and shopify",
+      "cleanContent": "the weevio shopify integration connects your pims system and shopify store into a unified commerce platform start by connecting your store then explore the two major feature areas: store connection connect one or more shopify stores to weevio cloud using oauth recommended or legacy api credentials widget a product page enhancement that provides real-time inventory visibility shipping estimates smart recommendations b2b pricing and more directly on your shopify storefront pims sync a continuous background process that automatically synchronizes products inventory levels and orders between pims and shopify",
       "headings": [],
       "keywords": [
         "Shopify",
@@ -191,6 +191,7 @@
         "orders",
         "widget",
         "e-commerce",
+        "Store Connection",
         "Widget",
         "PIMS Sync"
       ]
@@ -336,6 +337,65 @@
         "<input name=\"attributes[po-number]\">",
         "dep-number",
         "<input name=\"attributes[dep-number]\">"
+      ]
+    }
+  },
+  {
+    "slug": "/integrations/shopify/store-connection",
+    "title": "Store Connection",
+    "description": "Connect your Shopify stores to Weevio Cloud using OAuth or legacy API credentials, and manage multi-store setups.",
+    "content": "Weevio Cloud supports two methods for connecting your Shopify store: **OAuth** (recommended) and **Legacy API Key/Password**. OAuth provides secure, automatic token management without exposing API credentials, and is the preferred method for all new connections.\n\n## Connection Methods\n\n| Feature | OAuth (Recommended) | Legacy API Key |\n|:--------|:-------------------:|:--------------:|\n| Security | Automatic token management | Manual credential management |\n| Setup | One-click authorization | Copy/paste API keys |\n| Multi-store | Fully supported | Single store only |\n| Credential rotation | Automatic | Manual |\n| Recommended for | All new connections | Existing setups only |\n\n## Connecting with OAuth\n\n<Note type=\"info\">\n  The OAuth connection is active immediately. No additional configuration is needed to start syncing inventory and orders.\n</Note>\n\n## Multi-Store Management\n\nOAuth enables connecting **multiple Shopify stores** to a single Weevio Cloud account. This is useful if you operate several Shopify storefronts that share the same PIMS backend.\n\nTo add additional stores, repeat the OAuth connection steps above for each store. Each connected store appears as its own status card showing:\n\n* **Store domain** and connection type\n* **Connected** timestamp\n* **OAuth scopes** granted to Weevio\n\nTo disconnect a store, click the **Disconnect** button on its status card and confirm in the dialog. Disconnecting revokes OAuth access and stops all syncing for that store.\n\n## Upgrading from Legacy API Key to OAuth\n\nIf you currently use a legacy API key/password connection, you can upgrade to OAuth for improved security and multi-store support.\n\n<Note type=\"note\">\n  Your existing legacy connection will continue to work until you explicitly upgrade or remove it. There is no deadline to migrate, but OAuth is recommended for all stores going forward.\n</Note>\n\n## OAuth Permissions\n\nDuring the OAuth flow, Weevio requests the following Shopify permissions:\n\n| Permission | Purpose |\n|:-----------|:--------|\n| `read_customers`, `write_customers` | Sync customer data between PIMS and Shopify |\n| `read_orders`, `write_orders` | Process and sync orders |\n| `read_fulfillments`, `write_fulfillments` | Manage order fulfillment and shipping |\n| `read_inventory`, `write_inventory` | Sync inventory levels from PIMS |\n| `read_products`, `write_products` | Sync product catalog |\n| `read_locations` | Access store location information for multi-location features |\n| `read_publications` | Determine product visibility on sales channels |\n\nThese permissions are automatically requested and granted during the authorization step. You do not need to configure them manually.\n\n## Troubleshooting\n\n### \"Please enter a valid Shopify domain\"\n\nEnsure your domain is in the format `yourstore.myshopify.com` or `yourstore.myshopify.io`. Do not include `https://`, trailing slashes, or your custom domain (e.g., `www.yourstore.com`).\n\n### OAuth authorization fails or times out\n\n* The authorization window is valid for 5 minutes. If it times out, start the process again.\n* Check that your browser is not blocking pop-ups or redirects.\n* Verify you have admin access to the Shopify store.\n\n### Store shows as disconnected after connecting\n\nThe OAuth token may have expired or been revoked in Shopify. Click **Add Shopify Store (OAuth)** again to reconnect.\n\n### \"Disable order sync before upgrading\" error\n\nWhen upgrading a legacy store to OAuth, you must first set the order sync setting to **Don't Sync Orders**. This prevents duplicate webhooks during the transition. Re-enable it after the upgrade completes.\n\n## Related\n\n* [Widget](/docs/integrations/shopify/widget) — Enhance your Shopify product pages with real-time inventory and shipping estimates\n* [PIMS Sync](/docs/integrations/shopify/pims-sync) — Automatic background synchronization of products, inventory, and orders\n",
+    "_searchMeta": {
+      "cleanContent": "weevio cloud supports two methods for connecting your shopify store: oauth recommended and legacy api key password oauth provides secure automatic token management without exposing api credentials and is the preferred method for all new connections connection methods feature oauth recommended legacy api key:-------- :-------------------: :--------------:security automatic token management manual credential managementsetup one-click authorization copy paste api keysmulti-store fully supported single store onlycredential rotation automatic manualrecommended for all new connections existing setups only connecting with oauth the oauth connection is active immediately no additional configuration is needed to start syncing inventory and orders multi-store management oauth enables connecting multiple shopify stores to a single weevio cloud account this is useful if you operate several shopify storefronts that share the same pims backend to add additional stores repeat the oauth connection steps above for each store each connected store appears as its own status card showing: store domain and connection type connected timestamp oauth scopes granted to weevio to disconnect a store click the disconnect button on its status card and confirm in the dialog disconnecting revokes oauth access and stops all syncing for that store upgrading from legacy api key to oauth if you currently use a legacy api key password connection you can upgrade to oauth for improved security and multi-store support your existing legacy connection will continue to work until you explicitly upgrade or remove it there is no deadline to migrate but oauth is recommended for all stores going forward oauth permissions during the oauth flow weevio requests the following shopify permissions: permission purpose:----------- :--------readcustomers writecustomers sync customer data between pims and shopifyreadorders writeorders process and sync ordersreadfulfillments writefulfillments manage order fulfillment and shippingreadinventory writeinventory sync inventory levels from pimsreadproducts writeproducts sync product catalogread_locations access store location information for multi-location featuresread_publications determine product visibility on sales channels these permissions are automatically requested and granted during the authorization step you do not need to configure them manually troubleshooting please enter a valid shopify domain ensure your domain is in the format yourstore myshopify com or yourstore myshopify io do not include https: trailing slashes or your custom domain e g www yourstore com oauth authorization fails or times out the authorization window is valid for 5 minutes if it times out start the process again check that your browser is not blocking pop-ups or redirects verify you have admin access to the shopify store store shows as disconnected after connecting the oauth token may have expired or been revoked in shopify click add shopify store oauth again to reconnect disable order sync before upgrading error when upgrading a legacy store to oauth you must first set the order sync setting to don t sync orders this prevents duplicate webhooks during the transition re-enable it after the upgrade completes related widget enhance your shopify product pages with real-time inventory and shipping estimates pims sync automatic background synchronization of products inventory and orders",
+      "headings": [
+        "Connection Methods",
+        "Connecting with OAuth",
+        "Multi-Store Management",
+        "Upgrading from Legacy API Key to OAuth",
+        "OAuth Permissions",
+        "Troubleshooting",
+        "Related"
+      ],
+      "keywords": [
+        "Shopify",
+        "OAuth",
+        "connect",
+        "multi-store",
+        "API key",
+        "authentication",
+        "integration",
+        "setup",
+        "Connection Methods",
+        "Connecting with OAuth",
+        "Multi-Store Management",
+        "Upgrading from Legacy API Key to OAuth",
+        "OAuth Permissions",
+        "Troubleshooting",
+        "Related",
+        "Legacy API Key/Password",
+        "multiple Shopify stores",
+        "Store domain",
+        "Connected",
+        "OAuth scopes",
+        "Disconnect",
+        "Add Shopify Store (OAuth)",
+        "Don't Sync Orders",
+        "read_customers",
+        "write_customers",
+        "read_orders",
+        "write_orders",
+        "read_fulfillments",
+        "write_fulfillments",
+        "read_inventory",
+        "write_inventory",
+        "read_products",
+        "write_products",
+        "read_locations",
+        "read_publications",
+        "yourstore.myshopify.com",
+        "yourstore.myshopify.io",
+        "https://",
+        "www.yourstore.com"
       ]
     }
   },
