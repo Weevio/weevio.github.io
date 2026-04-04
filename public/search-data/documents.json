@@ -160,6 +160,31 @@
     }
   },
   {
+    "slug": "/customer-portal/troubleshooting",
+    "title": "Troubleshooting",
+    "description": "Solutions for common Customer Portal access issues, including team not found errors and URL configuration problems.",
+    "content": "## Portal Access Issues\n\n### \"Team Not Found\" Error\n\nIf you or your customers see a **\"Customer Portal - Team Not Found\"** error when trying to access the portal, the teamID in the URL is either missing or invalid.\n\n{/* TODO: Screenshot - the \"Customer Portal - Team Not Found\" 404 error page */}\n\n### Portal Page Not Loading\n\nIf the portal URL is correct but the page does not load or shows a generic error:\n\n* **Check your internet connection** and try refreshing the page.\n* **Try a different browser** or open an incognito/private window to rule out extension or cache issues.\n* **Wait and retry** — if the system is temporarily unable to connect to the database, you will see a \"unable to retrieve team information\" message. This is usually resolved within a few minutes.\n",
+    "_searchMeta": {
+      "cleanContent": "portal access issues team not found error if you or your customers see a customer portal - team not found error when trying to access the portal the teamid in the url is either missing or invalid todo: screenshot - the customer portal - team not found 404 error page portal page not loading if the portal url is correct but the page does not load or shows a generic error: check your internet connection and try refreshing the page try a different browser or open an incognito private window to rule out extension or cache issues wait and retry if the system is temporarily unable to connect to the database you will see a unable to retrieve team information message this is usually resolved within a few minutes",
+      "headings": [
+        "Portal Access Issues"
+      ],
+      "keywords": [
+        "customer portal",
+        "troubleshooting",
+        "team not found",
+        "teamID",
+        "404 error",
+        "portal access",
+        "Portal Access Issues",
+        "\"Customer Portal - Team Not Found\"",
+        "Check your internet connection",
+        "Try a different browser",
+        "Wait and retry"
+      ]
+    }
+  },
+  {
     "slug": "/integrations",
     "title": "Integrations",
     "description": "Weevio Cloud integrates with PIMS, Shopify, GSX, and more.",
