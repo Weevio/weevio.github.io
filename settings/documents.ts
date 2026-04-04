@@ -349,6 +349,13 @@ export const Documents: Paths[] = [
                     description: "Customers sign digitally and agree to your terms of service before submitting a bulk repair request."
                 }
             },
+            {
+                title: "Troubleshooting",
+                href: "/troubleshooting",
+                cardMeta: {
+                    description: "Solutions for common portal access issues, including team not found errors and URL configuration."
+                }
+            },
         ],
     },
     /*

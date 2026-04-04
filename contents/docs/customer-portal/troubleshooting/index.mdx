@@ -1,0 +1,55 @@
+---
+title: Troubleshooting
+description: Solutions for common Customer Portal access issues, including team not found errors and URL configuration problems.
+keywords: ["customer portal", "troubleshooting", "team not found", "teamID", "404 error", "portal access"]
+---
+
+## Portal Access Issues
+
+### "Team Not Found" Error
+
+If you or your customers see a **"Customer Portal - Team Not Found"** error when trying to access the portal, the teamID in the URL is either missing or invalid.
+
+{/* TODO: Screenshot - the "Customer Portal - Team Not Found" 404 error page */}
+
+<Step>
+  <StepItem title="Check the URL format">
+    The Customer Portal URL must include a `teamID` query parameter that identifies your organization. Make sure the URL follows this format:
+
+    ```
+    https://your-domain.com/portal?teamID=your_company_name
+    ```
+
+    <Note type="warning">
+    The `teamID` parameter is **case-sensitive** and must match exactly how it was configured in the system.
+    </Note>
+  </StepItem>
+  <StepItem title="Verify the teamID value">
+    Confirm you are using the correct teamID for your organization. If you are unsure of the correct value, contact your system administrator.
+
+    Common mistakes:
+    - Extra spaces or special characters in the teamID
+    - Using an old or renamed teamID
+    - Copying the URL without the `?teamID=...` portion
+  </StepItem>
+  <StepItem title="Clear browser cookies">
+    The portal stores your team information in a browser cookie. If you previously accessed the portal with a different or invalid teamID, stale cookies may cause issues.
+
+    Clear your browser cookies for the portal site and try again. In most cases, the system automatically clears invalid cookies, but a manual clear can help if problems persist.
+  </StepItem>
+  <StepItem title="Contact support">
+    If you continue to see the error after verifying the URL and clearing cookies, there may be a configuration issue on the backend. Contact your administrator or Weevio support for assistance.
+  </StepItem>
+</Step>
+
+### Portal Page Not Loading
+
+If the portal URL is correct but the page does not load or shows a generic error:
+
+- **Check your internet connection** and try refreshing the page.
+- **Try a different browser** or open an incognito/private window to rule out extension or cache issues.
+- **Wait and retry** — if the system is temporarily unable to connect to the database, you will see a "unable to retrieve team information" message. This is usually resolved within a few minutes.
+
+<Note type="info">
+If your customers report portal access problems, share the direct portal link with the correct `teamID` parameter included. This is the most common fix for access issues.
+</Note>
